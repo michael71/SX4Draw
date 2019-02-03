@@ -805,7 +805,7 @@ public class SX4Draw extends Application {
         infoItem.setGraphic(ivInfo);
         infoItem.setOnAction((event) -> {
             System.out.println("info clicked");
-            Dialogs.InfoAlert("Info", "Draw2 (SX4Draw)\nhttps://opensx.net/sx4 ", "Programm Version:" + version, this);
+            Dialogs.InfoAlert("Info", "SX4Draw\nhttps://opensx.net/sx4 ", "Programm Version:" + version, this);
         });
 
         menuBar.getMenus().addAll(menu1, menuOptions, menuCalc, menuExtra, menuInfo);

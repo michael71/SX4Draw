@@ -1,0 +1,29 @@
+# NetBeans specific #
+manifest.mf
+build.xml
+.project
+manifest.mf
+paneldesc.xml
+build.xml
+.project
+.classpath
+nbproject
+packages/
+panel.xml.2019*
+hs_err*
+*.iml
+.idea/
+private/
+archiv/
+*.backup
+out/
+.attach*
+target/
+
+# Class Files #
+*.class
+
+# Package Files #
+*.war
+*.ear
+/dist/
