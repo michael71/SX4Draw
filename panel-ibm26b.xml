@@ -1,0 +1,246 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<layout-config filename="panel-ibm26b.xml" version="20190130_131733">
+<locolist name="noName">
+<loco adr="47" name="Diesel 6047" mass="3" vmax="30" />
+<loco adr="8" name="Penn Central 8800" mass="3" vmax="30" />
+<loco adr="15" name="CSX" mass="3" vmax="30" />
+<loco adr="64" name="Canada" mass="3" vmax="30" />
+<loco adr="42" name="CSX4223" mass="3" vmax="30" />
+<loco adr="82" name="CSX Transportation" mass="3" vmax="30" />
+<loco adr="9" name="Spokane Portland" mass="3" vmax="30" />
+<loco adr="23" name="Great Nothern 2320" mass="3" vmax="30" />
+<loco adr="18" name="Union Pacific" mass="3" vmax="30" />
+</locolist>
+<panel name="IBM2018/7" protocol="sx">
+<track x="430" y="10" x2="450" y2="30" />
+<track x="530" y="30" x2="570" y2="70" />
+<track x="420" y="30" x2="630" y2="30" />
+<track x="380" y="70" x2="420" y2="30" />
+<track x="290" y="140" x2="350" y2="70" />
+<track x="350" y="10" x2="430" y2="10" />
+<track x="350" y="70" x2="630" y2="70" />
+<track x="190" y="220" x2="190" y2="280" />
+<track x="170" y="280" x2="170" y2="240" />
+<track x="170" y="240" x2="210" y2="200" />
+<track x="210" y="180" x2="250" y2="220" />
+<track x="590" y="180" x2="850" y2="180" />
+<track x="670" y="220" x2="710" y2="180" />
+<track x="250" y="220" x2="330" y2="220" />
+<track x="670" y="180" x2="710" y2="220" />
+<track x="770" y="260" x2="890" y2="140" />
+<track x="650" y="140" x2="670" y2="120" />
+<track x="470" y="120" x2="530" y2="120" />
+<track x="670" y="120" x2="830" y2="120" />
+<track x="450" y="180" x2="550" y2="280" />
+<track x="490" y="180" x2="570" y2="260" />
+<track x="530" y="120" x2="590" y2="180" />
+<track x="490" y="140" x2="570" y2="220" />
+<track x="410" y="180" x2="450" y2="140" />
+<track x="550" y="280" x2="950" y2="280" />
+<track x="610" y="280" x2="630" y2="260" />
+<track x="570" y="260" x2="770" y2="260" />
+<track x="570" y="220" x2="810" y2="220" />
+<track x="10" y="160" x2="50" y2="120" />
+<track x="50" y="120" x2="190" y2="120" />
+<track x="10" y="200" x2="70" y2="140" />
+<track x="70" y="140" x2="290" y2="140" />
+<track x="190" y="120" x2="210" y2="140" />
+<track x="50" y="220" x2="110" y2="160" />
+<track x="110" y="160" x2="230" y2="160" />
+<track x="230" y="160" x2="250" y2="180" />
+<track x="90" y="240" x2="150" y2="180" />
+<track x="150" y="180" x2="490" y2="180" />
+<track x="170" y="200" x2="310" y2="200" />
+<track x="310" y="200" x2="330" y2="180" />
+<track x="370" y="180" x2="450" y2="100" />
+<track x="10" y="200" x2="10" y2="300" />
+<track x="30" y="280" x2="50" y2="260" />
+<track x="30" y="280" x2="30" y2="310" />
+<track x="30" y="330" x2="30" y2="560" />
+<track x="10" y="420" x2="30" y2="400" />
+<track x="10" y="420" x2="10" y2="560" />
+<track x="50" y="220" x2="50" y2="330" />
+<track x="50" y="350" x2="50" y2="480" />
+<track x="50" y="480" x2="110" y2="540" />
+<track x="70" y="560" x2="150" y2="560" />
+<track x="110" y="540" x2="340" y2="540" />
+<track x="360" y="540" x2="470" y2="540" />
+<track x="410" y="560" x2="430" y2="540" />
+<track x="370" y="560" x2="410" y2="560" />
+<track x="330" y="520" x2="370" y2="560" />
+<track x="330" y="460" x2="330" y2="520" />
+<track x="290" y="420" x2="330" y2="460" />
+<track x="250" y="420" x2="290" y2="420" />
+<track x="230" y="400" x2="250" y2="420" />
+<track x="150" y="400" x2="210" y2="460" />
+<track x="130" y="410" x2="130" y2="440" />
+<track x="130" y="440" x2="150" y2="460" />
+<track x="150" y="460" x2="290" y2="460" />
+<track x="130" y="360" x2="130" y2="390" />
+<track x="130" y="360" x2="150" y2="340" />
+<track x="150" y="340" x2="270" y2="340" />
+<track x="90" y="240" x2="90" y2="370" />
+<track x="90" y="390" x2="90" y2="460" />
+<track x="90" y="460" x2="130" y2="500" />
+<track x="130" y="500" x2="320" y2="500" />
+<track x="150" y="560" x2="170" y2="540" />
+<track x="210" y="540" x2="250" y2="500" />
+<track x="340" y="500" x2="370" y2="500" />
+<track x="370" y="500" x2="450" y2="420" />
+<track x="10" y="300" x2="110" y2="400" />
+<track x="110" y="400" x2="410" y2="400" />
+<track x="350" y="420" x2="410" y2="420" />
+<track x="310" y="380" x2="410" y2="380" />
+<track x="290" y="400" x2="310" y2="380" />
+<track x="330" y="400" x2="350" y2="420" />
+<track x="450" y="100" x2="870" y2="100" />
+<track x="450" y="140" x2="1010" y2="140" />
+<track x="870" y="100" x2="900" y2="130" />
+<track x="950" y="160" x2="1010" y2="160" />
+<track x="920" y="150" x2="1010" y2="240" />
+<track x="930" y="140" x2="950" y2="160" />
+<track x="1010" y="240" x2="1010" y2="480" />
+<track x="670" y="500" x2="950" y2="500" />
+<track x="770" y="500" x2="810" y2="460" />
+<track x="630" y="340" x2="950" y2="340" />
+<track x="490" y="380" x2="950" y2="380" />
+<track x="450" y="420" x2="950" y2="420" />
+<track x="810" y="460" x2="950" y2="460" />
+<track x="590" y="540" x2="950" y2="540" />
+<track x="550" y="420" x2="630" y2="340" />
+<track x="510" y="420" x2="550" y2="460" />
+<track x="590" y="420" x2="670" y2="500" />
+<track x="810" y="420" x2="850" y2="460" />
+<track x="770" y="340" x2="810" y2="380" />
+<track x="850" y="380" x2="890" y2="420" />
+<track x="550" y="460" x2="550" y2="500" />
+<track x="550" y="500" x2="590" y2="540" />
+<track x="950" y="540" x2="1010" y2="480" />
+<track x="390" y="320" x2="490" y2="320" />
+<track x="400" y="330" x2="420" y2="310" />
+<track x="950" y="540" x2="1010" y2="480" />
+<track x="460" y="330" x2="480" y2="310" />
+<track x="360" y="250" x2="460" y2="250" />
+<track x="370" y="260" x2="390" y2="240" />
+<track x="430" y="260" x2="450" y2="240" />
+<track x="140" y="230" x2="170" y2="200" />
+<turnout x="530" y="30" x2="544" y2="30" xt="540" yt="40" adr="923" />
+<turnout x="450" y="30" x2="436" y2="30" xt="440" yt="20" adr="922" />
+<turnout x="380" y="70" x2="394" y2="70" xt="390" yt="60" adr="921" />
+<turnout x="570" y="70" x2="556" y2="70" xt="560" yt="60" adr="923" />
+<turnout x="210" y="140" x2="196" y2="140" xt="200" yt="130" adr="938" />
+<turnout x="250" y="180" x2="236" y2="180" xt="240" yt="170" adr="914" />
+<turnout x="50" y="260" x2="50" y2="276" xt="40" yt="270" adr="933" />
+<turnout x="30" y="400" x2="30" y2="416" xt="20" yt="410" adr="934" />
+<turnout x="170" y="540" x2="156" y2="540" xt="160" yt="550" adr="935" />
+<turnout x="210" y="540" x2="224" y2="540" xt="220" yt="530" adr="937" />
+<turnout x="430" y="540" x2="416" y2="540" xt="420" yt="550" adr="983" />
+<turnout x="230" y="400" x2="240" y2="410" xt="244" yt="400" adr="913" />
+<turnout x="210" y="460" x2="200" y2="450" xt="196" yt="460" adr="912" />
+<turnout x="150" y="400" x2="164" y2="400" xt="160" yt="410" adr="911" />
+<turnout x="250" y="500" x2="236" y2="500" xt="240" yt="510" adr="937" />
+<turnout x="290" y="400" x2="304" y2="400" xt="300" yt="390" adr="11" />
+<turnout x="330" y="400" x2="344" y2="400" xt="340" yt="410" adr="11" />
+<turnout x="610" y="280" x2="624" y2="280" xt="620" yt="270" adr="951" />
+<turnout x="590" y="380" x2="570" y2="380" xt="580" yt="390" adr="986" />
+<turnout x="810" y="380" x2="796" y2="380" xt="800" yt="370" adr="971" />
+<turnout x="850" y="380" x2="864" y2="380" xt="860" yt="390" adr="972" />
+<turnout x="550" y="420" x2="564" y2="420" xt="560" yt="410" adr="981" />
+<turnout x="510" y="420" x2="520" y2="430" xt="524" yt="420" adr="982" />
+<turnout x="590" y="420" x2="604" y2="420" xt="600" yt="430" adr="988" />
+<turnout x="810" y="420" x2="824" y2="420" xt="820" yt="430" adr="973" />
+<turnout x="590" y="380" x2="610" y2="380" xt="600" yt="370" adr="987" />
+<turnout x="430" y="320" x2="430" y2="320" xt="430" yt="320" adr="987" />
+<turnout x="510" y="320" x2="510" y2="320" xt="510" yt="320" adr="986" />
+<turnout x="770" y="500" x2="784" y2="500" xt="780" yt="490" adr="984" />
+<turnout x="770" y="340" x2="784" y2="340" xt="780" yt="350" adr="971" />
+<turnout x="890" y="420" x2="876" y2="420" xt="880" yt="410" adr="972" />
+<turnout x="850" y="460" x2="836" y2="460" xt="840" yt="450" adr="973" />
+<turnout x="330" y="180" x2="316" y2="180" xt="320" yt="190" adr="931" />
+<turnout x="370" y="180" x2="384" y2="180" xt="380" yt="170" adr="947" inv="1" />
+<turnout x="930" y="140" x2="944" y2="140" xt="940" yt="150" adr="957" />
+<turnout x="410" y="180" x2="424" y2="180" xt="420" yt="170" adr="941" />
+<turnout x="630" y="260" x2="616" y2="260" xt="620" yt="270" adr="951" />
+<turnout x="450" y="180" x2="464" y2="180" xt="460" yt="190" adr="942" />
+<turnout x="550" y="140" x2="570" y2="140" xt="560" yt="150" adr="944" inv="1" />
+<turnout x="550" y="140" x2="530" y2="140" xt="540" yt="130" adr="945" inv="1" />
+<turnout x="490" y="140" x2="504" y2="140" xt="500" yt="150" adr="943" />
+<turnout x="655" y="220" x2="655" y2="220" xt="655" yt="220" />
+<turnout x="667" y="140" x2="667" y2="140" xt="667" yt="140" adr="946" />
+<turnout x="810" y="220" x2="800" y2="230" xt="796" yt="220" adr="954" />
+<turnout x="890" y="140" x2="876" y2="140" xt="880" yt="150" adr="956" />
+<turnout x="650" y="140" x2="664" y2="140" xt="660" yt="130" adr="946" />
+<turnout x="710" y="180" x2="696" y2="180" xt="700" yt="190" adr="952" />
+<turnout x="670" y="180" x2="684" y2="180" xt="680" yt="190" adr="953" />
+<turnout x="850" y="180" x2="840" y2="190" xt="836" yt="180" adr="955" />
+<turnout x="710" y="220" x2="696" y2="220" xt="700" yt="210" adr="953" />
+<turnout x="190" y="220" x2="190" y2="234" xt="180" yt="230" adr="915" inv="1" />
+<turnout x="210" y="200" x2="196" y2="200" xt="200" yt="210" adr="916" />
+<turnout x="210" y="180" x2="224" y2="180" xt="220" yt="190" adr="914" />
+<turnout x="230" y="200" x2="230" y2="200" xt="230" yt="200" />
+<turnout x="690" y="200" x2="690" y2="200" xt="690" yt="200" />
+<turnout x="670" y="220" x2="684" y2="220" xt="680" yt="210" adr="952" />
+<turnout x="550" y="140" x2="550" y2="140" xt="550" yt="140" />
+<turnout x="380" y="250" x2="380" y2="250" xt="380" yt="250" adr="944" />
+<turnout x="440" y="250" x2="440" y2="250" xt="440" yt="250" adr="945" />
+<turnout x="410" y="320" x2="410" y2="320" xt="410" yt="320" adr="987" />
+<turnout x="470" y="320" x2="470" y2="320" xt="470" yt="320" adr="986" />
+<sensor name="CS24" x="600" y="70" adr="875" />
+<sensor name="CS24" x="390" y="10" adr="873" />
+<sensor name="CS24" x="490" y="30" adr="874" />
+<sensor name="CS24" x="600" y="30" adr="871" />
+<sensor name="CS24" x="490" y="70" adr="872" />
+<sensor name="CS24" x="110" y="120" adr="903" />
+<sensor name="CS24" x="110" y="140" adr="902" />
+<sensor name="CS24" x="80" y="190" adr="895" />
+<sensor name="CS24" x="120" y="210" adr="896" />
+<sensor name="CS24" x="170" y="260" adr="888" />
+<sensor name="CS24" x="290" y="220" adr="891" />
+<sensor name="CS24" x="10" y="500" adr="883" />
+<sensor name="CS24" x="30" y="500" adr="894" />
+<sensor name="CS24" x="110" y="560" adr="898" />
+<sensor name="CS24" x="450" y="540" adr="884" />
+<sensor name="CS24" x="390" y="560" adr="887" />
+<sensor name="CS24" x="210" y="340" adr="907" />
+<sensor name="CS24" x="370" y="400" adr="906" />
+<sensor name="CS24" x="290" y="540" adr="886" />
+<sensor name="CS24" x="250" y="460" adr="908" />
+<sensor name="CS24" x="180" y="430" adr="905" />
+<sensor name="CS24" x="190" y="400" adr="904" />
+<sensor name="CS24" x="410" y="460" adr="885" />
+<sensor name="CS24" x="530" y="380" adr="993" />
+<sensor name="CS24" x="690" y="340" adr="994" />
+<sensor name="CS24" x="690" y="380" adr="991" />
+<sensor name="CS24" x="690" y="420" adr="992" />
+<sensor name="CS24" x="710" y="500" adr="997" />
+<sensor name="CS24" x="650" y="540" adr="1001" />
+<sensor name="CS24" x="890" y="540" adr="1001" />
+<sensor name="CS24" x="890" y="380" adr="996" />
+<sensor name="CS24" x="930" y="420" adr="995" />
+<sensor name="CS24" x="890" y="460" adr="1002" />
+<sensor name="CS24" x="950" y="180" adr="1001" />
+<sensor name="CS24" x="325" y="100" adr="901" />
+<sensor name="CS24" x="290" y="500" adr="881" />
+<sensor name="CS24" x="90" y="520" adr="893" />
+<sensor name="CS24" x="30" y="380" adr="895" />
+<sensor name="CS24" x="870" y="340" adr="1003" />
+<sensor name="CS24" x="870" y="500" adr="998" />
+<sensor name="CS24" x="190" y="260" adr="892" />
+<sensor name="CS24" x="170" y="200" adr="882" />
+<sensor name="CS24" x="350" y="180" adr="1016" />
+<sensor name="CS24" x="400" y="180" adr="1013" />
+<sensor name="CS24" x="500" y="120" adr="1026" />
+<sensor name="CS24" x="630" y="180" adr="1027" />
+<sensor name="CS24" x="630" y="220" adr="1025" />
+<sensor name="CS24" x="700" y="260" adr="1012" />
+<sensor name="CS24" x="820" y="280" adr="1011" />
+<sensor name="CS24" x="980" y="140" adr="1015" />
+<sensor name="CS24" x="980" y="160" adr="1014" />
+<sensor name="CS24" x="520" y="250" adr="1023" />
+<sensor name="CS24" x="520" y="210" adr="1024" />
+<sensor name="CS24" x="740" y="120" adr="1018" />
+<sensor name="CS24" x="740" y="140" adr="1028" />
+<sensor name="CS24" x="620" y="100" adr="1021" />
+<sensor name="CS24" x="190" y="540" adr="897" />
+</panel>
+</layout-config>
