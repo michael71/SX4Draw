@@ -1,6 +1,10 @@
 # SX4Draw
 
-Zeichenprogramm, um XML Panel Definitionen für SX4 und Lanbahnpanel zu zeichnen. ACHTUNG: Die Oberfläche ist hier rein für die XML-Erzeugung optimiert (!), die Ansicht von Signalen etc ist im Programm LanbahnPanel deutlich komplexer und kann auf verschiedene Themen (Deutsch, US, UK) umgestellt werden. So sieht die Erstellung einer Fahrstraße im SX4Draw-GUI aus:
+Zeichenprogramm, um XML Panel Definitionen für SX4 und Lanbahnpanel zu zeichnen.
+
+(ACHTUNG: Die Oberfläche ist hier rein für die XML-Erzeugung optimiert (!), die Ansicht von Signalen etc ist im Programm LanbahnPanel deutlich komplexer und kann auf verschiedene Themen (Deutsch, US, UK) umgestellt werden.)
+
+So sieht die Erstellung/Test einer Fahrstraße im SX4Draw-GUI aus:
 
 <img src="https://opensx.net/wordpress/wp-content/uploads/2019/02/sx4draw-1.png" />
 
