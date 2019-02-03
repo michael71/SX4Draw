@@ -1,0 +1,223 @@
+package de.blankedv.sx4draw;
+
+import static de.blankedv.sx4draw.Constants.DEBUG;
+import static de.blankedv.sx4draw.Constants.INVALID_INT;
+
+import static de.blankedv.sx4draw.SX4Draw.panelElements;
+import static de.blankedv.sx4draw.SX4Draw.routes;
+import static de.blankedv.sx4draw.SX4Draw.compRoutes;
+import static de.blankedv.sx4draw.SX4Draw.timetables;
+import static de.blankedv.sx4draw.SX4Draw.trips;
+import static de.blankedv.sx4draw.ReadConfig.YOFF;
+
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+
+/**
+ * WriteConfig - Utility turnout save Panel Config
+ *
+ * @author Michael Blank
+ * @version 1.0
+ */
+public class WriteConfig {
+
+    static StringWriter writer;
+    private static String localPanelName = "";
+
+    /**
+     * writeConfigToXML
+     * <p>
+     * saves all PanelElements to an XML file configFilename will have ".(date)"
+     * appended, if no filename given
+     *
+     * @param fname File Name (can be empty)
+     * @param pName Panel Name (can be empty)
+     * @return true, if succeeds - false, if not.
+     */
+    public static boolean writeToXML(String fname, String pName) {
+        if (pName.isEmpty()) {
+            localPanelName = "paneltest";
+        } else {
+            localPanelName = pName;
+        }
+
+        FileWriter fWriter = null;
+        SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");
+        String version = df.format(new Date());
+        try {
+            fWriter = new FileWriter(fname);
+            fWriter.write(writeXml(localPanelName, version));
+            fWriter.flush();
+            fWriter.close();
+
+            if (DEBUG) {
+                System.out.println("Config File " + fname + " saved! ");
+            }
+            //configHasChanged = false; // reset flag
+
+        } catch (Exception e) {
+            System.out.println("fname = " + fname);
+            System.out.println("ERROR: " + e.getMessage());
+            return false;
+        } finally {
+            if (fWriter != null) {
+                try {
+                    fWriter.close();
+                } catch (IOException e) {
+                    System.out.println("ERROR: could not close output file!");
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private static void writeStart(String tagname) {
+        writer.write("<" + tagname);
+    }
+
+    private static void writeClose() {
+        writer.write(" />\n");
+    }
+
+    private static void writeCloseTag(String tagname) {
+        writer.write("</" + tagname + ">\n");
+    }
+
+    private static void writeAttribute(String name, int val) {
+        writer.write(" " + name + "=\"" + val + "\"");
+    }
+
+    private static void writeAttribute(String name, String sval) {
+        writer.write(" " + name + "=\"" + sval + "\"");
+    }
+
+    /**
+     * writeConfigToXML
+     * <p>
+     * saves all PanelElements (including deducted elements) to an XML file (=
+     * simple XMLSerializer for lanbahn panel elements and routes)
+     *
+     * @param
+     * @return true, if succeeds - false, if not.
+     */
+    private static String writeXml(String panelName, String version) {
+
+        writer = new StringWriter();
+
+        writer.write("<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>\n");
+        writer.write("<layout-config>\n");
+        writer.write("<panel name=\"" + panelName + "\" version=\"" + version + "\">\n");
+
+        ArrayList<PanelElement> peList = new ArrayList<>(panelElements);
+        Collections.sort(peList);
+        // now write all panel elements to the file
+        for (PanelElement pe : peList) {
+            // if (DEBUG) {
+            //    System.out.println("writing panel element " + pe.toString());
+            //}
+            writeStart(pe.getType().name().toLowerCase());
+            if (pe.name.length() > 0) {
+                writeAttribute("name=", pe.name);
+            }
+            writeAttribute("x", pe.x);
+            writeAttribute("y", pe.y - YOFF);
+            if (pe.x2 != INVALID_INT) { // save only valid attributes
+                writeAttribute("x2", pe.x2);
+                writeAttribute("y2", pe.y2 - YOFF);
+            }
+            if (pe.xt != INVALID_INT) {
+                writeAttribute("xt", pe.xt);
+                writeAttribute("yt", pe.yt - YOFF);
+            }
+            if (pe.adr2 != INVALID_INT) {
+                if (pe.getAdr() != INVALID_INT) {
+                    writeAttribute("adr", pe.adr + "," + pe.adr2);
+                }
+            } else if (pe.adr != INVALID_INT) {
+                writeAttribute("adr", pe.adr);
+            }
+
+            if (pe.getInv() != 0) {
+                writeAttribute("inv", pe.getAdr());
+            }
+            writeClose();
+        }
+
+        if (!routes.isEmpty()) {
+            ArrayList<Route> rtList = new ArrayList<>(routes);
+            Collections.sort(rtList);
+            for (Route rt : rtList) {
+                writeStart("route");
+                writeAttribute("id", rt.id);
+                if (rt.btn1 != INVALID_INT) {
+                    writeAttribute("btn1", rt.btn1);
+                }
+                if (rt.btn2 != INVALID_INT) {
+                    writeAttribute("btn2", rt.btn2);
+                }
+                writeAttribute("route", rt.route);
+                writeAttribute("sensors", rt.sensors);
+                writeAttribute("offending", rt.offending);
+                writeClose();
+
+            }
+        }
+
+        if (!compRoutes.isEmpty()) {
+            ArrayList<CompRoute> crList = new ArrayList<>(compRoutes);
+            Collections.sort(crList);
+            for (CompRoute rt : crList) {
+                writeStart("comproute");
+                writeAttribute("id", rt.id);
+                if (rt.btn1 != INVALID_INT) {
+                    writeAttribute("btn1", rt.btn1);
+                }
+                if (rt.btn2 != INVALID_INT) {
+                    writeAttribute("btn2", rt.btn2);
+                }
+                writeAttribute("routes", rt.routes);
+                writeClose();
+            }
+        }
+
+        if (!trips.isEmpty()) {
+            ArrayList<Trip> tripsList = new ArrayList<>(trips);
+            Collections.sort(tripsList);
+            for (Trip rt : tripsList) {
+                writeStart("trip");
+                writeAttribute("id", rt.id);
+                writeAttribute("routeid", rt.routeid);
+                writeAttribute("sens1", rt.sens1);
+                writeAttribute("sens2", rt.sens2);
+                writeAttribute("loco", rt.loco);
+                writeAttribute("stopdelay", rt.stopdelay);
+                writeClose();
+            }
+        }
+        if (!timetables.isEmpty()) {
+            ArrayList<Timetable> ttList = new ArrayList<>(timetables);
+            Collections.sort(ttList);
+            for (Timetable rt : ttList) {
+                writeStart("timetable");
+                writeAttribute("id", rt.id);
+                writeAttribute("time", rt.time);
+                writeAttribute("trip", rt.trip);
+                writeAttribute("next", rt.next);
+                writeClose();
+            }
+        }
+
+        writer.write("</panel>\n");
+        writer.write("</layout-config>\n");
+
+        return writer.toString();
+
+    }
+
+}
