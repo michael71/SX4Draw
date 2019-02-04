@@ -100,9 +100,9 @@ object AddressDialog {
             lblOrient.isVisible = false
         }
 
-        val addrListener = ChangeListener<Int> { observable, oldValue, newValue -> updateAddress() }
+        val addrListener = ChangeListener<Int> { _, _, _ -> updateAddress() }
 
-        val invListener = ChangeListener<Boolean> { observable, oldValue, newValue -> updateAddress() }
+        val invListener = ChangeListener<Boolean> { _, _, _ -> updateAddress() }
 
         spinner1000.valueProperty().addListener(addrListener)
         spinner100.valueProperty().addListener(addrListener)
@@ -150,11 +150,11 @@ object AddressDialog {
         val secondScene = Scene(grid, 420.0, 160.0)
         // New window (Stage)
         val newWindow = Stage()
-        btnCancel.setOnAction { e ->
+        btnCancel.setOnAction { _ ->
             genAddress.addr = -1
             newWindow.close()
         }
-        btnSave.setOnAction { e ->
+        btnSave.setOnAction { _ ->
             genAddress.orient = orient.selectionModel.selectedIndex
             newWindow.close()
         }

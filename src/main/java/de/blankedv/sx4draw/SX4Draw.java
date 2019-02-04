@@ -1101,7 +1101,7 @@ public class SX4Draw extends Application {
                 Alert alert = new Alert(AlertType.INFORMATION);
                 alert.setTitle("Fahrstraße "+currentRoute.getId()+ " abgeschlossen.");
                 alert.setHeaderText(null);
-                alert.setContentText("Die Signalstellungen müssen noch manuell korrigiert werden!");
+                alert.setContentText("Die Signalstellungen mssen noch manuell korrigiert werden!");
                 alert.showAndWait();
 
                 resetPEStates();

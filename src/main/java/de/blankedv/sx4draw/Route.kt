@@ -102,6 +102,7 @@ class Route : Comparator<Route>, Comparable<Route> {
             } else {
                 route = route + ";" + pe.adr + ",0"
             }
+            else -> {}
         }
     }
 
@@ -127,6 +128,7 @@ class Route : Comparator<Route>, Comparable<Route> {
             } else {
                 route = route + ";" + peSt.key.adr + ",0"
             }
+            else -> {}
         }
     }
 
@@ -204,8 +206,8 @@ class Route : Comparator<Route>, Comparable<Route> {
 
     }
 
-    override fun compareTo(o: Route): Int {
-        return id - o.id
+    override fun compareTo(other: Route): Int {
+        return id - other.id
     }
 
     companion object {

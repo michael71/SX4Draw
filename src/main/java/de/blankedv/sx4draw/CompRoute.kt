@@ -37,8 +37,9 @@ data class CompRoute (var id: Int = 0, var btn1: Int = 0, var btn2: Int = 0, var
         return o1.id - o2.id
     }
 
-    override fun compareTo(o: CompRoute): Int {
-        return id - o.id
+
+    override fun compareTo(other: CompRoute): Int {
+        return id - other.id
     }
 
     companion object {

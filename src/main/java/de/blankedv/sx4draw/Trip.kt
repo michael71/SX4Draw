@@ -30,8 +30,9 @@ class Trip : Comparator<Trip>, Comparable<Trip> {
 
     }
 
-    override fun compareTo(o: Trip): Int {
-        return id - o.id
+    @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
+    override fun compareTo(o1: Trip): Int {
+        return id - o1.id
     }
 
     companion object {
