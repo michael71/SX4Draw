@@ -10,7 +10,7 @@ package de.blankedv.sx4draw;
  */
 public class Constants {
 
-    public static final String version = "0.33 - 03 Feb 2019";
+    public static final String version = "0.34 - 03 Feb 2019";
     public static final int SXMAX_USED = 1068; // max sx address used (106, bit 8)
     public static final int LBMIN = 1200;  // minimum virtual address
     public static final int LBMAX = 9999;

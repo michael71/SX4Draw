@@ -127,7 +127,9 @@ public class SX4Draw extends Application {
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Panel XML File Creator (Name: ???)");
-
+        primaryStage.getIcons().add(new Image("file:sx4_ico64.png"));
+        primaryStage.getIcons().add(new Image("file:sx4_ico256.png"));
+        primaryStage.getIcons().add(new Image("file:sx4_icon.png"));
         final Preferences prefs = Preferences.userNodeForPackage(this.getClass());
 
         Scene scene = new Scene(root, 1100, 600);
