@@ -70,7 +70,7 @@ import static de.blankedv.sx4draw.ReadConfig.YOFF;
 
 public class SX4Draw extends Application {
 
-    public static String version = "0.35 - 04 Feb 2019";
+    public static String version = "0.36 - 04 Feb 2019";
 
     // FIXED: weichengleichheit nicht auf den Pixel genau
     // FIXED: UNDO funktioniert nicht nach Zeichnen eines Tracks
@@ -159,6 +159,7 @@ public class SX4Draw extends Application {
 
         Scene scene = new Scene(root, 1100, 600);
         // Build the VBox container for the lineBox, canvas, and toolBox
+
         vb = new VBox(3);
         canvas = new Canvas(RECT_X, RECT_Y);
         gc = canvas.getGraphicsContext2D();
@@ -490,7 +491,9 @@ public class SX4Draw extends Application {
         btnUnSelect.setText("Unselect");
         //btnUnSelect.setGraphic(selIcon);
         btnUnSelect.setOnAction((ActionEvent event) -> {
+            System.out.println("unselect");
             unselectAll();
+            redrawPanelElements();
         });
 
         btnMove.setToggleGroup(toggleGroup);
@@ -715,13 +718,25 @@ public class SX4Draw extends Application {
         });
 
         scale200.setOnAction((event) -> {
-            System.out.println("scale *2");
-            PanelElement.scalePlus();
-            redrawPanelElements();
-            if (dispAddresses.isSelected()) {
-                drawAddresses(gc);
-            } else {
-                gc.clearRect(0, 0, RECT_X, RECT_Y);
+            if (((CheckMenuItem) scale200).isSelected()) {
+                System.out.println("scale *2");
+                PanelElement.scalePlus();
+                redrawPanelElements();
+                if (dispAddresses.isSelected()) {
+                    drawAddresses(gc);
+                } else {
+                    gc.clearRect(0, 0, RECT_X, RECT_Y);
+                }
+            } else  {
+                //scale back 50%
+                System.out.println("scale * 0.5");
+                PanelElement.scaleMinus();
+                redrawPanelElements();
+                if (dispAddresses.isSelected()) {
+                    drawAddresses(gc);
+                } else {
+                    gc.clearRect(0, 0, RECT_X, RECT_Y);
+                }
             }
         });
 
@@ -754,7 +769,8 @@ public class SX4Draw extends Application {
             dialog.setContentText("Adresse: ");
             Optional<String> result = dialog.showAndWait();
             result.ifPresent(addr -> {
-                addr = addr.replaceAll("\\s+", "");
+                //addr = addr.replaceAll("\\s+", "");
+                addr = addr.replaceAll("[ \\t\\n\\x0b\\r\\f.]+","");  // replace whitespace and '.'
                 System.out.println("suche nach: " + addr);
                 if (addr.contains("?")) {
                     addr = addr.substring(0, addr.length() - 1);
@@ -785,6 +801,7 @@ public class SX4Draw extends Application {
                     }
 
                 }
+                redrawPanelElements();
 
             });
 

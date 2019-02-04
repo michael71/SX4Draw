@@ -25,8 +25,8 @@ class Timetable  : Comparator<Timetable>, Comparable<Timetable> {
         return o1.id - o2.id
     }
 
-    override fun compareTo(o1: Timetable): Int {
-        return id - o1.id
+    override fun compareTo(other: Timetable): Int {
+        return id - other.id
     }
 
     companion object {

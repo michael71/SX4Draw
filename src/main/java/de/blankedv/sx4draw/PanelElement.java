@@ -25,6 +25,7 @@ import javafx.util.Pair;
 public class PanelElement implements Comparator<PanelElement>, Comparable<PanelElement> {
 
     private static boolean scaledPlus = false;
+    private static boolean scaledMinus = false;
 
     final public static int TOUCH_RADIUS = 7;
     final  public  static double  TRACKWIDTH = 5.0;
@@ -654,7 +655,52 @@ public class PanelElement implements Comparator<PanelElement>, Comparable<PanelE
         }
 
         scaledPlus = true;
+        scaledMinus = false;
     }
+
+    public static void scaleMinus() {
+        if (scaledMinus) {
+            return;  // only once allowed !!!
+        }
+        for (PanelElement pe : panelElements) {
+            int dx = pe.x /2;
+            int dy = pe.y /2;
+            pe.x =  pe.x /2;
+            pe.y =  pe.y / 2;
+            switch (pe.type) {
+                case TRACK:
+                case SENSOR:
+                    if (pe.x2 != INVALID_INT) {
+                        pe.x2 = pe.x2 /2;
+                    }
+                    if (pe.y2 != INVALID_INT) {
+                        pe.y2 = pe.y2 /2;
+                    }
+                    break;
+                case TURNOUT:
+                case SIGNAL:
+                    // do not scale x2/y2 BUT TRANSLATE
+                    if (pe.x2 != INVALID_INT) {
+                        pe.x2 -= dx;
+                    }
+                    if (pe.y2 != INVALID_INT) {
+                        pe.y2 -= dy;
+                    }
+                    if (pe.xt != INVALID_INT) {
+                        pe.xt -= dx;
+                    }
+                    if (pe.yt != INVALID_INT) {
+                        pe.yt -= dy;
+                    }
+                    break;
+            }
+            pe.createShape();  // must be redone
+        }
+
+        scaledMinus = true;
+        scaledPlus = false;
+    }
+
 
     @Override
     public int compare(PanelElement o1, PanelElement o2) {

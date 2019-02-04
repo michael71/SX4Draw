@@ -38,7 +38,7 @@ object Dialogs {
         alert.title = title
         alert.headerText = header
         val window = alert.dialogPane.scene.window
-        window.setOnCloseRequest { event -> window.hide() }
+        window.setOnCloseRequest { _ -> window.hide() }
 
         val openOpensx = ButtonType("-> opensx.net/sx4")
         alert.buttonTypes.addAll(openOpensx)
