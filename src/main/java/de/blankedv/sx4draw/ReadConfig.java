@@ -161,7 +161,7 @@ public class ReadConfig {
         routes.clear();
         items = root.getElementsByTagName("route");
         for (int i = 0; i < items.getLength(); i++) {
-            Route.add(items.item(i));
+            Route.Companion.add(items.item(i));
         }
         System.out.println(routes.size() + " routes read");
 
@@ -169,7 +169,7 @@ public class ReadConfig {
 
         items = root.getElementsByTagName("comproute");
         for (int i = 0; i < items.getLength(); i++) {
-            CompRoute.add(items.item(i));
+            CompRoute.Companion.add(items.item(i));
         }
         System.out.println(compRoutes.size() + " compRoutes read");
 
@@ -177,7 +177,7 @@ public class ReadConfig {
 
         items = root.getElementsByTagName("trip");
         for (int i = 0; i < items.getLength(); i++) {
-            Trip.add(items.item(i));
+            Trip.Companion.add(items.item(i));
         }
         System.out.println(trips.size() + " trips read");
 
@@ -185,7 +185,7 @@ public class ReadConfig {
         timetables.clear();
         items = root.getElementsByTagName("timetable");
         for (int i = 0; i < items.getLength(); i++) {
-            Timetable.add(items.item(i));
+            Timetable.Companion.add(items.item(i));
         }
         System.out.println(timetables.size() + " timetables read");
 
@@ -299,7 +299,7 @@ public class ReadConfig {
                         System.out.println("ERROR in XML definition, more than 2 adresses");
                 }
             } else {
-                System.out.println("ERROR in XML definition, no address found for type=" + type.name() + " at (" + p.x + "," + p.y + ")");
+                System.out.println("ERROR in XML definition, no address found for type=" + type.name() + " at (" + p.getX() + "," + p.getY() + ")");
             }
         } else {
             // create a new track panel element
@@ -317,17 +317,17 @@ public class ReadConfig {
         for (int i = 0; i < attributes.getLength(); i++) {
             Node theAttribute = attributes.item(i);
             if (theAttribute.getNodeName().equals("x")) {
-                pos.x = Integer.parseInt(theAttribute.getNodeValue());
+                pos.setX(Integer.parseInt(theAttribute.getNodeValue()));
             } else if (theAttribute.getNodeName().equals("y")) {
-                pos.y = YOFF + Integer.parseInt(theAttribute.getNodeValue());
+                pos.setY(YOFF + Integer.parseInt(theAttribute.getNodeValue()));
             } else if (theAttribute.getNodeName().equals("x2")) {
-                pos.x2 = Integer.parseInt(theAttribute.getNodeValue());
+                pos.setX2(Integer.parseInt(theAttribute.getNodeValue()));
             } else if (theAttribute.getNodeName().equals("y2")) {
-                pos.y2 = YOFF + Integer.parseInt(theAttribute.getNodeValue());
+                pos.setY2(YOFF + Integer.parseInt(theAttribute.getNodeValue()));
             } else if (theAttribute.getNodeName().equals("xt")) {
-                pos.xt = Integer.parseInt(theAttribute.getNodeValue());
+                pos.setXt(Integer.parseInt(theAttribute.getNodeValue()));
             } else if (theAttribute.getNodeName().equals("yt")) {
-                pos.yt = YOFF + Integer.parseInt(theAttribute.getNodeValue());
+                pos.setYt(YOFF + Integer.parseInt(theAttribute.getNodeValue()));
             }
         }
         return pos;

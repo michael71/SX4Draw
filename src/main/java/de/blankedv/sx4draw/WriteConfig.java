@@ -154,16 +154,16 @@ public class WriteConfig {
             Collections.sort(rtList);
             for (Route rt : rtList) {
                 writeStart("route");
-                writeAttribute("id", rt.id);
-                if (rt.btn1 != INVALID_INT) {
-                    writeAttribute("btn1", rt.btn1);
+                writeAttribute("id", rt.getId());
+                if (rt.getBtn1() != INVALID_INT) {
+                    writeAttribute("btn1", rt.getBtn1());
                 }
-                if (rt.btn2 != INVALID_INT) {
-                    writeAttribute("btn2", rt.btn2);
+                if (rt.getBtn2() != INVALID_INT) {
+                    writeAttribute("btn2", rt.getBtn2());
                 }
-                writeAttribute("route", rt.route);
-                writeAttribute("sensors", rt.sensors);
-                writeAttribute("offending", rt.offending);
+                writeAttribute("route", rt.getRoute());
+                writeAttribute("sensors", rt.getSensors());
+                writeAttribute("offending", rt.getOffending());
                 writeClose();
 
             }
@@ -174,14 +174,14 @@ public class WriteConfig {
             Collections.sort(crList);
             for (CompRoute rt : crList) {
                 writeStart("comproute");
-                writeAttribute("id", rt.id);
-                if (rt.btn1 != INVALID_INT) {
-                    writeAttribute("btn1", rt.btn1);
+                writeAttribute("id", rt.getId());
+                if (rt.getBtn1() != INVALID_INT) {
+                    writeAttribute("btn1", rt.getBtn1());
                 }
-                if (rt.btn2 != INVALID_INT) {
-                    writeAttribute("btn2", rt.btn2);
+                if (rt.getBtn2() != INVALID_INT) {
+                    writeAttribute("btn2", rt.getBtn2());
                 }
-                writeAttribute("routes", rt.routes);
+                writeAttribute("routes", rt.getRoutes());
                 writeClose();
             }
         }
@@ -191,12 +191,12 @@ public class WriteConfig {
             Collections.sort(tripsList);
             for (Trip rt : tripsList) {
                 writeStart("trip");
-                writeAttribute("id", rt.id);
-                writeAttribute("routeid", rt.routeid);
-                writeAttribute("sens1", rt.sens1);
-                writeAttribute("sens2", rt.sens2);
-                writeAttribute("loco", rt.loco);
-                writeAttribute("stopdelay", rt.stopdelay);
+                writeAttribute("id", rt.getId());
+                writeAttribute("routeid", rt.getRouteid());
+                writeAttribute("sens1", rt.getSens1());
+                writeAttribute("sens2", rt.getSens2());
+                writeAttribute("loco", rt.getLoco());
+                writeAttribute("stopdelay", rt.getStopdelay());
                 writeClose();
             }
         }
@@ -205,10 +205,10 @@ public class WriteConfig {
             Collections.sort(ttList);
             for (Timetable rt : ttList) {
                 writeStart("timetable");
-                writeAttribute("id", rt.id);
-                writeAttribute("time", rt.time);
-                writeAttribute("trip", rt.trip);
-                writeAttribute("next", rt.next);
+                writeAttribute("id", rt.getId());
+                writeAttribute("time", rt.getTime());
+                writeAttribute("trip", rt.getTrip());
+                writeAttribute("next", rt.getNext());
                 writeClose();
             }
         }

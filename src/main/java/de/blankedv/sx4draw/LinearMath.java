@@ -1,15 +1,33 @@
+/*
+SX4Draw
+Copyright (C) 2019 Michael Blank
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package de.blankedv.sx4draw;
 
 import de.blankedv.sx4draw.SX4Draw.PEType;
 
-import static de.blankedv.sx4draw.Constants.TURNOUT_LENGTH;
-import static de.blankedv.sx4draw.Constants.TURNOUT_LENGTH_LONG;
 import static de.blankedv.sx4draw.ReadConfig.YOFF;
 //import java.awt.Point;
 
 public class LinearMath {
 
     private static final boolean DEBUG_MATH = false;
+    private static final int TURNOUT_LENGTH = 10;
+    private static final int TURNOUT_LENGTH_LONG = 14;
 
     /**
      * Computes the intersection between two lines. The calculated point is
@@ -162,8 +180,8 @@ public class LinearMath {
                 IntPoint p2 = new IntPoint(xc2, yc2);
                 if (DEBUG_MATH)
                     System.out.println("pi=" + xi + "," + yi + "  p1=" + p1.toString() + " p2=" + p2.toString());
-                double d1 = Utils.calcDistance(new IntPoint(xt, yt), p1);
-                double d2 = Utils.calcDistance(new IntPoint(xt, yt), new IntPoint(xc2, yc2));
+                double d1 = Utils.INSTANCE.calcDistance(new IntPoint(xt, yt), p1);
+                double d2 = Utils.INSTANCE.calcDistance(new IntPoint(xt, yt), new IntPoint(xc2, yc2));
                 if (DEBUG_MATH) System.out.println("d1 = " + d1 + " d2=" + d2);
                 if (Math.abs(d1 - d2) < 1.0) {
                     // gleise kreuzen bei 90grad => keine Weiche
@@ -176,7 +194,7 @@ public class LinearMath {
                             new IntPoint(xt, yt));
                 }
             } else {
-                if (DEBUG_MATH) System.out.println("doubleslip at " + px.x + "," + px.y + " ??");
+                if (DEBUG_MATH) System.out.println("doubleslip at " + px.getX() + "," + px.getY() + " ??");
                 //return new DoubleSlipElement(px, px, px);
                 return null;
             }

@@ -1,6 +1,26 @@
+/*
+SX4Draw
+Copyright (C) 2019 Michael Blank
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package de.blankedv.sx4draw;
 
 import de.blankedv.sx4draw.PanelElement.PEState;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -32,6 +52,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import javafx.util.Duration;
 import javafx.util.Pair;
 
 import java.io.File;
@@ -43,9 +64,13 @@ import java.util.Optional;
 import java.util.prefs.Preferences;
 
 import static de.blankedv.sx4draw.Constants.*;
+import static de.blankedv.sx4draw.PanelElement.SENSORWIDTH;
+import static de.blankedv.sx4draw.PanelElement.TRACKWIDTH;
 import static de.blankedv.sx4draw.ReadConfig.YOFF;
 
 public class SX4Draw extends Application {
+
+    public static String version = "0.35 - 04 Feb 2019";
 
     // FIXED: weichengleichheit nicht auf den Pixel genau
     // FIXED: UNDO funktioniert nicht nach Zeichnen eines Tracks
@@ -146,7 +171,7 @@ public class SX4Draw extends Application {
             @Override
             public void handle(MouseEvent me) {
                 IntPoint poi = new IntPoint(me.getSceneX(), me.getSceneY());
-                System.out.println("linegroup mouse pressed x=" + poi.x + " y=" + poi.y + " currentGUIState=" + currentGUIState.name() + " src=" + me.getSource());
+                System.out.println("linegroup mouse pressed x=" + poi.getX() + " y=" + poi.getY() + " currentGUIState=" + currentGUIState.name() + " src=" + me.getSource());
                 if (me.getButton() == MouseButton.PRIMARY) {
                     System.out.println("prim btn");
                     switch (currentGUIState) {
@@ -171,8 +196,8 @@ public class SX4Draw extends Application {
                             //}
                             break;
                         case MOVE:
-                            moveStart.x = (int) me.getSceneX();
-                            moveStart.y = (int) me.getSceneY();
+                            moveStart.setX((int) me.getSceneX());
+                            moveStart.setY((int) me.getSceneY());
                             System.out.println("moveStart");
                             addToDraggedGroup();
                             break;
@@ -215,8 +240,8 @@ public class SX4Draw extends Application {
         canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, me -> {
             IntPoint poi = new IntPoint(me.getSceneX(), me.getSceneY());
             IntPoint end;
-            start = IntPoint.toRaster(poi, getRaster());
-            System.out.println("canvas mouse pressed x=" + poi.x + " y=" + poi.y + " currentGUIState=" + currentGUIState.name());
+            start = IntPoint.Companion.toRaster(poi, getRaster());
+            System.out.println("canvas mouse pressed x=" + poi.getX() + " y=" + poi.getY() + " currentGUIState=" + currentGUIState.name());
             if (me.getButton() == MouseButton.PRIMARY) {
                 System.out.println("primary button");
                 switch (currentGUIState) {
@@ -253,9 +278,9 @@ public class SX4Draw extends Application {
                         break;
 
                     case MOVE:
-                        IntPoint ms = IntPoint.toRaster(poi, getRaster());
-                        moveStart.x = ms.x;
-                        moveStart.y = ms.y;
+                        IntPoint ms = IntPoint.Companion.toRaster(poi, getRaster());
+                        moveStart.setX(ms.getX());
+                        moveStart.setY(ms.getY());
                         System.out.println("moveStart at " + moveStart.toString());
                         addToDraggedGroup();
                         break;
@@ -292,13 +317,13 @@ public class SX4Draw extends Application {
                 // keep shapes within rectangle
                 if (canvas.getBoundsInLocal().contains(me.getX(), me.getY())) {
                     IntPoint poi = new IntPoint(me.getSceneX(), me.getSceneY());
-                    System.out.println("end approx x=" + poi.x + " y=" + poi.y);
-                    IntPoint end = IntPoint.correctAngle(start, poi, getRaster());
-                    System.out.println("end x=" + end.x + " y=" + end.y);
+                    System.out.println("end approx x=" + poi.getX() + " y=" + poi.getY());
+                    IntPoint end = IntPoint.Companion.correctAngle(start, poi, getRaster());
+                    System.out.println("end x=" + end.getX() + " y=" + end.getY());
                     switch (currentGUIState) {
                         case ADD_TRACK:
-                            line.setEndX(end.x);
-                            line.setEndY(end.y);
+                            line.setEndX(end.getX());
+                            line.setEndY(end.getY());
                             lineGroup.getChildren().remove(line);  // will be re-added from within PE
                             if ((Math.abs(line.getEndX() - line.getStartX()) > 5)
                                     || (Math.abs(line.getEndY() - line.getStartY()) > 5)) {
@@ -310,8 +335,8 @@ public class SX4Draw extends Application {
                             break;
 
                         case ADD_SENSOR:
-                            line.setEndX(end.x);
-                            line.setEndY(end.y);
+                            line.setEndX(end.getX());
+                            line.setEndY(end.getY());
                             lineGroup.getChildren().remove(line);  // will be re-added from within PE
                             if ((Math.abs(line.getEndX() - line.getStartX()) > 5)
                                     || (Math.abs(line.getEndY() - line.getStartY()) > 5)) {
@@ -327,8 +352,8 @@ public class SX4Draw extends Application {
                         case ADD_ROUTE:
                             break;
                         case MOVE:    // MOVE ends
-                            IntPoint d = IntPoint.delta(moveStart, poi, getRasterDiv2());
-                            System.out.println("move END: final delta =" + d.x + "," + d.y);
+                            IntPoint d = IntPoint.Companion.delta(moveStart, poi, getRasterDiv2());
+                            System.out.println("move END: final delta =" + d.getX() + "," + d.getY());
                             PanelElement.translate(d);
                             draggedGroup.getChildren().clear();
                             resetPEStates();
@@ -351,9 +376,9 @@ public class SX4Draw extends Application {
                         case ADD_TRACK:
                         case ADD_SENSOR:
                             lineGroup.getChildren().remove(line);
-                            IntPoint mp = IntPoint.correctAngle(start, poi, getRaster());
-                            line.setEndX(mp.x);
-                            line.setEndY(mp.y);
+                            IntPoint mp = IntPoint.Companion.correctAngle(start, poi, getRaster());
+                            line.setEndX(mp.getX());
+                            line.setEndY(mp.getY());
                             //System.out.println("x=" + (int)me.getSceneX() + " y=" + (int)me.getSceneY());
                             if (!lineGroup.getChildren().contains(line)) {
                                 lineGroup.getChildren().add(line);
@@ -364,10 +389,10 @@ public class SX4Draw extends Application {
                             // do nothing
                             break;
                         case MOVE:  // MOVE dragging
-                            IntPoint d = IntPoint.delta(moveStart, poi, getRasterDiv2());
+                            IntPoint d = IntPoint.Companion.delta(moveStart, poi, getRasterDiv2());
                             //System.out.println("delta =" + d.x + "," + d.y);
-                            draggedGroup.setTranslateX(d.x);
-                            draggedGroup.setTranslateY(d.y);
+                            draggedGroup.setTranslateX(d.getX());
+                            draggedGroup.setTranslateY(d.getY());
                     }
                 }
 
@@ -807,7 +832,7 @@ public class SX4Draw extends Application {
         infoItem.setGraphic(ivInfo);
         infoItem.setOnAction((event) -> {
             System.out.println("info clicked");
-            Dialogs.InfoAlert("Info", "SX4Draw\nhttps://opensx.net/sx4 ", "Programm Version:" + version, this);
+            Dialogs.INSTANCE.InfoAlert("Info", "SX4Draw\nhttps://opensx.net/sx4 ", "Programm Version:" + version, this);
         });
 
         menuBar.getMenus().addAll(menu1, menuOptions, menuCalc, menuExtra, menuInfo);
@@ -884,7 +909,7 @@ public class SX4Draw extends Application {
         boolean found = false;
         for (PanelElement pe : panelElements) {
             if ((pe.getType() == type)
-                    && (Math.abs(poi.x - pe.x) <= 1) && (Math.abs(poi.y - pe.y) <= 1)) {
+                    && (Math.abs(poi.getX() - pe.x) <= 1) && (Math.abs(poi.getY() - pe.y) <= 1)) {
                 found = true;
             }
         }
@@ -892,7 +917,7 @@ public class SX4Draw extends Application {
     }
 
     private void toggleSelectionPE(IntPoint p) {
-        PanelElement pe = selectedPE(p.x, p.y);
+        PanelElement pe = selectedPE(p.getX(), p.getY());
         if (pe != null) {
             pe.toggleShapeSelected();
             redrawPanelElements();
@@ -906,8 +931,8 @@ public class SX4Draw extends Application {
         System.out.println("startNewLine");
         Line l = new Line();
 
-        l.setStartX(p.x);
-        l.setStartY(p.y);
+        l.setStartX(p.getX());
+        l.setStartY(p.getY());
 
         l.setStrokeWidth(lineWidth);
         l.setStroke(Color.BLACK);
@@ -916,7 +941,7 @@ public class SX4Draw extends Application {
     }
 
     private void editPanelElement(IntPoint poi, Stage primStage) {
-        PanelElement pe = selectedPENotTrack(poi.x, poi.y);
+        PanelElement pe = selectedPENotTrack(poi.getX(), poi.getY());
         // all panel elements except tracks have an address
 
         if (pe != null) {
@@ -926,32 +951,32 @@ public class SX4Draw extends Application {
             }
             GenericAddress initA;
             if (pe.getType() == PEType.SIGNAL) {
-                int orient = Utils.signalDX2ToOrient(new IntPoint(pe.x2 - pe.x, pe.y2 - pe.y));
+                int orient = Utils.INSTANCE.signalDX2ToOrient(new IntPoint(pe.x2 - pe.x, pe.y2 - pe.y));
                 initA = new GenericAddress(pe.adr, pe.inv, orient);
             } else {
                 initA = new GenericAddress(pe.adr, pe.inv, INVALID_INT);
             }
-            GenericAddress res = AddressDialog.open(pe, primStage, initA);
-            if (res.addr != -1) {
-                System.out.println("addr=" + res.addr + " inv=" + res.inv + " orient=" + res.orient);
-                boolean addressOK = Dialogs.checkAddress(initA, res);
+            GenericAddress res = AddressDialog.INSTANCE.open(pe, primStage, initA);
+            if (res.getAddr() != -1) {
+                System.out.println("addr=" + res.getAddr() + " inv=" + res.getInv() + " orient=" + res.getOrient());
+                boolean addressOK = Dialogs.INSTANCE.checkAddress(initA, res);
                 if (!addressOK) {
                     System.out.println("addressOK=false");
                     return; // do nothing
                 }
-                pe.adr = res.addr;
+                pe.adr = res.getAddr();
 
-                if (pe.inv != res.inv) {
+                if (pe.inv != res.getInv()) {
                     // inv bit was changed, recreate shape
-                    pe.inv = res.inv;
+                    pe.inv = res.getInv();
                     pe.recreateShape();
                 }
 
                 if (pe.type == PEType.SIGNAL) {
-                    IntPoint d = Utils.signalOrientToDXY2(res.orient);
-                    System.out.println("or=" + res.orient + " dx=" + d.x + " dy=" + d.y);
-                    pe.x2 = pe.x + d.x;
-                    pe.y2 = pe.y + d.y;
+                    IntPoint d = Utils.INSTANCE.signalOrientToDXY2(res.getOrient());
+                    System.out.println("or=" + res.getOrient() + " dx=" + d.getX() + " dy=" + d.getY());
+                    pe.x2 = pe.x + d.getX();
+                    pe.y2 = pe.y + d.getY();
                     pe.recreateShape();  // orientation might have changed, create new
                     lastPE = pe;
                     btnUndo.setDisable(false);
@@ -966,7 +991,7 @@ public class SX4Draw extends Application {
                 System.out.println("no address selected");
             }
         } else {
-            System.out.println("no panel element found at " + poi.x + "/" + poi.y);
+            System.out.println("no panel element found at " + poi.getX() + "/" + poi.getY());
         }
     }
 
@@ -1029,7 +1054,7 @@ public class SX4Draw extends Application {
     }
 
     private void addElement(PEType t, IntPoint p, Group lg) {
-        IntPoint end = IntPoint.toRaster(p, getRasterDiv2());
+        IntPoint end = IntPoint.Companion.toRaster(p, getRasterDiv2());
         // avoid "double signal on same point
         if (!isPETypeOn(t, end)) {
             PanelElement pe = new PanelElement(t, end);
@@ -1044,41 +1069,48 @@ public class SX4Draw extends Application {
         PanelElement rtbtn = getRouteBtn(poi);
         if (currentRoute == null) {
             // initialize new route
-            currentRoute = new Route(Route.getnewid());
-            System.out.println("init route with id=" + currentRoute.id);
+            currentRoute = new Route(Route.Companion.getnewid());
+            System.out.println("init route with id=" + currentRoute.getId());
             if (rtbtn != null) {  // first button
-                currentRoute.btn1 = rtbtn.adr;
+                currentRoute.setBtn1(rtbtn.adr);
                 rtbtn.createShapeAndSetState(PEState.MARKED);
-                System.out.println("btn1 =" + currentRoute.btn1);
+                redrawPanelElements();
+                System.out.println("btn1 =" + currentRoute.getBtn1());
+                //gc.strokeText("1", rtbtn.x - 4, rtbtn.y - YOFF + 4);
             } else {
                 currentRoute = null; // no routebtn at this point
             }
         } else {
             if (rtbtn == null) {
                 // continue to add elements to route
-                Pair<PanelElement, Integer> peSt = selectedPENotTrackInclState(poi.x, poi.y);
+                Pair<PanelElement, Integer> peSt = selectedPENotTrackInclState(poi.getX(), poi.getY());
                 if (peSt != null) {
                     // add to route and mark
                     currentRoute.addElement(peSt);
                     peSt.getKey().createShapeAndSetState(PEState.MARKED);
+                    redrawPanelElements();
                 }
             } else {
                 // creation finished - a end route button has been selected
-                currentRoute.btn2 = rtbtn.adr;
+                currentRoute.setBtn2(rtbtn.adr);
                 rtbtn.createShapeAndSetState(PEState.MARKED);
-                System.out.println("btn2 =" + currentRoute.btn2);
+                showRoute(currentRoute,0);
+                System.out.println("btn2 =" + currentRoute.getBtn2());
                 routes.add(new Route(currentRoute));  // add a new route from btn1 to btn2
+
                 Alert alert = new Alert(AlertType.INFORMATION);
-                alert.setTitle("Fahrstraße");
+                alert.setTitle("Fahrstraße "+currentRoute.getId()+ " abgeschlossen.");
                 alert.setHeaderText(null);
-                alert.setContentText("Fahrstraße beendet!");
+                alert.setContentText("Die Signalstellungen müssen noch manuell korrigiert werden!");
                 alert.showAndWait();
+
                 resetPEStates();
                 redrawPanelElements();
                 currentRoute = null; // reset
             }
         }
     }
+
 
     private static void drawAddresses(GraphicsContext gc) {
         gc.clearRect(0, 0, RECT_X, RECT_Y);
@@ -1160,7 +1192,7 @@ public class SX4Draw extends Application {
             lastPE = null;
             dispAddresses.setSelected(false);
             rasterOn.setSelected(true);
-            gc.clearRect(0, 0, RECT_X, RECT_Y);  // clear addresses labels, if any
+            gc.clearRect(0, 0, RECT_X, INSTANCE.RECT_Y);  // clear addresses labels, if any
             String result = ReadConfig.readXML(selectedFile.toString());
             if (result.equals("OK")) {
                 currentFileName = selectedFile.getName();
@@ -1198,5 +1230,20 @@ public class SX4Draw extends Application {
         }
     }
 
+    public void showRoute(Route rt, int seconds) {
+        rt.setRouteStates();
+        redrawPanelElements();
+        drawRTButtons(rt.getBtn1(), rt.getBtn2());
+        if (seconds != 0) {
+            Timeline timeline = new Timeline(new KeyFrame(
+                    Duration.millis(seconds * 1000),
+                    ae -> {
+                        rt.setMarked(false);
+                        redrawPanelElements();
+                    }));
+
+            timeline.play();
+        }
+    }
 }
 

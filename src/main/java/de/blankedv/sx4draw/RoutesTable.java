@@ -165,7 +165,8 @@ public class RoutesTable {
                     @Override
                     public void handle(ActionEvent event) {
                         final Route rtShown = row.getItem();
-                        rtShown.setRouteStates();
+                        app.showRoute(rtShown, 6);
+                        /*rtShown.setRouteStates();
                         app.redrawPanelElements();
                         app.drawRTButtons(rtShown.getBtn1(), rtShown.getBtn2());
                         Timeline timeline = new Timeline(new KeyFrame(
@@ -175,7 +176,7 @@ public class RoutesTable {
                                     app.redrawPanelElements();
                                 }));
 
-                        timeline.play();
+                        timeline.play(); */
 
                     }
                 });
@@ -220,7 +221,7 @@ public class RoutesTable {
         tableView.setItems(routes);
 
         // textField.setTextFormatter(formatter);
-        Utils.customResize(tableView);
+        Utils.INSTANCE.customResize(tableView);
 
     }
 

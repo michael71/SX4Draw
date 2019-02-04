@@ -26,6 +26,10 @@ public class PanelElement implements Comparator<PanelElement>, Comparable<PanelE
 
     private static boolean scaledPlus = false;
 
+    final public static int TOUCH_RADIUS = 7;
+    final  public  static double  TRACKWIDTH = 5.0;
+    final  public  static double   SENSORWIDTH = 4.0;
+
     protected String name = "";
     protected PEType type = PEType.TRACK;
     protected int x; // starting point
@@ -110,12 +114,12 @@ public class PanelElement implements Comparator<PanelElement>, Comparable<PanelE
 
     public PanelElement(PEType type, IntPoint poi, IntPoint closed, IntPoint thrown) {
         this.type = type;
-        this.x = poi.x;
-        this.y = poi.y;
-        this.x2 = closed.x;
-        this.y2 = closed.y;
-        this.xt = thrown.x;
-        this.yt = thrown.y;
+        this.x = poi.getX();
+        this.y = poi.getY();
+        this.x2 = closed.getX();
+        this.y2 = closed.getY();
+        this.xt = thrown.getX();
+        this.yt = thrown.getY();
         // NO ORDERING HERE
         name = "";
         createShapeAndSetState(PEState.DEFAULT);
@@ -124,12 +128,12 @@ public class PanelElement implements Comparator<PanelElement>, Comparable<PanelE
 
     public PanelElement(PEType type, Position pos) {
         this.type = type;
-        this.x = pos.x;
-        this.y = pos.y;
-        this.x2 = pos.x2;
-        this.y2 = pos.y2;
-        this.xt = pos.xt;
-        this.yt = pos.yt;
+        this.x = pos.getX();
+        this.y = pos.getY();
+        this.x2 = pos.getX2();
+        this.y2 = pos.getY2();
+        this.xt = pos.getXt();
+        this.yt = pos.getYt();
         name = "";
         createShapeAndSetState(PEState.DEFAULT);
         autoAddress();
@@ -137,12 +141,12 @@ public class PanelElement implements Comparator<PanelElement>, Comparable<PanelE
 
     public PanelElement(PEType type, IntPoint poi) {
         this.type = type;
-        this.x = poi.x;
-        this.y = poi.y;
+        this.x = poi.getX();
+        this.y = poi.getY();
         if (type == PEType.SIGNAL) {
-            IntPoint d = Utils.signalOrientToDXY2(0); // 0 (= 0 grad) is default orientation for signal
-            x2 = x + d.x;
-            y2 = y + d.y;
+            IntPoint d = Utils.INSTANCE.signalOrientToDXY2(0); // 0 (= 0 grad) is default orientation for signal
+            x2 = x + d.getX();
+            y2 = y + d.getY();
         }
         name = "";
         createShapeAndSetState(PEState.DEFAULT);
@@ -301,7 +305,6 @@ public class PanelElement implements Comparator<PanelElement>, Comparable<PanelE
                 shape.setStroke(defaultColor);
                 break;
         }
-
     }
 
 
@@ -312,11 +315,11 @@ public class PanelElement implements Comparator<PanelElement>, Comparable<PanelE
                 if (x2 != INVALID_INT) {
                     ymin = Math.min(y, y2);
                     ymax = Math.max(y, y2);
-                    if ((touch.x >= (x - TOUCH_RADIUS))
-                            && (touch.x <= (x2 + TOUCH_RADIUS))
-                            && (touch.y >= (ymin - TOUCH_RADIUS))
-                            && (touch.y <= (ymax + TOUCH_RADIUS))) {
-                        if (Utils.calcDistanceFromLine(new IntPoint(x, y), new IntPoint(x2, y2), touch) < TOUCH_RADIUS) {
+                    if ((touch.getX() >= (x - TOUCH_RADIUS))
+                            && (touch.getX() <= (x2 + TOUCH_RADIUS))
+                            && (touch.getY() >= (ymin - TOUCH_RADIUS))
+                            && (touch.getY() <= (ymax + TOUCH_RADIUS))) {
+                        if (Utils.  INSTANCE.calcDistanceFromLine(new IntPoint(x, y), new IntPoint(x2, y2), touch) < TOUCH_RADIUS) {
                             return new Pair(true, 0);
                         } else {
                             return new Pair(false, 0);
@@ -326,10 +329,10 @@ public class PanelElement implements Comparator<PanelElement>, Comparable<PanelE
                     }
                 } else {
                     // US Sensor
-                    if ((touch.x >= (x - TOUCH_RADIUS))
-                            && (touch.x <= (x + TOUCH_RADIUS))
-                            && (touch.y >= (y - TOUCH_RADIUS))
-                            && (touch.y <= (y + TOUCH_RADIUS))) {
+                    if ((touch.getX() >= (x - TOUCH_RADIUS))
+                            && (touch.getX() <= (x + TOUCH_RADIUS))
+                            && (touch.getY() >= (y - TOUCH_RADIUS))
+                            && (touch.getY() <= (y + TOUCH_RADIUS))) {
                         return new Pair(true, 0);
                     } else {
                         return new Pair(false, 0);
@@ -337,26 +340,26 @@ public class PanelElement implements Comparator<PanelElement>, Comparable<PanelE
                 }
             case SIGNAL:
             case ROUTEBUTTON:
-                double dist = Math.sqrt((touch.x - x) * (touch.x - x) + (touch.y - y) * (touch.y - y));
+                double dist = Math.sqrt((touch.getX() - x) * (touch.getX() - x) + (touch.getY() - y) * (touch.getY() - y));
                 boolean result = (dist < TOUCH_RADIUS * 2);
                 return new Pair(result, 0);
             case TURNOUT:
                 // check first for (x2,y2) touch (state 0)
-                if ((touch.x >= (x2 - TOUCH_RADIUS))
-                        && (touch.x <= (x2 + TOUCH_RADIUS))
-                        && (touch.y >= (y2 - TOUCH_RADIUS))
-                        && (touch.y <= (y2 + TOUCH_RADIUS))) {
+                if ((touch.getX() >= (x2 - TOUCH_RADIUS))
+                        && (touch.getX() <= (x2 + TOUCH_RADIUS))
+                        && (touch.getY() >= (y2 - TOUCH_RADIUS))
+                        && (touch.getY() <= (y2 + TOUCH_RADIUS))) {
                     return new Pair(true, 0);
 
-                } else if ((touch.x >= (xt - TOUCH_RADIUS)) // thrown, state1
-                        && (touch.x <= (xt + TOUCH_RADIUS))
-                        && (touch.y >= (yt - TOUCH_RADIUS))
-                        && (touch.y <= (yt + TOUCH_RADIUS))) {
+                } else if ((touch.getX() >= (xt - TOUCH_RADIUS)) // thrown, state1
+                        && (touch.getX() <= (xt + TOUCH_RADIUS))
+                        && (touch.getY() >= (yt - TOUCH_RADIUS))
+                        && (touch.getY() <= (yt + TOUCH_RADIUS))) {
                     return new Pair(true, 1);  // thrown state
-                } else if ((touch.x >= (x - TOUCH_RADIUS)) // next center
-                        && (touch.x <= (x + TOUCH_RADIUS))
-                        && (touch.y >= (y - TOUCH_RADIUS))
-                        && (touch.y <= (y + TOUCH_RADIUS))) {
+                } else if ((touch.getX() >= (x - TOUCH_RADIUS)) // next center
+                        && (touch.getX() <= (x + TOUCH_RADIUS))
+                        && (touch.getY() >= (y - TOUCH_RADIUS))
+                        && (touch.getY() <= (y + TOUCH_RADIUS))) {
                     return new Pair(true, 0);
                 } else {
                     return new Pair(false, 0);
@@ -583,19 +586,19 @@ public class PanelElement implements Comparator<PanelElement>, Comparable<PanelE
     public static void translate(IntPoint d) {
         for (PanelElement pe : panelElements) {
             if (pe.state == PEState.SELECTED) {
-                pe.x += d.x;
-                pe.y += d.y;
+                pe.x += d.getX();
+                pe.y += d.getY();
                 if (pe.x2 != INVALID_INT) {
-                    pe.x2 += d.x;
+                    pe.x2 += d.getX();
                 }
                 if (pe.xt != INVALID_INT) {
-                    pe.xt += d.x;
+                    pe.xt += d.getX();
                 }
                 if (pe.y2 != INVALID_INT) {
-                    pe.y2 += d.y;
+                    pe.y2 += d.getY();
                 }
                 if (pe.yt != INVALID_INT) {
-                    pe.yt += d.y;
+                    pe.yt += d.getY();
                 }
             }
             pe.createShape();   // state will be reset to DEFAULT also

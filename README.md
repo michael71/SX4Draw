@@ -2,7 +2,8 @@
 
 Zeichenprogramm, um XML Panel Definitionen für SX4 und Lanbahnpanel zu zeichnen.
 
-(ACHTUNG: Die Oberfläche ist hier rein für die XML-Erzeugung optimiert (!), die Ansicht von Signalen etc ist im Programm LanbahnPanel deutlich komplexer und kann auf verschiedene Themen (Deutsch, US, UK) umgestellt werden.)
+(ACHTUNG: Das Programm ist KEIN Gleisbildstellpult, sondern rein für die XML-Erzeugung gedacht
+ (für "LanbahnPanel"), die Ansicht von Signalen etc ist z.B. "rein schematisch" (in einer Farbe))
 
 So sieht die Erstellung/Test einer Fahrstraße im SX4Draw-GUI aus:
 
