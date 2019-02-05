@@ -27,6 +27,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -41,8 +42,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
@@ -54,7 +54,9 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import javafx.util.Pair;
+import sun.plugin.javascript.navig.Anchor;
 
+import javax.swing.*;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -79,8 +81,9 @@ public class SX4Draw extends Application {
     // FIXED: warnung bei doppelter Adresse (mit Anzeige)
     // FIXED: suchfunktion - Adresse eingeben -> elemente anzeigen
     // FIXED: Signale auch 45Grad, 135Grad, ....
-    // TODO für weichen INV funktion einbauen (in Fahrstrassenanzeige)
+    // FIXED: für weichen INV funktion einbauen (in Fahrstrassenanzeige)
     // TODO Mixbetrieb Fahrstrassen und Manueller Betrieb mit manuellem Fahrstrassenlöschen
+    // TODO ScrollPane einführen für Drawing bereich
 
     public static ArrayList<PanelElement> panelElements = new ArrayList<>();
     public static PanelElement lastPE = null;
@@ -157,10 +160,11 @@ public class SX4Draw extends Application {
         primaryStage.getIcons().add(new Image("file:sx4_icon.png"));
         final Preferences prefs = Preferences.userNodeForPackage(this.getClass());
 
-        Scene scene = new Scene(root, 1100, 600);
+
         // Build the VBox container for the lineBox, canvas, and toolBox
 
         vb = new VBox(3);
+        Scene scene = new Scene(vb, 1400, 700);
         canvas = new Canvas(RECT_X, RECT_Y);
         gc = canvas.getGraphicsContext2D();
         mousePositionToolTip.setOpacity(0.7);
@@ -171,7 +175,7 @@ public class SX4Draw extends Application {
         lineGroup.setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent me) {
-                IntPoint poi = new IntPoint(me.getSceneX(), me.getSceneY());
+                IntPoint poi = new IntPoint(me.getX(), me.getY());
                 System.out.println("linegroup mouse pressed x=" + poi.getX() + " y=" + poi.getY() + " currentGUIState=" + currentGUIState.name() + " src=" + me.getSource());
                 if (me.getButton() == MouseButton.PRIMARY) {
                     System.out.println("prim btn");
@@ -197,8 +201,8 @@ public class SX4Draw extends Application {
                             //}
                             break;
                         case MOVE:
-                            moveStart.setX((int) me.getSceneX());
-                            moveStart.setY((int) me.getSceneY());
+                            moveStart.setX((int) me.getX());
+                            moveStart.setY((int) me.getY());
                             System.out.println("moveStart");
                             addToDraggedGroup();
                             break;
@@ -239,7 +243,7 @@ public class SX4Draw extends Application {
         //System.out.println("size rect: x=" + (scene.getWidth()) + " y=" + (scene.getHeight() - 230));
         canvas.setCursor(Cursor.DEFAULT);
         canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, me -> {
-            IntPoint poi = new IntPoint(me.getSceneX(), me.getSceneY());
+            IntPoint poi = new IntPoint(me.getX(), me.getY());
             IntPoint end;
             start = IntPoint.Companion.toRaster(poi, getRaster());
             System.out.println("canvas mouse pressed x=" + poi.getX() + " y=" + poi.getY() + " currentGUIState=" + currentGUIState.name());
@@ -297,14 +301,14 @@ public class SX4Draw extends Application {
         canvas.setOnMouseMoved(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                String msg = "(" + (int) event.getSceneX() + ", " + ((int) event.getSceneY() - YOFF) + ")";
+                String msg = "(" + (int) event.getX() + ", " + ((int) event.getY() - YOFF) + ")";
                 /* + ")\n(sceneX: "
                     + event.getSceneX() + ", sceneY: " + event.getSceneY() + ")\n(screenX: "
                     + event.getScreenX() + ", screenY: " + event.getScreenY() + ")"; */
                 if (showMousePos.isSelected()) {
                     mousePositionToolTip.setText(msg);
                     Node node = (Node) event.getSource();
-                    mousePositionToolTip.show(node, event.getScreenX() + 30, event.getScreenY() + 20);
+                    mousePositionToolTip.show(node, event.getX() + 30, event.getY() + 20);
 
                 }
             }
@@ -317,7 +321,7 @@ public class SX4Draw extends Application {
             public void handle(MouseEvent me) {
                 // keep shapes within rectangle
                 if (canvas.getBoundsInLocal().contains(me.getX(), me.getY())) {
-                    IntPoint poi = new IntPoint(me.getSceneX(), me.getSceneY());
+                    IntPoint poi = new IntPoint(me.getX(), me.getY());
                     System.out.println("end approx x=" + poi.getX() + " y=" + poi.getY());
                     IntPoint end = IntPoint.Companion.correctAngle(start, poi, getRaster());
                     System.out.println("end x=" + end.getX() + " y=" + end.getY());
@@ -372,7 +376,7 @@ public class SX4Draw extends Application {
             @Override
             public void handle(MouseEvent me) {
                 if (canvas.getBoundsInLocal().contains(me.getX(), me.getY())) {
-                    IntPoint poi = new IntPoint(me.getSceneX(), me.getSceneY());
+                    IntPoint poi = new IntPoint(me.getX(), me.getY());
                     switch (currentGUIState) {
                         case ADD_TRACK:
                         case ADD_SENSOR:
@@ -380,7 +384,7 @@ public class SX4Draw extends Application {
                             IntPoint mp = IntPoint.Companion.correctAngle(start, poi, getRaster());
                             line.setEndX(mp.getX());
                             line.setEndY(mp.getY());
-                            //System.out.println("x=" + (int)me.getSceneX() + " y=" + (int)me.getSceneY());
+                            //System.out.println("x=" + (int)me.getX() + " y=" + (int)me.getY());
                             if (!lineGroup.getChildren().contains(line)) {
                                 lineGroup.getChildren().add(line);
                             }
@@ -398,28 +402,54 @@ public class SX4Draw extends Application {
                 }
 
                 if (showMousePos.isSelected()) {
-                    String msg = "(" + (int) me.getSceneX() + ", " + ((int) me.getSceneY() - YOFF) + ")";
-                    /* + ")\n(sceneX: "
-                    + event.getSceneX() + ", sceneY: " + event.getSceneY() + ")\n(screenX: "
-                    + event.getScreenX() + ", screenY: " + event.getScreenY() + ")"; */
+                    String msg = "(" + (int) me.getX() + ", " + ((int) me.getY() - YOFF) + ")";
                     mousePositionToolTip.setText(msg);
                     Node node = (Node) me.getSource();
-                    mousePositionToolTip.show(node, (int) me.getScreenX() + 30, (int) me.getScreenY() + 20);
+                    mousePositionToolTip.show(node, (int) me.getX() + 30, (int) me.getY() + 20);
                 }
 
             }
         });
 
-        vb.setLayoutX(0);
-        vb.setLayoutY(0);
-        vb.getChildren().addAll(menuBar, buttons, canvas);
+        //vb.setLayoutX(0);
+        //vb.setLayoutY(0);
+        //vb.getChildren().addAll(menuBar, buttons);
+
+        /*BorderPane bp = new BorderPane();
+        bp.setMaxSize(10000,6000);
+        bp.minHeight(100);
+        bp.minWidth(400);
+        //bp.setPrefSize(2000,1200);
+        bp.setPickOnBounds(true); */
+
+
+        //StackPane stackPane = new StackPane();
+
+
+        ScrollPane scPane = new ScrollPane();
+        vb.getChildren().addAll(menuBar, buttons,scPane);
+        //scPane.setFitToHeight(true);
+        //scPane.setFitToWidth(true);
+        scPane.setMaxWidth(Double.MAX_VALUE);
+        scPane.setMaxHeight(Double.MAX_VALUE);
+        scPane.setPrefSize(RECT_X,RECT_Y);
+        scPane.setFitToWidth(true);
+        //BorderPane.setAlignment(scPane, Pos.CENTER);
+        VBox.setVgrow(scPane, Priority.ALWAYS);
+        HBox.setHgrow(scPane, Priority.ALWAYS);
+        AnchorPane anchorPane = new AnchorPane();
+        //anchorPane.setPrefSize(1100,540);
+        //scPane.setContent(stackPane);
+        scPane.setContent(anchorPane);
+        //bp.setCenter(scPane);
+        //bp.setTop(vb);
 
         /* URSPRUNG Koordinatensystem x=0 y=60 */
         //raster
-        for (int i = 20;
+        for (int i = 0;
              i <= (RECT_X + 100);
              i = i + 20) {
-            for (int j = 80; j <= (RECT_Y + 160); j = j + RASTER) {
+            for (int j = 0; j <= (RECT_Y + 160); j = j + RASTER) {
                 Circle cir = new Circle(i, j, 0.5);
                 cir.setFill(Color.BLUE);
                 if (canvas.getBoundsInParent().contains(i, j)) {
@@ -428,8 +458,7 @@ public class SX4Draw extends Application {
             }
         }
 
-        root.getChildren()
-                .addAll(lineGroup, vb, raster, draggedGroup);
+        anchorPane.getChildren().addAll(lineGroup, raster,canvas,draggedGroup);
 
         primaryStage.setScene(scene);
 

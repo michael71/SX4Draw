@@ -49,7 +49,7 @@ import static de.blankedv.sx4draw.SX4Draw.trips;
  */
 public class ReadConfig {
 
-    public static final int YOFF = 60;   // y values start at 60, this value get added when reading a config
+    public static final int YOFF = 0;   // y values start at 60, this value get added when reading a config
     // and substracted when storing.
 
     private static final boolean CFG_DEBUG = true;
