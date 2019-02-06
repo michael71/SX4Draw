@@ -50,21 +50,21 @@ public class Calc {
                     // check whether this turnout is already known
                     boolean known = false;
                     for (PanelElement e : panelElements) {
-                        if ((e.type == PEType.TURNOUT) && (e.x == turnout.x) && (e.y == turnout.y)
+                        if ((e.getType() == PEType.TURNOUT) && (e.getX() == turnout.getX()) && (e.getY() == turnout.getY())
                                 // at the approximately the same position => match
-                                && ((Math.abs(e.x2 - turnout.x2) <= 5) && (Math.abs(e.y2 - turnout.y2) <= 5) &&
-                                (Math.abs(e.xt - turnout.xt) <= 5) && (Math.abs(e.yt - turnout.yt) <= 5))
+                                && ((Math.abs(e.getX2() - turnout.getX2()) <= 5) && (Math.abs(e.getY2() - turnout.getY2()) <= 5) &&
+                                (Math.abs(e.getXt() - turnout.getXt()) <= 5) && (Math.abs(e.getYt() - turnout.getYt()) <= 5))
                                 // thrown vs. closed position reversed => match
-                                || ((Math.abs(e.x2 - turnout.xt) <= 5) && (Math.abs(e.y2 - turnout.yt) <= 5) &&
-                                (Math.abs(e.xt - turnout.x2) <= 5) && (Math.abs(e.yt - turnout.y2) <= 5))) {
+                                || ((Math.abs(e.getX2() - turnout.getXt()) <= 5) && (Math.abs(e.getY2() - turnout.getYt()) <= 5) &&
+                                (Math.abs(e.getXt() - turnout.getX2()) <= 5) && (Math.abs(e.getYt() - turnout.getY2()) <= 5))) {
 
                             known = true;
                             break;
                         }
                     }
                     if (!known) {
-                        System.out.println("adding turnout at " + turnout.x + "," + (turnout.y - YOFF));
-                        turnout.adr = 1;  // dummy address to have an address stored as placeholder in XML File
+                        System.out.println("adding turnout at " + turnout.getX() + "," + (turnout.getY() - YOFF));
+                        turnout.setAdr(1);  // dummy address to have an address stored as placeholder in XML File
                         panelElements.add(turnout);  // with unknown SX address
                     } else {
                         // System.out.println("already known at " + turnout.x + "," + (turnout.y- YOFF));

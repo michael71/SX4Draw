@@ -287,12 +287,12 @@ public class ReadConfig {
                 PanelElement pe = new PanelElement(type, p);
                 switch (addressArr.size()) {
                     case 1:
-                        pe.adr = lba;
+                        pe.setAdr(lba);
                         panelElements.add(pe);
                         break;
                     case 2:
-                        pe.adr = lba;
-                        pe.adr2 = addressArr.get(1);
+                        pe.setAdr(lba);
+                        pe.setAdr2(addressArr.get(1));
                         panelElements.add(pe);
                         break;
                     default:

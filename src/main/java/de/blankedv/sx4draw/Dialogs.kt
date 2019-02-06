@@ -32,7 +32,7 @@ import javafx.scene.control.ButtonType
  */
 object Dialogs {
 
-    fun InfoAlert(title: String, header: String, msg: String, app: Application) {
+    fun buildInfoAlert(title: String, header: String, msg: String, app: Application) {
         val alert = Alert(Alert.AlertType.INFORMATION)
         alert.contentText = msg
         alert.title = title
@@ -50,22 +50,21 @@ object Dialogs {
             } catch (e: Exception) {
                 println(e.message)
             }
-
         }
     }
 
-    fun ConfirmationAlert(title: String, header: String, msg: String, app: Application) {
-        val alert = Alert(Alert.AlertType.CONFIRMATION)
+    fun buildInformationAlert(title: String, header: String, msg: String, app: Application) {
+        val alert = Alert(Alert.AlertType.INFORMATION)
         alert.contentText = msg
         alert.title = title
         alert.headerText = header
         val window = alert.dialogPane.scene.window
         window.setOnCloseRequest { _ -> window.hide() }
 
-        val option = alert.showAndWait()
+        alert.showAndWait()
     }
 
-    fun ErrorAlert(title : String, header : String, content: String) {
+    fun buildErrorAlert(title : String, header : String, content: String) {
         val alert = Alert(Alert.AlertType.ERROR)
         alert.setTitle(title)
         alert.setHeaderText(header)

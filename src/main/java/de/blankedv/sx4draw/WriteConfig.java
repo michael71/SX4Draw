@@ -122,25 +122,25 @@ public class WriteConfig {
             //    System.out.println("writing panel element " + pe.toString());
             //}
             writeStart(pe.getType().name().toLowerCase());
-            if (pe.name.length() > 0) {
-                writeAttribute("name=", pe.name);
+            if (pe.getName().length() > 0) {
+                writeAttribute("name=", pe.getName());
             }
-            writeAttribute("x", pe.x);
-            writeAttribute("y", pe.y - YOFF);
-            if (pe.x2 != INVALID_INT) { // save only valid attributes
-                writeAttribute("x2", pe.x2);
-                writeAttribute("y2", pe.y2 - YOFF);
+            writeAttribute("x", pe.getX());
+            writeAttribute("y", pe.getY() - YOFF);
+            if (pe.getX2() != INVALID_INT) { // save only valid attributes
+                writeAttribute("x2", pe.getX2());
+                writeAttribute("y2", pe.getY2() - YOFF);
             }
-            if (pe.xt != INVALID_INT) {
-                writeAttribute("xt", pe.xt);
-                writeAttribute("yt", pe.yt - YOFF);
+            if (pe.getXt() != INVALID_INT) {
+                writeAttribute("xt", pe.getXt());
+                writeAttribute("yt", pe.getYt() - YOFF);
             }
-            if (pe.adr2 != INVALID_INT) {
+            if (pe.getAdr2() != INVALID_INT) {
                 if (pe.getAdr() != INVALID_INT) {
-                    writeAttribute("adr", pe.adr + "," + pe.adr2);
+                    writeAttribute("adr", pe.getAdr() + "," + pe.getAdr2());
                 }
-            } else if (pe.adr != INVALID_INT) {
-                writeAttribute("adr", pe.adr);
+            } else if (pe.getAdr() != INVALID_INT) {
+                writeAttribute("adr", pe.getAdr());
             }
 
             if (pe.getInv() != 0) {

@@ -39,21 +39,21 @@ public class LinearMath {
     public static PanelElement trackIntersect(PanelElement e, PanelElement f) {
 
         // only look for crossing track elements
-        if ((e.type != PEType.TRACK) || (f.type != PEType.TRACK)) {
+        if ((e.getType() != PEType.TRACK) || (f.getType() != PEType.TRACK)) {
             return null;
         }
 
         int x1, y1, x2, y2, x3, y3, x4, y4;
 
-        x1 = e.x;
-        y1 = e.y;
-        x2 = e.x2;
-        y2 = e.y2;
+        x1 = e.getX();
+        y1 = e.getY();
+        x2 = e.getX2();
+        y2 = e.getY2();
 
-        x3 = f.x;
-        y3 = f.y;
-        x4 = f.x2;
-        y4 = f.y2;
+        x3 = f.getX();
+        y3 = f.getY();
+        x4 = f.getX2();
+        y4 = f.getY2();
 
         int d = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
         if (d == 0) {
@@ -82,12 +82,12 @@ public class LinearMath {
             // y-limits of second line
 
             // check if point is not endpoint of both tracks => no turnout
-            if (((xi == e.x) && (yi == e.y))
+            if (((xi == e.getX()) && (yi == e.getY()))
                     || // startpoint of e ( e=thrown, f=closed)
-                    ((xi == e.x2) && (yi == e.y2))) { // endpoint of e =>
+                    ((xi == e.getX2()) && (yi == e.getY2()))) { // endpoint of e =>
                 // delta-x immer negativ start/endpoint of e
-                if (((xi == f.x) && (yi == f.y))
-                        || ((xi == f.x2) && (yi == f.y2))) {
+                if (((xi == f.getX()) && (yi == f.getY()))
+                        || ((xi == f.getX2()) && (yi == f.getY2()))) {
                     // AND start/endpoint of f
                     return null; // => no turnout
                 }
@@ -98,9 +98,9 @@ public class LinearMath {
             // => double crossover
             // swap e and f if e is not "durchgehendes Gleis"
             boolean doubleslip = true;
-            if (((xi == e.x) && (yi == e.y))
+            if (((xi == e.getX()) && (yi == e.getY()))
                     || // startpoint of e ( e=thrown, f=closed)
-                    ((xi == e.x2) && (yi == e.y2))) { // endpoint of e =>
+                    ((xi == e.getX2()) && (yi == e.getY2()))) { // endpoint of e =>
                 // delta-x immer negativ
                 doubleslip = false;
                 // swap e and f => e is always "durchgehendes Gleis" (=close)
@@ -109,7 +109,7 @@ public class LinearMath {
                 f = temp;
                 if (DEBUG_MATH) System.out.println("swap e/f");
             } // else start/endpoint of f
-            else if (((xi == f.x) && (yi == f.y)) || ((xi == f.x2) && (yi == f.y2))) {
+            else if (((xi == f.getX()) && (yi == f.getY())) || ((xi == f.getX2()) && (yi == f.getY2()))) {
                 doubleslip = false;
             }
 
@@ -117,30 +117,30 @@ public class LinearMath {
                 // =========== this is a turnout !! ======================
                 // find closed and thrown positions (x2>x) both for e and f !!
                 // 1. check, turnout which lines' endpoint (xi,yi) belongs
-                String es = "E x,y=(" + e.x + "," + (e.y - YOFF) + ") x2,y2=(" + e.x2 + "," + (e.y2 - YOFF) + ")";
-                String fs = "F x,y=(" + f.x + "," + (f.y - YOFF) + ") x2,y2=(" + f.x2 + "," + (f.y2 - YOFF) + ")";
+                String es = "E x,y=(" + e.getX() + "," + (e.getY() - YOFF) + ") x2,y2=(" + e.getX2() + "," + (e.getY2() - YOFF) + ")";
+                String fs = "F x,y=(" + f.getX() + "," + (f.getY() - YOFF) + ") x2,y2=(" + f.getX2() + "," + (f.getY2() - YOFF) + ")";
                 if (DEBUG_MATH) System.out.println(es);
                 if (DEBUG_MATH) System.out.println(fs);
                 xc1 = xt = xi;
                 yc2 = yt = yi;
 
-                if ((xi == f.x) && (yi == f.y)) { // startpoint of f
-                    if ((sgn(f.x2, f.x) == 0) || (sgn(f.y2, f.y) == 0)) {
-                        xt = xi + TURNOUT_LENGTH_LONG * sgn(f.x2, f.x);
-                        yt = yi + TURNOUT_LENGTH_LONG * sgn(f.y2, f.y);
+                if ((xi == f.getX()) && (yi == f.getY())) { // startpoint of f
+                    if ((sgn(f.getX2(), f.getX()) == 0) || (sgn(f.getY2(), f.getY()) == 0)) {
+                        xt = xi + TURNOUT_LENGTH_LONG * sgn(f.getX2(), f.getX());
+                        yt = yi + TURNOUT_LENGTH_LONG * sgn(f.getY2(), f.getY());
                     } else {
-                        xt = xi + TURNOUT_LENGTH * sgn(f.x2, f.x);
-                        yt = yi + TURNOUT_LENGTH * sgn(f.y2, f.y);
+                        xt = xi + TURNOUT_LENGTH * sgn(f.getX2(), f.getX());
+                        yt = yi + TURNOUT_LENGTH * sgn(f.getY2(), f.getY());
                     }
 
 
-                } else if ((xi == f.x2) && (yi == f.y2)) { // endpoint of f
-                    if ((sgn(f.x, f.x2) == 0) || (sgn(f.y, f.y2) == 0)) {
-                        xt = xi + TURNOUT_LENGTH_LONG * sgn(f.x, f.x2);
-                        yt = yi + TURNOUT_LENGTH_LONG * sgn(f.y, f.y2);
+                } else if ((xi == f.getX2()) && (yi == f.getY2())) { // endpoint of f
+                    if ((sgn(f.getX(), f.getX2()) == 0) || (sgn(f.getY(), f.getY2()) == 0)) {
+                        xt = xi + TURNOUT_LENGTH_LONG * sgn(f.getX(), f.getX2());
+                        yt = yi + TURNOUT_LENGTH_LONG * sgn(f.getY(), f.getY2());
                     } else {
-                        xt = xi + TURNOUT_LENGTH * sgn(f.x, f.x2);
-                        yt = yi + TURNOUT_LENGTH * sgn(f.y, f.y2);
+                        xt = xi + TURNOUT_LENGTH * sgn(f.getX(), f.getX2());
+                        yt = yi + TURNOUT_LENGTH * sgn(f.getY(), f.getY2());
                     }
 
                 }
@@ -148,20 +148,20 @@ public class LinearMath {
                 // calculate possible "closed" turnout lines in both
                 // directions of "durchgehendes Gleis"
                 // choose the one which is nearer to "thrown" line end
-                if (e.x2 == e.x) {
+                if (e.getX2() == e.getX()) {
                     if (DEBUG_MATH) System.out.println("e senkrecht");
                     xc1 = xi;
                     xc2 = xi;
-                    yc1 = yi + TURNOUT_LENGTH_LONG * sgn(e.y2, e.y);
-                    yc2 = yi - TURNOUT_LENGTH_LONG * sgn(e.y2, e.y);
-                } else if (e.y2 == e.y) {
+                    yc1 = yi + TURNOUT_LENGTH_LONG * sgn(e.getY2(), e.getY());
+                    yc2 = yi - TURNOUT_LENGTH_LONG * sgn(e.getY2(), e.getY());
+                } else if (e.getY2() == e.getY()) {
                     if (DEBUG_MATH) System.out.println("e waagerecht");
-                    xc1 = xi + TURNOUT_LENGTH_LONG * sgn(e.x2, e.x);
-                    xc2 = xi - TURNOUT_LENGTH_LONG * sgn(e.x2, e.x);
+                    xc1 = xi + TURNOUT_LENGTH_LONG * sgn(e.getX2(), e.getX());
+                    xc2 = xi - TURNOUT_LENGTH_LONG * sgn(e.getX2(), e.getX());
                     yc1 = yi;
                     yc2 = yi;
                 } else {
-                    if (((e.y2 - e.y) / (e.x2 - e.x)) > 0) {
+                    if (((e.getY2() - e.getY()) / (e.getX2() - e.getX())) > 0) {
                         if (DEBUG_MATH) System.out.println("e s>0");
                         xc1 = xi + TURNOUT_LENGTH;
                         yc1 = yi + TURNOUT_LENGTH;
