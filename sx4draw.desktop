@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=SX4Draw
+Comment=SX4Draw - Graphische Erstellen von LanbahnPanel XML Files zur Modellbahnsteurung
+Keywords=java;SX4;Draw;Paint;XML;lanbahn
+Exec=/home/mblank/sx4draw/start.sh
+Terminal=false
+Type=Application
+Icon=/home/mblank/.local/share/icons/sx4monitor_ico64_3.png
+Categories=Game;

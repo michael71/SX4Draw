@@ -664,6 +664,7 @@ public class SX4Draw extends Application {
     private void createMenu(Preferences prefs, MenuBar menuBar, Stage stage) {
         // final ImageView ivSettings = new ImageView(new Image("/de/blankedv/sx4monitorfx/res/settings.png"));
         final ImageView ivInfo = new ImageView(new Image("info.png"));
+        final ImageView ivSX4generic = new ImageView(new Image("sx4.png"));
         final Menu menu1 = new Menu("File");
         final Menu menuOptions = new Menu("Optionen");
         final MenuItem setName = new MenuItem("Set Panel-Name");
@@ -874,12 +875,32 @@ public class SX4Draw extends Application {
          */
         //menuOptions.getItems().addAll(new SeparatorMenuItem(), virtData, new SeparatorMenuItem(), autoColumn);
         final MenuItem infoItem = new MenuItem("Info");
-        menuInfo.getItems().add(infoItem);
+        final MenuItem updateItem = new MenuItem("Sind Updates verfügbar?");
+        menuInfo.getItems().addAll(infoItem, updateItem);
         infoItem.setGraphic(ivInfo);
         infoItem.setOnAction((event) -> {
             System.out.println("info clicked");
             Dialogs.INSTANCE.InfoAlert("Info", "SX4Draw\nhttps://opensx.net/sx4 ", "Programm Version:" + version, this);
         });
+
+        updateItem.setGraphic(ivSX4generic);
+        updateItem.setOnAction((event) -> {
+            System.out.println("info clicked");
+            String newVersion = Utils.readLastVersionFromURL();
+            if (newVersion.contains("ERROR")) {
+                Alert alert = new Alert(AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("Konnte die aktuelle Version nicht von Github lesen!");
+                alert.setContentText(newVersion);
+                alert.showAndWait();
+
+            } else if (version.contains(newVersion)) {
+                Dialogs.INSTANCE.InfoAlert("Version ist aktuell" , null , "keine neue Version vorhanden", this);
+
+            } else {
+                Dialogs.INSTANCE.InfoAlert("Download update", "von https://github.com/michael71/SX4Draw/sx4draw.zip ", "Programm Version:" + version, this);
+            }
+            });
 
         menuBar.getMenus().addAll(menu1, menuOptions, menuCalc, menuExtra, menuInfo);
     }

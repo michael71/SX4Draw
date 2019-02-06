@@ -10,7 +10,11 @@ import java.util.concurrent.atomic.AtomicLong
 
 import javafx.scene.control.TableView
 import javafx.util.Pair
+import java.net.URL
 import kotlin.reflect.KParameter
+import jdk.nashorn.internal.runtime.ScriptingFunctions.readLine
+import java.io.*
+
 
 /**
  * @author mblank
@@ -100,6 +104,28 @@ object Utils {
             if (d1.x == delta.x && d1.y == delta.y) return orient
         }
         return INVALID_INT
+    }
+
+    @JvmStatic
+    fun readLastVersionFromURL(): String {
+        val urlObject = URL("https://github.com/michael71/SX4Draw/version.txt")
+        val urlConnection = urlObject.openConnection()
+        try {
+            val inputStream = urlConnection.getInputStream()
+            val result = StringBuilder()
+
+            BufferedReader(InputStreamReader(inputStream)).use { br ->
+                var line: String
+                line = br.readLine()
+                while (line != null) {
+                    result.append(line).append("\n")
+                    line = br.readLine()
+                }
+            }
+            return result.toString()
+        } catch (e: FileNotFoundException) {
+            return "ERROR: ($e)"
+        }
     }
 
 }
