@@ -108,22 +108,16 @@ object Utils {
 
     @JvmStatic
     fun readLastVersionFromURL(): String {
-        val urlObject = URL("https://github.com/michael71/SX4Draw/version.txt")
+        val urlObject = URL("https://github.com/michael71/SX4Draw/blob/master/version.txt")
         val urlConnection = urlObject.openConnection()
         try {
+            var line: String =""
             val inputStream = urlConnection.getInputStream()
-            val result = StringBuilder()
-
             BufferedReader(InputStreamReader(inputStream)).use { br ->
-                var line: String
-                line = br.readLine()
-                while (line != null) {
-                    result.append(line).append("\n")
-                    line = br.readLine()
-                }
+                line = br.readLine()   // read a single line
             }
-            return result.toString()
-        } catch (e: FileNotFoundException) {
+            return line.toString()
+        } catch (e: Exception) {
             return "ERROR: ($e)"
         }
     }

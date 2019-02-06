@@ -54,6 +54,25 @@ object Dialogs {
         }
     }
 
+    fun ConfirmationAlert(title: String, header: String, msg: String, app: Application) {
+        val alert = Alert(Alert.AlertType.CONFIRMATION)
+        alert.contentText = msg
+        alert.title = title
+        alert.headerText = header
+        val window = alert.dialogPane.scene.window
+        window.setOnCloseRequest { _ -> window.hide() }
+
+        val option = alert.showAndWait()
+    }
+
+    fun ErrorAlert(title : String, header : String, content: String) {
+        val alert = Alert(Alert.AlertType.ERROR)
+        alert.setTitle(title)
+        alert.setHeaderText(header)
+        alert.setContentText(content)
+        alert.showAndWait()
+    }
+
 
     fun checkAddress(oldValue: GenericAddress, newAddress: GenericAddress): Boolean {
         println("check address = " + newAddress.addr)

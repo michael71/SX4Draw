@@ -120,6 +120,8 @@ public class SX4Draw extends Application {
     final CheckMenuItem rasterOn = new CheckMenuItem("Raster");
     final CheckMenuItem showMousePos = new CheckMenuItem("Mauspos. anzeigen");
     final Tooltip mousePositionToolTip = new Tooltip("");
+    final AnchorPane anchorPane = new AnchorPane();
+    final Label status = new Label("status");
 
     private final Group root = new Group();
 
@@ -155,9 +157,10 @@ public class SX4Draw extends Application {
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Panel XML File Creator (Name: ???)");
-        primaryStage.getIcons().add(new Image("file:sx4_ico64.png"));
-        primaryStage.getIcons().add(new Image("file:sx4_ico256.png"));
-        primaryStage.getIcons().add(new Image("file:sx4_icon.png"));
+        primaryStage.getIcons().add(new Image("sx4_draw_ico64.png"));
+        //primaryStage.getIcons().add(new Image("file:sx4_ico256.png"));
+        //primaryStage.getIcons().add(new Image("file:sx4_iconx.png"));
+
         final Preferences prefs = Preferences.userNodeForPackage(this.getClass());
 
 
@@ -427,7 +430,7 @@ public class SX4Draw extends Application {
 
 
         ScrollPane scPane = new ScrollPane();
-        vb.getChildren().addAll(menuBar, buttons,scPane);
+        vb.getChildren().addAll(menuBar, buttons,scPane);    //, status);
         //scPane.setFitToHeight(true);
         //scPane.setFitToWidth(true);
         scPane.setMaxWidth(Double.MAX_VALUE);
@@ -437,7 +440,7 @@ public class SX4Draw extends Application {
         //BorderPane.setAlignment(scPane, Pos.CENTER);
         VBox.setVgrow(scPane, Priority.ALWAYS);
         HBox.setHgrow(scPane, Priority.ALWAYS);
-        AnchorPane anchorPane = new AnchorPane();
+
         //anchorPane.setPrefSize(1100,540);
         //scPane.setContent(stackPane);
         scPane.setContent(anchorPane);
@@ -885,17 +888,19 @@ public class SX4Draw extends Application {
 
         updateItem.setGraphic(ivSX4generic);
         updateItem.setOnAction((event) -> {
-            System.out.println("info clicked");
+            System.out.println("checking version ...");
+            // does not work as expected ProgressIndicator p1 = new ProgressIndicator();
+            //anchorPane.getChildren().add(p1);
+            // gets never diplayes:   status.setText("checking version ...");
+            // TODO move to async as soon as using kotlin
             String newVersion = Utils.readLastVersionFromURL();
+            // status.setText("");
+            //anchorPane.getChildren().remove(p1);
+            System.out.println("read from github: " + newVersion);
             if (newVersion.contains("ERROR")) {
-                Alert alert = new Alert(AlertType.ERROR);
-                alert.setTitle("Error");
-                alert.setHeaderText("Konnte die aktuelle Version nicht von Github lesen!");
-                alert.setContentText(newVersion);
-                alert.showAndWait();
-
+                Dialogs.INSTANCE.ErrorAlert("Error","Konnte die aktuelle Version nicht von Github lesen!", newVersion);
             } else if (version.contains(newVersion)) {
-                Dialogs.INSTANCE.InfoAlert("Version ist aktuell" , null , "keine neue Version vorhanden", this);
+                Dialogs.INSTANCE.ConfirmationAlert("Version "+version+" ist aktuell" , "" , "keine neue Version vorhanden", this);
 
             } else {
                 Dialogs.INSTANCE.InfoAlert("Download update", "von https://github.com/michael71/SX4Draw/sx4draw.zip ", "Programm Version:" + version, this);
