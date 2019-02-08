@@ -30,7 +30,7 @@ object Constants {
     const val INVALID_INT = -1
     const val DEBUG = true
 
-    const val RASTER = 20
+    const val RASTER = 10
     const val RECT_X = 1600
     const val RECT_Y = 1000
 

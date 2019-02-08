@@ -120,14 +120,12 @@ public class SX4Draw extends Application {
     final AnchorPane anchorPane = new AnchorPane();
     final Label status = new Label("status");
 
-    private final Group root = new Group();
-
     public enum GUIState {
         ADD_TRACK, ADD_SENSOR, ADD_SENSOR_US, ADD_SIGNAL, ADD_ROUTEBTN, ADD_ROUTE, SELECT, MOVE
     }
 
     public enum PEType {
-        TRACK, SENSOR, SIGNAL, TURNOUT, ROUTEBUTTON;
+        TRACK, SENSOR, SIGNAL, TURNOUT, ROUTEBUTTON
     }
 
     //public static ArrayList<Route> routes = new ArrayList<>();
@@ -221,7 +219,7 @@ public class SX4Draw extends Application {
         MenuBar menuBar = new MenuBar();
         createMenu(prefs, menuBar, primaryStage);
 
-        root.addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+        anchorPane.addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
 
             @Override
             public void handle(KeyEvent t) {
@@ -357,7 +355,7 @@ public class SX4Draw extends Application {
                         case ADD_ROUTE:
                             break;
                         case MOVE:    // MOVE ends
-                            IntPoint d = IntPoint.Companion.delta(moveStart, poi, getRasterDiv2());
+                            IntPoint d = IntPoint.Companion.delta(moveStart, poi, getRaster());
                             System.out.println("move END: final delta =" + d.getX() + "," + d.getY());
                             PanelElement.Companion.translate(d);
                             draggedGroup.getChildren().clear();
@@ -394,7 +392,7 @@ public class SX4Draw extends Application {
                             // do nothing
                             break;
                         case MOVE:  // MOVE dragging
-                            IntPoint d = IntPoint.Companion.delta(moveStart, poi, getRasterDiv2());
+                            IntPoint d = IntPoint.Companion.delta(moveStart, poi, getRaster());
                             //System.out.println("delta =" + d.x + "," + d.y);
                             draggedGroup.setTranslateX(d.getX());
                             draggedGroup.setTranslateY(d.getY());
@@ -446,12 +444,10 @@ public class SX4Draw extends Application {
         //bp.setCenter(scPane);
         //bp.setTop(vb);
 
-        /* URSPRUNG Koordinatensystem x=0 y=60 */
-        //raster
         for (int i = 0;
              i <= (RECT_X + 100);
-             i = i + 20) {
-            for (int j = 0; j <= (RECT_Y + 160); j = j + RASTER) {
+             i = i + (RASTER *2)) {
+            for (int j = 0; j <= (RECT_Y + 160); j = j + (RASTER*2)) {
                 Circle cir = new Circle(i, j, 0.5);
                 cir.setFill(Color.BLUE);
                 if (canvas.getBoundsInParent().contains(i, j)) {
@@ -691,14 +687,14 @@ public class SX4Draw extends Application {
         showMousePos.setSelected(false);
 
         exitItem.setOnAction((event) -> {
-            //PanelElement.scaleAll();
+            //PanelElement.normPositions();
             String path = prefs.get("directory", System.getProperty("user.home"));
             writeFile(stage, path, false);
             System.exit(0);
         });
 
         saveItem.setOnAction((event) -> {
-            //PanelElement.scaleAll();
+            //PanelElement.normPositions();
             redrawPanelElements();
             String path = prefs.get("directory", System.getProperty("user.home"));
             String lastPath = writeFile(stage, path, true);
@@ -734,9 +730,11 @@ public class SX4Draw extends Application {
         rasterOn.setOnAction((event) -> {
             System.out.println("raster toggle");
             if (rasterOn.isSelected()) {
-                root.getChildren().add(raster);
+                if (!anchorPane.getChildren().contains(raster)) {
+                    anchorPane.getChildren().add(raster);
+                }
             } else {
-                root.getChildren().remove(raster);
+                anchorPane.getChildren().remove(raster);
             }
         });
 
@@ -789,7 +787,8 @@ public class SX4Draw extends Application {
         });
         cNormPositions.setOnAction((event) -> {
             System.out.println("norm positions");
-            PanelElement.Companion.scaleAll();
+
+            PanelElement.Companion.normPositions();
             redrawPanelElements();
         });
 
@@ -1058,7 +1057,8 @@ public class SX4Draw extends Application {
         Collections.sort(panelElements);
         for (PanelElement pe : panelElements) {
             lineGroup.getChildren().add(pe.getShape());
-            //System.out.println("drawing PE at " + pe.x + "," + pe.y + " type=" + pe.type + " state="+pe.getState().name());
+            System.out.println("drawing PE at " + pe.getX() + "," + pe.getY() + " type=" + pe.getType()
+                    + " state="+pe.getState().name() + " fillC=" + pe.getShape().getFill());
         }
     }
 
@@ -1096,7 +1096,7 @@ public class SX4Draw extends Application {
     }
 
     private void addElement(PEType t, IntPoint p, Group lg) {
-        IntPoint end = IntPoint.Companion.toRaster(p, getRasterDiv2());
+        IntPoint end = IntPoint.Companion.toRaster(p, getRaster());
         // avoid "double signal on same point
         if (!isPETypeOn(t, end)) {
             PanelElement pe = new PanelElement(t, end);
@@ -1264,13 +1264,6 @@ public class SX4Draw extends Application {
         }
     }
 
-    public int getRasterDiv2() {
-        if (rasterOn.isSelected()) {
-            return RASTER / 2;
-        } else {
-            return 1;
-        }
-    }
 
     public void showRoute(Route rt, int seconds) {
         rt.setRouteStates();

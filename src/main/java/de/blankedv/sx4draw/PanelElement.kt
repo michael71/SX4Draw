@@ -48,11 +48,7 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
     var state = PEState.DEFAULT
         private set
 
-    protected var defaultColor = Color.BLACK
-
-    // a non-active element is never expired
-    val isExpired: Boolean
-        get() = false
+    protected var defaultColor = Color.ALICEBLUE
 
 
     enum class PEState {
@@ -460,7 +456,7 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
          * only called from readXMLConfigFile (i.e. NOT when flipUpsideDown is
          * changed in the prefs)
          */
-        fun scaleAll() {
+        fun normPositions() {
 
             // in WriteConfig the NEW values are written !!
             var xmin = INVALID_INT
@@ -559,7 +555,7 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
                         pe.yt = YOFF + 20 + (ymax - pe.yt)
                     }
                 }
-                pe.createShape()
+                pe.createShapeAndSetState(PEState.DEFAULT)
 
             }
 
