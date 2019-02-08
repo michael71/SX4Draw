@@ -13,6 +13,8 @@ import static de.blankedv.sx4draw.ReadConfig.YOFF;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,7 +53,7 @@ public class WriteConfig {
         String version = df.format(new Date());
         try {
             fWriter = new FileWriter(fname);
-            fWriter.write(writeXml(localPanelName, version));
+            fWriter.write(writeXml(localPanelName, fname, version));
             fWriter.flush();
             fWriter.close();
 
@@ -106,12 +108,15 @@ public class WriteConfig {
      * @param
      * @return true, if succeeds - false, if not.
      */
-    private static String writeXml(String panelName, String version) {
+    private static String writeXml(String panelName, String fullFilename, String version) {
 
         writer = new StringWriter();
 
+        Path p = Paths.get(fullFilename);
+        String filename = p.getFileName().toString();
+
         writer.write("<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>\n");
-        writer.write("<layout-config>\n");
+        writer.write("<layout-config filename=\"" + filename + "\">\n");
         writer.write("<panel name=\"" + panelName + "\" version=\"" + version + "\">\n");
 
         ArrayList<PanelElement> peList = new ArrayList<>(panelElements);

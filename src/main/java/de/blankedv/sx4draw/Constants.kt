@@ -20,8 +20,8 @@ package de.blankedv.sx4draw
 /**
  * @author mblank
  */
-object Constants {
 
+object Constants {
 
     const val SXMAX_USED = 1068 // max sx address used (106, bit 8)
     const val LBMIN = 1200  // minimum virtual address
@@ -33,5 +33,6 @@ object Constants {
     const val RASTER = 10
     const val RECT_X = 1600
     const val RECT_Y = 1000
+
 
 }

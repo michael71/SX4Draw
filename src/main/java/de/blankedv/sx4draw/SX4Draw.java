@@ -66,10 +66,13 @@ import static de.blankedv.sx4draw.Constants.*;
 import static de.blankedv.sx4draw.PanelElement.SENSORWIDTH;
 import static de.blankedv.sx4draw.PanelElement.TRACKWIDTH;
 import static de.blankedv.sx4draw.ReadConfig.YOFF;
+import static de.blankedv.sx4draw.SX4Draw.PEType.*;
 
 public class SX4Draw extends Application {
 
-    public static String version = "0.37 - 06 Feb 2019";
+    public static double vNumber = 0.38;
+    public static String vString = "08 Feb 2019";
+    public static String version = vNumber + " - " +vString;
 
     // FIXED: weichengleichheit nicht auf den Pixel genau
     // FIXED: UNDO funktioniert nicht nach Zeichnen eines Tracks
@@ -79,7 +82,6 @@ public class SX4Draw extends Application {
     // FIXED: suchfunktion - Adresse eingeben -> elemente anzeigen
     // FIXED: Signale auch 45Grad, 135Grad, ....
     // FIXED: für weichen INV funktion einbauen (in Fahrstrassenanzeige)
-    // TODO für "SX4" -> Mixbetrieb Fahrstrassen und Manueller Betrieb mit manuellem Fahrstrassenlöschen
     // FIXED ScrollPane einführen für Drawing bereich
 
     public static ArrayList<PanelElement> panelElements = new ArrayList<>();
@@ -128,15 +130,20 @@ public class SX4Draw extends Application {
         TRACK, SENSOR, SIGNAL, TURNOUT, ROUTEBUTTON
     }
 
+    public enum RT {
+        ROUTE, COMPROUTE, TRIP, TIMETABLE
+    }
+
+
+
+
     //public static ArrayList<Route> routes = new ArrayList<>();
     public static final ObservableList<Route> routes = FXCollections.observableArrayList();
     public static final ObservableList<CompRoute> compRoutes = FXCollections.observableArrayList();
     public static final ObservableList<Trip> trips = FXCollections.observableArrayList();
     public static final ObservableList<Timetable> timetables = FXCollections.observableArrayList();
 
-    public static enum RT {
-        ROUTE, COMPROUTE, TRIP, TIMETABLE
-    }
+
 
     private GUIState currentGUIState = GUIState.SELECT;
     private final IntPoint moveStart = new IntPoint();
@@ -255,7 +262,7 @@ public class SX4Draw extends Application {
                         addElement(PEType.SIGNAL, poi, lineGroup);
                         break;
                     case ADD_ROUTEBTN:
-                        addElement(PEType.ROUTEBUTTON, poi, lineGroup);
+                        addElement(ROUTEBUTTON, poi, lineGroup);
                         break;
                     case ADD_SENSOR_US:
                         addElement(PEType.SENSOR, poi, lineGroup);
@@ -330,7 +337,7 @@ public class SX4Draw extends Application {
                             lineGroup.getChildren().remove(line);  // will be re-added from within PE
                             if ((Math.abs(line.getEndX() - line.getStartX()) > 5)
                                     || (Math.abs(line.getEndY() - line.getStartY()) > 5)) {
-                                lastPE = new PanelElement(PEType.TRACK, line);
+                                lastPE = new PanelElement(TRACK, line);
                                 panelElements.add(lastPE);
                                 lineGroup.getChildren().add(lastPE.getShape());
                                 btnUndo.setDisable(false);
@@ -343,7 +350,7 @@ public class SX4Draw extends Application {
                             lineGroup.getChildren().remove(line);  // will be re-added from within PE
                             if ((Math.abs(line.getEndX() - line.getStartX()) > 5)
                                     || (Math.abs(line.getEndY() - line.getStartY()) > 5)) {
-                                lastPE = new PanelElement(PEType.SENSOR, line);
+                                lastPE = new PanelElement(SENSOR, line);
                                 lineGroup.getChildren().add(lastPE.getShape());
                                 panelElements.add(lastPE);
                                 btnUndo.setDisable(false);
@@ -463,10 +470,7 @@ public class SX4Draw extends Application {
         primaryStage.show();
 
         primaryStage.setOnCloseRequest((WindowEvent e) -> {
-            Calc.turnouts();
-            String path = prefs.get("directory", System.getProperty("user.home"));
-            writeFile(primaryStage, path, false);
-            System.exit(0);
+            saveOnExit(prefs, primaryStage);
             System.exit(0);
         });
 
@@ -659,6 +663,17 @@ public class SX4Draw extends Application {
         }
     }
 
+    private void saveOnExit(Preferences prefs, Stage stage) {
+        boolean result = Dialogs.INSTANCE.confAlert("Abspeichern?", "Vor dem Beenden abspeichern?", "");
+        if (result) {
+            String path = prefs.get("directory", System.getProperty("user.home"));
+            String lastPath = writeFile(stage, path, true);
+            if ((lastPath != null) && (!lastPath.isEmpty())) {
+                prefs.put("directory", lastPath);
+            }
+        }
+    }
+
     private void createMenu(Preferences prefs, MenuBar menuBar, Stage stage) {
         // final ImageView ivSettings = new ImageView(new Image("/de/blankedv/sx4monitorfx/res/settings.png"));
         final ImageView ivInfo = new ImageView(new Image("info.png"));
@@ -667,7 +682,8 @@ public class SX4Draw extends Application {
         final Menu menuOptions = new Menu("Optionen");
         final MenuItem setName = new MenuItem("Set Panel-Name");
 
-        final MenuItem scale200 = new CheckMenuItem("Scale *2");
+        final MenuItem scale200 = new MenuItem("Scale 200%");
+        final MenuItem scale50 = new MenuItem("Scale 50%");
         final MenuItem openRoutingTable = new MenuItem("Fahrstr. anzeigen");
 
         final Menu menuCalc = new Menu("Berechnen");
@@ -681,16 +697,15 @@ public class SX4Draw extends Application {
         final MenuItem exitItem = new MenuItem("Programm-Ende/Exit");
         menu1.getItems().addAll(openItem, saveItem, exitItem);
         menuOptions.getItems().addAll(setName, dispAddresses, rasterOn, showMousePos, openRoutingTable);
-        menuCalc.getItems().addAll(cTurnouts, cNormPositions, scale200); //, scale50);
+        menuCalc.getItems().addAll(cTurnouts, cNormPositions, scale200, scale50);
         menuExtra.getItems().addAll(cSearch);
         rasterOn.setSelected(true);
         showMousePos.setSelected(false);
 
         exitItem.setOnAction((event) -> {
-            //PanelElement.normPositions();
-            String path = prefs.get("directory", System.getProperty("user.home"));
-            writeFile(stage, path, false);
+           saveOnExit(prefs, stage);
             System.exit(0);
+
         });
 
         saveItem.setOnAction((event) -> {
@@ -748,26 +763,16 @@ public class SX4Draw extends Application {
         });
 
         scale200.setOnAction((event) -> {
-            if (((CheckMenuItem) scale200).isSelected()) {
-                System.out.println("scale *2");
+                System.out.println("scale 200%");
                 PanelElement.Companion.scalePlus();
                 redrawPanelElements();
-                if (dispAddresses.isSelected()) {
-                    drawAddresses(gc);
-                } else {
-                    gc.clearRect(0, 0, RECT_X, RECT_Y);
-                }
-            } else  {
-                //scale back 50%
-                System.out.println("scale * 0.5");
-                PanelElement.Companion.scaleMinus();
-                redrawPanelElements();
-                if (dispAddresses.isSelected()) {
-                    drawAddresses(gc);
-                } else {
-                    gc.clearRect(0, 0, RECT_X, RECT_Y);
-                }
-            }
+        });
+
+        scale50.setOnAction((event) -> {
+
+            System.out.println("scale 50%");
+            PanelElement.Companion.scaleMinus();
+            redrawPanelElements();
         });
 
         dispAddresses.setOnAction((event) -> {
@@ -863,16 +868,18 @@ public class SX4Draw extends Application {
             //anchorPane.getChildren().add(p1);
             // gets never diplayes:   status.setText("checking version ...");
             // TODO move to async as soon as using kotlin
-            String newVersion = Utils.readLastVersionFromURL();
+            double newVersion = Utils.readLastVersionFromURL();
             // status.setText("");
             //anchorPane.getChildren().remove(p1);
             System.out.println("read from github: " + newVersion);
-            if (newVersion.contains("ERROR")) {
-                Dialogs.INSTANCE.buildErrorAlert("Error","Konnte die aktuelle Version nicht von Github lesen!", newVersion);
-            } else if (version.contains(newVersion)) {
+            if (newVersion < 0.0) {
+                Dialogs.INSTANCE.buildErrorAlert("Error","Konnte die aktuelle Version nicht von Github lesen!", "?");
+            } else if (newVersion <= vNumber) {
                 Dialogs.INSTANCE.buildInformationAlert("keine neue Version vorhanden" , "" , "Version "+version+" ist aktuell", this);
             } else {
-                Dialogs.INSTANCE.buildInfoAlert("Download update", "von https://github.com/michael71/SX4Draw/sx4draw.zip ", "Programm Version:" + version, this);
+                String title = "" + vNumber + " ist nicht aktuell.";
+                String msg = "Download der aktuellen Version " + newVersion + " von: " + "https://opensx.net/sx4 möglich ";
+                Dialogs.INSTANCE.buildInfoAlert(title , msg, "" , this);
             }
             });
 
@@ -935,7 +942,7 @@ public class SX4Draw extends Application {
     }  */
     private static PanelElement getRouteBtn(IntPoint p) {
         for (PanelElement pe : panelElements) {
-            if (pe.getType() == PEType.ROUTEBUTTON) {
+            if (pe.getType() == ROUTEBUTTON) {
                 Pair<Boolean, Integer> result = pe.isTouched(p);
                 if (result.getKey()) {
                     return pe;
@@ -986,12 +993,12 @@ public class SX4Draw extends Application {
         // all panel elements except tracks have an address
 
         if (pe != null) {
-            if (pe.getType() == PEType.ROUTEBUTTON) {
+            if (pe.getType() == ROUTEBUTTON) {
                 System.out.println("no address editing for route button");
                 return;
             }
             GenericAddress initA;
-            if (pe.getType() == PEType.SIGNAL) {
+            if (pe.getType() == SIGNAL) {
                 int orient = Utils.INSTANCE.signalDX2ToOrient(new IntPoint(pe.getX2() - pe.getX(), pe.getY2() - pe.getY()));
                 initA = new GenericAddress(pe.getAdr(), pe.getInv(), orient);
             } else {
@@ -1006,6 +1013,12 @@ public class SX4Draw extends Application {
                     return; // do nothing
                 }
                 pe.setAdr(res.getAddr());
+                if (pe.getType() ==  SENSOR) {
+                    if ((pe.getAdr() > 300) && (pe.getAdr() < LBMIN)) {
+                        // set a virtual secondary SENSOR address
+                        pe.setAdr2(pe.getAdr() + 1000);
+                    }
+                }
 
                 if (pe.getInv() != res.getInv()) {
                     // inv bit was changed, recreate shape
@@ -1013,7 +1026,7 @@ public class SX4Draw extends Application {
                     pe.recreateShape();
                 }
 
-                if (pe.getType() == PEType.SIGNAL) {
+                if (pe.getType() == SIGNAL) {
                     IntPoint d = Utils.INSTANCE.signalOrientToDXY2(res.getOrient());
                     System.out.println("or=" + res.getOrient() + " dx=" + d.getX() + " dy=" + d.getY());
                     pe.setX2(pe.getX() + d.getX());
@@ -1054,11 +1067,11 @@ public class SX4Draw extends Application {
         }
 
         lineGroup.getChildren().clear();
-        Collections.sort(panelElements);
+        Collections.sort(panelElements);   // route buttons on top of sensors, sensors on top of track, etc ...
         for (PanelElement pe : panelElements) {
             lineGroup.getChildren().add(pe.getShape());
-            System.out.println("drawing PE at " + pe.getX() + "," + pe.getY() + " type=" + pe.getType()
-                    + " state="+pe.getState().name() + " fillC=" + pe.getShape().getFill());
+            //System.out.println("drawing PE at " + pe.getX() + "," + pe.getY() + " type=" + pe.getType()
+            //        + " state="+pe.getState().name() + " fillC=" + pe.getShape().getFill());
         }
     }
 
@@ -1166,7 +1179,7 @@ public class SX4Draw extends Application {
 
     private String writeFile(Stage stage, String path, boolean chooseName) {
         if (chooseName) {
-            System.out.println("path=" + path);
+            //System.out.println("path=" + path);
             FileChooser fileChooser = new FileChooser();
             File file = new File(path);
             if (!file.isDirectory()) {
@@ -1187,7 +1200,7 @@ public class SX4Draw extends Application {
             File selectedFile = fileChooser.showSaveDialog(stage);
             if (selectedFile != null) {
                 path = selectedFile.getParent();
-                System.out.println("path=" + path);
+                //System.out.println("path=" + path);
                 String fn = selectedFile.toString();
                 if (!fn.endsWith(".xml")) {
                     fn = fn + ".xml";
@@ -1199,7 +1212,7 @@ public class SX4Draw extends Application {
                 return "";
             }
         } else {
-            System.out.println("path=" + path);
+            //System.out.println("path=" + path);
             File file = new File(path);
             if (!file.isDirectory()) {
                 String p = file.getParent();

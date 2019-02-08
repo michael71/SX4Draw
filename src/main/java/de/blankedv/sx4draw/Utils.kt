@@ -14,6 +14,8 @@ import java.net.URL
 import kotlin.reflect.KParameter
 import jdk.nashorn.internal.runtime.ScriptingFunctions.readLine
 import java.io.*
+import java.lang.NumberFormatException
+import java.nio.charset.Charset
 
 
 /**
@@ -107,19 +109,11 @@ object Utils {
     }
 
     @JvmStatic
-    fun readLastVersionFromURL(): String {
-        val urlObject = URL("https://github.com/michael71/SX4Draw/blob/master/version.txt")
-        val urlConnection = urlObject.openConnection()
-        try {
-            var line: String =""
-            val inputStream = urlConnection.getInputStream()
-            BufferedReader(InputStreamReader(inputStream)).use { br ->
-                line = br.readLine()   // read a single line
-            }
-            return line.toString()
-        } catch (e: Exception) {
-            return "ERROR: ($e)"
-        }
+    fun readLastVersionFromURL(): Double {
+        val urlObject = URL("https://raw.githubusercontent.com/michael71/SX4Draw/master/version.txt")
+        val versionFromGithub = urlObject.readText()
+        return versionFromGithub.toDouble()
+
     }
 
 }

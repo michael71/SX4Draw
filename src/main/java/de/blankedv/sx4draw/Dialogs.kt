@@ -25,7 +25,9 @@ import de.blankedv.sx4draw.SX4Draw.panelElements
 
 import javafx.application.Application
 import javafx.scene.control.Alert
+import javafx.scene.control.Button
 import javafx.scene.control.ButtonType
+import javafx.scene.layout.Region
 
 /**
  * @author mblank
@@ -59,6 +61,7 @@ object Dialogs {
         alert.title = title
         alert.headerText = header
         val window = alert.dialogPane.scene.window
+        alert.dialogPane.minHeight = Region.USE_PREF_SIZE
         window.setOnCloseRequest { _ -> window.hide() }
 
         alert.showAndWait()
@@ -72,6 +75,19 @@ object Dialogs {
         alert.showAndWait()
     }
 
+    fun confAlert(title : String, header : String, content: String) : Boolean {
+        val alert = Alert(Alert.AlertType.CONFIRMATION)
+        alert.title = title
+        alert.headerText = header
+        alert.contentText = content
+
+        (alert.dialogPane.lookupButton(ButtonType.OK) as Button).text = "Ja"
+        (alert.dialogPane.lookupButton(ButtonType.CANCEL) as Button).text = "Nein"
+
+        val result = alert.showAndWait()
+
+        return (result.get() == ButtonType.OK)
+    }
 
     fun checkAddress(oldValue: GenericAddress, newAddress: GenericAddress): Boolean {
         println("check address = " + newAddress.addr)

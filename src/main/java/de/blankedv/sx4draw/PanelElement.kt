@@ -1,7 +1,11 @@
 package de.blankedv.sx4draw
 
 import de.blankedv.sx4draw.SX4Draw.PEType
-
+import de.blankedv.sx4draw.SX4Draw.PEType.SIGNAL
+import de.blankedv.sx4draw.SX4Draw.PEType.TRACK
+import de.blankedv.sx4draw.SX4Draw.PEType.ROUTEBUTTON
+import de.blankedv.sx4draw.SX4Draw.PEType.TURNOUT
+import de.blankedv.sx4draw.SX4Draw.PEType.SENSOR
 import de.blankedv.sx4draw.Constants.SXMAX_USED
 import de.blankedv.sx4draw.Constants.LBMIN
 import de.blankedv.sx4draw.Constants.LBMAX
@@ -24,6 +28,7 @@ import javafx.scene.shape.Shape
 import javafx.scene.shape.StrokeLineCap
 import javafx.util.Pair
 
+
 /**
  * generic panel element can be any of PEType types
  *
@@ -32,7 +37,7 @@ import javafx.util.Pair
 class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
 
     var name = ""
-    var type = PEType.TRACK
+    var type = TRACK
     var x: Int = 0 // starting point
     var y: Int = 0
     var x2 = INVALID_INT // endpoint - x2 always >x
@@ -80,7 +85,7 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
     }
 
 
-    constructor(type: PEType, l: Line) {
+    constructor(type: de.blankedv.sx4draw.SX4Draw.PEType, l: Line) {
         this.type = type
         this.x = l.startX.toInt()
         this.x2 = l.endX.toInt()
@@ -144,7 +149,7 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
         this.type = type
         this.x = poi.x
         this.y = poi.y
-        if (type == PEType.SIGNAL) {
+        if (type == SIGNAL) {
             val d = Utils.signalOrientToDXY2(0) // 0 (= 0 grad) is default orientation for signal
             x2 = x + d.x
             y2 = y + d.y
@@ -155,20 +160,30 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
     }
 
     private fun autoAddress() {
-        if (type == PEType.ROUTEBUTTON) {
+        if (type == ROUTEBUTTON) {
             // automatically assign route btn address
             var a = 1200  // minumum for route buttons
             for (pe in panelElements) {
-                if (pe.type == PEType.ROUTEBUTTON) {
+                if (pe.type == ROUTEBUTTON) {
                     if (pe.adr >= a) {
                         a = pe.adr + 1
                     }
                 }
             }
             adr = a
-        } else if (type == PEType.SIGNAL || type == PEType.SENSOR) {
+        } else if (type == SIGNAL) {
             // assign a dummy address to have it stored in xml file (if not assigned by hand)
             // this is needed for
+            var a = 4000  // default for signal
+            for (pe in panelElements) {
+                if (pe.type == SIGNAL) {
+                    if (pe.adr >= a) {
+                        a = pe.adr + 1
+                    }
+                }
+            }
+            adr = a
+        } else if (type == SENSOR) {
             if (adr == INVALID_INT) {
                 adr = 1
             }
@@ -177,7 +192,7 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
 
     private fun createShape() {
         when (type) {
-            SX4Draw.PEType.TURNOUT -> {
+            TURNOUT -> {
                 defaultColor = Color.ORANGE
                 when (state) {
                     PanelElement.PEState.STATE_0 -> {
@@ -219,28 +234,28 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
                     }
                 }
             }
-            SX4Draw.PEType.TRACK -> {
+            TRACK -> {
                 defaultColor = Color.BLACK
                 shape = Line(x.toDouble(), y.toDouble(), x2.toDouble(), y2.toDouble())
                 shape.strokeWidth = TRACKWIDTH
                 shape.strokeLineCap = StrokeLineCap.ROUND
             }
-            SX4Draw.PEType.ROUTEBUTTON -> {
+            ROUTEBUTTON -> {
                 shape = Circle(x.toDouble(), y.toDouble(), 9.5, Color.DARKGREY)
                 defaultColor = Color.DARKGREY
             }
-            SX4Draw.PEType.SENSOR -> if (x2 != INVALID_INT) {  //DE type of sensor
+            SENSOR -> if (x2 != INVALID_INT) {  //DE type of sensor
                 shape = Line(x.toDouble(), y.toDouble(), x2.toDouble(), y2.toDouble())
                 shape.strokeWidth = SENSORWIDTH
                 shape.strokeDashArray.addAll(15.0, 10.0)
                 shape.strokeLineCap = StrokeLineCap.ROUND
                 defaultColor = Color.YELLOW
 
-            } else { //US Type
+            } else { //US Type SENSOR
                 shape = Circle(x.toDouble(), y.toDouble(), 8.0, Color.ORANGE)
                 defaultColor = Color.ORANGE
             }
-            SX4Draw.PEType.SIGNAL -> {
+            SIGNAL -> {
                 defaultColor = Color.BLACK
                 val ls = Line(x.toDouble(), y.toDouble(), x2.toDouble(), y2.toDouble())
                 val c = Circle(x.toDouble(), y.toDouble(), 5.0)
@@ -393,9 +408,6 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
 
     companion object {
 
-        private var scaledPlus = false
-        private var scaledMinus = false
-
         const val TOUCH_RADIUS = 7
         const val TRACKWIDTH = 5.0
         const val SENSORWIDTH = 4.0
@@ -451,10 +463,8 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
         }
 
         /**
-         * scale all panel elements for better fit on display and for possible
-         * "upside down" display (=view from other side of the layout) currently
-         * only called from readXMLConfigFile (i.e. NOT when flipUpsideDown is
-         * changed in the prefs)
+         * better fit on display (20,20) smallest (x,y) and for possible upside down" display
+         * (=view from other side of the layout) currently
          */
         fun normPositions() {
 
@@ -599,9 +609,7 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
         }
 
         fun scalePlus() {
-            if (scaledPlus) {
-                return   // only scalePlus once allowed !!!
-            }
+
             for (pe in panelElements) {
                 val dx = pe.x
                 val dy = pe.y
@@ -633,17 +641,13 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
                     }
                 }
 
-                pe.createShape()
+                pe.createShapeAndSetState(PEState.DEFAULT)
             }
 
-            scaledPlus = true
-            scaledMinus = false
         }
 
         fun scaleMinus() {
-            if (scaledMinus) {
-                return   // only once allowed !!!
-            }
+
             for (pe in panelElements) {
                 val dx = pe.x / 2
                 val dy = pe.y / 2
@@ -678,11 +682,9 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
                     }
                 }
 
-                pe.createShape()  // must be redone
+                pe.createShapeAndSetState(PEState.DEFAULT)
             }
 
-            scaledMinus = true
-            scaledPlus = false
         }
     }
 }
