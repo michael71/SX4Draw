@@ -13,13 +13,10 @@ package de.blankedv.sx4draw;
  */
 
 import static de.blankedv.sx4draw.Constants.INVALID_INT;
+import static de.blankedv.sx4draw.SX4Draw.*;
 
 import de.blankedv.sx4draw.SX4Draw.PEType;
 import de.blankedv.sx4draw.SX4Draw.RT;
-
-import static de.blankedv.sx4draw.SX4Draw.compRoutes;
-import static de.blankedv.sx4draw.SX4Draw.panelElements;
-import static de.blankedv.sx4draw.SX4Draw.panelName;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,10 +34,6 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import static de.blankedv.sx4draw.SX4Draw.routes;
-import static de.blankedv.sx4draw.SX4Draw.timetables;
-import static de.blankedv.sx4draw.SX4Draw.trips;
-
 /**
  * utility function for the mapping of lanbahn addresses to DCC addresses (and
  * bits) and vice versa
@@ -48,6 +41,8 @@ import static de.blankedv.sx4draw.SX4Draw.trips;
  * @author mblank
  */
 public class ReadConfig {
+
+    //TODO read/write locolist (see SX4)
 
     public static final int YOFF = 0;   // y values start at 60, this value get added when reading a config
     // and substracted when storing.
@@ -70,6 +65,7 @@ public class ReadConfig {
         try {
             doc = builder.parse(new File(fname));
             parsePanelElements(doc);
+            parseLocoList(doc);
         } catch (SAXException e) {
             System.out.println("SAX Exception - " + e.getMessage());
             return "SAX Exception - " + e.getMessage();
@@ -189,6 +185,66 @@ public class ReadConfig {
         }
         System.out.println(timetables.size() + " timetables read");
 
+    }
+
+    private static void parseLocoList(Document doc) {
+        // <loco adr="97" name="SchoenBB" mass="2" vmax="120" />
+
+        allLocos.clear();
+
+        NodeList items;
+        Element root = doc.getDocumentElement();
+
+        items = root.getElementsByTagName("locolist");
+        if (items.getLength() == 0) {
+            return;
+        }
+
+        locolistName = parsePanelAttribute(items.item(0), "name");
+        String locolistVersion = parsePanelAttribute(items.item(0), "version");  // NOT USED
+
+        items = root.getElementsByTagName("loco");
+        for (int i = 0; i < items.getLength(); i++) {
+            Loco loco = parseLoco(items.item(i));
+            if (loco != null ) allLocos.add(loco);
+        }
+        System.out.println("config: " + allLocos.size() + " locos");
+
+    }
+
+    private static Loco parseLoco(Node item) {
+//<loco adr="97" name="SchoenBB" mass="2" vmax="120" />
+        Loco lo = new Loco();
+
+        NamedNodeMap attributes = item.getAttributes();
+        for (int i = 0; i < attributes.getLength(); i++) {
+            Node theAttribute = attributes.item(i);
+            switch (theAttribute.getNodeName()) {
+                case "adr":
+                case "addr":
+                    lo.setAddr(getIntValueOfNode(theAttribute));
+                    break;
+                case "name":
+                    lo.setName(theAttribute.getNodeValue());
+                    break;
+                case "mass":
+                    lo.setMass(getIntValueOfNode(theAttribute));
+                    break;
+                case "vmax":
+                    lo.setVmax(getIntValueOfNode(theAttribute));
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        // check if Loco is valid
+        if (lo.getAddr() != INVALID_INT)  {
+            // we have the minimum info needed
+            return lo;
+        } else {
+            return null;
+        }
     }
 
     // code from lanbahnPanel

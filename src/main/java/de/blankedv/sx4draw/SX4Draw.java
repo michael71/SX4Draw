@@ -70,8 +70,8 @@ import static de.blankedv.sx4draw.SX4Draw.PEType.*;
 
 public class SX4Draw extends Application {
 
-    public static double vNumber = 0.38;
-    public static String vString = "08 Feb 2019";
+    public static double vNumber = 0.39;
+    public static String vString = "11 Feb 2019";
     public static String version = vNumber + " - " +vString;
 
     // FIXED: weichengleichheit nicht auf den Pixel genau
@@ -82,11 +82,14 @@ public class SX4Draw extends Application {
     // FIXED: suchfunktion - Adresse eingeben -> elemente anzeigen
     // FIXED: Signale auch 45Grad, 135Grad, ....
     // FIXED: für weichen INV funktion einbauen (in Fahrstrassenanzeige)
-    // FIXED ScrollPane einführen für Drawing bereich
+    // FIXED: ScrollPane einführen für Drawing bereich
 
     public static ArrayList<PanelElement> panelElements = new ArrayList<>();
     public static PanelElement lastPE = null;
     public static String panelName = "";
+
+    public static ArrayList<Loco> allLocos = new ArrayList<>();
+    public static String locolistName = "";
 
     private Group lineGroup;
     private Group draggedGroup = new Group();
@@ -136,8 +139,6 @@ public class SX4Draw extends Application {
 
 
 
-
-    //public static ArrayList<Route> routes = new ArrayList<>();
     public static final ObservableList<Route> routes = FXCollections.observableArrayList();
     public static final ObservableList<CompRoute> compRoutes = FXCollections.observableArrayList();
     public static final ObservableList<Trip> trips = FXCollections.observableArrayList();

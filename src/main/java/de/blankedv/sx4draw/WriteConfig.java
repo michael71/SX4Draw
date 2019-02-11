@@ -3,12 +3,8 @@ package de.blankedv.sx4draw;
 import static de.blankedv.sx4draw.Constants.DEBUG;
 import static de.blankedv.sx4draw.Constants.INVALID_INT;
 
-import static de.blankedv.sx4draw.SX4Draw.panelElements;
-import static de.blankedv.sx4draw.SX4Draw.routes;
-import static de.blankedv.sx4draw.SX4Draw.compRoutes;
-import static de.blankedv.sx4draw.SX4Draw.timetables;
-import static de.blankedv.sx4draw.SX4Draw.trips;
 import static de.blankedv.sx4draw.ReadConfig.YOFF;
+import static de.blankedv.sx4draw.SX4Draw.*;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -117,6 +113,22 @@ public class WriteConfig {
 
         writer.write("<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>\n");
         writer.write("<layout-config filename=\"" + filename + "\">\n");
+        writer.write("<locolist name=\"" + locolistName + "\" version=\"" + version+ "\">\n");
+
+        if (!allLocos.isEmpty()) {
+            //ArrayList<Loco> locosList = new ArrayList<>(allLocos);
+            //Collections.sort(locosList);
+            for (Loco lo : allLocos) {
+                writeStart("loco");
+                writeAttribute("adr", lo.getAddr());
+                writeAttribute("name", lo.getName());
+                writeAttribute("mass", lo.getMass());
+                writeAttribute("vmax", lo.getVmax());
+                writeClose();
+            }
+        }
+        writer.write("</locolist>\n");
+
         writer.write("<panel name=\"" + panelName + "\" version=\"" + version + "\">\n");
 
         ArrayList<PanelElement> peList = new ArrayList<>(panelElements);
