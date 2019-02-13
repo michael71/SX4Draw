@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 package de.blankedv.sx4draw;
 
 import de.blankedv.sx4draw.PanelElement.PEState;
+import de.blankedv.sxdraw.Trip;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
@@ -118,6 +119,8 @@ public class SX4Draw extends Application {
     private static final Button btnDelete = new Button();
     private static final ToggleGroup toggleGroup = new ToggleGroup();
 
+    private final LayoutConfig layoutConfig = new LayoutConfig();
+
     final CheckMenuItem dispAddresses = new CheckMenuItem("Adressen anzeigen");
     final CheckMenuItem rasterOn = new CheckMenuItem("Raster");
     final CheckMenuItem showMousePos = new CheckMenuItem("Mauspos. anzeigen");
@@ -141,7 +144,8 @@ public class SX4Draw extends Application {
 
     public static final ObservableList<Route> routes = FXCollections.observableArrayList();
     public static final ObservableList<CompRoute> compRoutes = FXCollections.observableArrayList();
-    public static final ObservableList<Trip> trips = FXCollections.observableArrayList();
+    //public static final ObservableList<Trip> trips = FXCollections.observableArrayList();
+    public static final ArrayList<Trip> trips = new ArrayList<>();
     public static final ObservableList<Timetable> timetables = FXCollections.observableArrayList();
 
 
@@ -1179,6 +1183,11 @@ public class SX4Draw extends Application {
     }
 
     private String writeFile(Stage stage, String path, boolean chooseName) {
+
+        layoutConfig.setTrips(trips);
+        layoutConfig.setName("123name");  //panelName
+        WriteConfigNew.writeToXML(layoutConfig);
+
         if (chooseName) {
             //System.out.println("path=" + path);
             FileChooser fileChooser = new FileChooser();

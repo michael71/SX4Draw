@@ -3,25 +3,37 @@
  */
 package de.blankedv.sx4draw
 
-import de.blankedv.sx4draw.Constants.INVALID_INT
-import de.blankedv.sx4draw.SX4Draw.timetables
 
+import de.blankedv.sx4draw.Constants.INVALID_INT
 import java.util.Comparator
 
 import org.w3c.dom.NamedNodeMap
 import org.w3c.dom.Node
+import javax.xml.bind.annotation.XmlAttribute
+import javax.xml.bind.annotation.XmlRootElement
+import javax.xml.bind.annotation.XmlType
 
 /**
  * @author mblank
  */
+@XmlRootElement(name = "timetable")
+@XmlType
 class Timetable  : Comparator<Timetable>, Comparable<Timetable> {
 
-    var id = INVALID_INT
-    var time = ""
-    var trip = ""
-    var next = ""
+    @get:XmlAttribute
+    var id : Int = INVALID_INT   // is mandatory
+
+    @get:XmlAttribute
+    var time : String? = ""
+
+    @get:XmlAttribute
+    var trip : String = ""   // is mandatory
+
+    @get:XmlAttribute
+    var next : String? = ""
 
     override fun compare(o1: Timetable, o2: Timetable): Int {
+        // if id can be =null use:   val o2id = (o2.id)?: -1
         return o1.id - o2.id
     }
 
@@ -49,7 +61,7 @@ class Timetable  : Comparator<Timetable>, Comparable<Timetable> {
                 }
             }
             if (tt.id != INVALID_INT) {
-                timetables.add(tt)
+               // timetables.add(tt)
             }
 
         }

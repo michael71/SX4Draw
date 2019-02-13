@@ -1,26 +1,41 @@
 /*
  *<trip id="3100" routeid="2300" sens1="924" sens2="902" loco="29,1,126" stopdelay="1500" />
  */
-package de.blankedv.sx4draw
+package de.blankedv.sxdraw
+
 
 import de.blankedv.sx4draw.Constants.INVALID_INT
 import de.blankedv.sx4draw.SX4Draw.trips
-
 import java.util.Comparator
 
 import org.w3c.dom.NamedNodeMap
 import org.w3c.dom.Node
+import javax.xml.bind.annotation.*
 
 /**
  * @author mblank
  */
+@XmlRootElement(name = "trip")
+@XmlType() //TODO Does not work: propOrder = {"id", "routeid", "sens1", "sens2", "loco", "stopdelay"})
+
 class Trip : Comparator<Trip>, Comparable<Trip> {
 
+    @get:XmlAttribute    // @get: WICHTIG für KOTLIN !!!
     var id = INVALID_INT
+
+    @get:XmlAttribute
     var routeid = INVALID_INT
+
+    @get:XmlAttribute
     var sens1 = INVALID_INT
-    var sens2 = INVALID_INT
+
+    @get:XmlAttribute
+    var sens2  = INVALID_INT
+
+    @get:XmlAttribute
     var loco = ""
+
+    @get:XmlAttribute
     var stopdelay = INVALID_INT
 
     internal constructor()
@@ -30,9 +45,9 @@ class Trip : Comparator<Trip>, Comparable<Trip> {
 
     }
 
-    @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
-    override fun compareTo(o1: Trip): Int {
-        return id - o1.id
+
+    override fun compareTo(other: Trip): Int {
+        return id - other.id
     }
 
     companion object {

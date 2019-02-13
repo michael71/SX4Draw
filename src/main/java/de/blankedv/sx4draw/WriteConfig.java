@@ -1,5 +1,7 @@
 package de.blankedv.sx4draw;
 
+import de.blankedv.sxdraw.Trip;
+
 import static de.blankedv.sx4draw.Constants.DEBUG;
 import static de.blankedv.sx4draw.Constants.INVALID_INT;
 
