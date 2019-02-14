@@ -68,9 +68,18 @@ class Turnout : GenericPE {
     var inv : Int? = null  // 0 or null == not inverted
 
     @get:XmlAttribute
-    var adr = INVALID_INT
+    var adr = 800
 
     constructor()
+
+    constructor(poi: IntPoint, closed: IntPoint, thrown: IntPoint) {
+        x = poi.x
+        y = poi.y
+        x2 = closed.x
+        y2 = closed.y
+        xt = thrown.x
+        yt = thrown.y
+    }
 
     constructor (pe : PanelElement) {
         if (!pe.name.isBlank()) {
@@ -89,6 +98,31 @@ class Turnout : GenericPE {
     }
 
 
+    override fun isTouched(touch : IntPoint) : Pair<Boolean, Int> {
+        // check first for (x2,y2) touch (state 0)
+        return if (touch.x >= x2 - PanelElementNew.TOUCH_RADIUS
+                && touch.x <= x2 + PanelElementNew.TOUCH_RADIUS
+                && touch.y >= y2 - PanelElementNew.TOUCH_RADIUS
+                && touch.y <= y2 + PanelElementNew.TOUCH_RADIUS) {
+            Pair(true, 0)
+
+        } else if (touch.x >= xt - PanelElementNew.TOUCH_RADIUS // thrown, state1
+
+                && touch.x <= xt + PanelElementNew.TOUCH_RADIUS
+                && touch.y >= yt - PanelElementNew.TOUCH_RADIUS
+                && touch.y <= yt + PanelElementNew.TOUCH_RADIUS) {
+            Pair(true, 1)  // thrown state
+        } else if (touch.x >= x - PanelElementNew.TOUCH_RADIUS // near center
+
+                && touch.x <= x + PanelElementNew.TOUCH_RADIUS
+                && touch.y >= y - PanelElementNew.TOUCH_RADIUS
+                && touch.y <= y + PanelElementNew.TOUCH_RADIUS) {
+            Pair(true, 0)
+        } else {
+            Pair(false, 0)
+        }
+
+    }
     /* private fun orderXY() {
         if (x == x2) {
             if (y2 < y) {

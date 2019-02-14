@@ -1,6 +1,5 @@
 package de.blankedv.sx4draw
 
-import de.blankedv.sx4draw.SX4Draw.PEType
 import de.blankedv.sx4draw.SX4Draw.PEType.SIGNAL
 import de.blankedv.sx4draw.SX4Draw.PEType.TRACK
 import de.blankedv.sx4draw.SX4Draw.PEType.ROUTEBUTTON
@@ -14,8 +13,8 @@ import de.blankedv.sx4draw.Constants.DEBUG
 import de.blankedv.sx4draw.Constants.RASTER
 import de.blankedv.sx4draw.Constants.RECT_X
 import de.blankedv.sx4draw.Constants.RECT_Y
-import de.blankedv.sx4draw.SX4Draw.panelElements
 import de.blankedv.sx4draw.ReadConfig.YOFF
+import de.blankedv.sx4draw.SX4Draw.*
 
 import java.util.ArrayList
 import java.util.Comparator
@@ -40,16 +39,16 @@ import javax.xml.bind.annotation.XmlType
  */
 @XmlRootElement(name = "signal")
 @XmlType
-class Signal {
+class Signal : GenericPE {
 
     @get:XmlAttribute
-    var name : String? = null
+    override var name : String? = null
 
     @get:XmlAttribute
-    var x: Int = 0 // starting point
+    override var x: Int = 0 // starting point
 
     @get:XmlAttribute
-    var y: Int = 0
+    override var y: Int = 0
 
     @get:XmlAttribute
     var x2 = INVALID_INT // endpoint - x2 always >x
@@ -63,6 +62,16 @@ class Signal {
 
     constructor() {}
 
+    constructor(poi : IntPoint) {
+        x = poi.x
+        y = poi.y
+        val d = Utils.signalOrientToDXY2(0) // 0 (= 0 grad) is default orientation for signal
+        x2 = x + d.x
+        y2 = y + d.y
+        autoAddress()
+    }
+
+
     constructor (pe : PanelElement) {
         if (!pe.name.isBlank()) {
             this.name = pe.name
@@ -75,6 +84,18 @@ class Signal {
         if (pe.adr2 != INVALID_INT) {
             this.adrStr += "," + pe.adr2
         }
+    }
+
+    private fun autoAddress() {
+        var a = 4000  // default for signal
+        for (pe in panelElementsNew) {
+            if (pe.gpe is Signal) {
+                if (pe.gpe.getAddr() >= a) {
+                    a = pe.gpe.getAddr() + 1
+                }
+            }
+        }
+        adrStr = "" + a
     }
 
     companion object {

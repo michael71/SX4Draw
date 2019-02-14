@@ -48,6 +48,17 @@ public class LayoutConfig {
 
     }
 
+    public ArrayList<PanelElement> initPanelElement() {
+
+        ArrayList<PanelElement> panelElements = new ArrayList<>();
+      /*  for (Track tr : tracks) {
+            PanelElement pe = new PanelElement((GenericPE)tr);
+            panelElements.add(pe)
+        } */
+      return panelElements;
+
+    }
+
     public void setPanelElements(ArrayList<PanelElement> pes) {
 
         setTracks(pes);

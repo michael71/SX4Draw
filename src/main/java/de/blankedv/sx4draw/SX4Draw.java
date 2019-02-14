@@ -86,6 +86,7 @@ public class SX4Draw extends Application {
     // FIXED: ScrollPane einführen für Drawing bereich
 
     public static ArrayList<PanelElement> panelElements = new ArrayList<>();
+    public static ArrayList<PanelElementNew> panelElementsNew = new ArrayList<>();
     public static PanelElement lastPE = null;
     public static String panelName = "";
 

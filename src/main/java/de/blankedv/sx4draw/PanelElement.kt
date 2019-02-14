@@ -38,10 +38,24 @@ import javax.xml.bind.annotation.XmlType
  *
  * @author mblank
  */
-@XmlRootElement(name = "panel")
-@XmlType
-class PanelElement : PanelElementCore {
 
+class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
+
+    var type = TRACK
+    var name = ""
+    var x: Int = 0 // starting point
+    var y: Int = 0
+
+
+    var x2 = INVALID_INT // endpoint - x2 always >x
+    var y2 = INVALID_INT
+    var xt = INVALID_INT // "thrown" position for turnout
+    var yt = INVALID_INT
+    var inv = 0  // 0 == not inverted
+    var adr = INVALID_INT
+    var adr2 = INVALID_INT
+
+    // elements for graphics
 
     protected var route = ""
 
@@ -113,6 +127,15 @@ class PanelElement : PanelElementCore {
         }
     }
 
+    constructor (gpe : GenericPE) {
+        when (gpe) {
+            is Track -> {
+                type = TRACK
+
+            }
+
+        }
+    }
 
     constructor(type: PEType, poi: IntPoint, closed: IntPoint, thrown: IntPoint) {
         this.type = type
@@ -385,6 +408,21 @@ class PanelElement : PanelElementCore {
         gc.strokeText(sAddr, x.toDouble(), (y - YOFF + 10).toDouble())
     }
 
+    override fun compare(o1: PanelElement, o2: PanelElement): Int {
+        return if (o1.type.ordinal == o2.type.ordinal) {
+            o1.x - o2.x
+        } else {
+            o1.type.ordinal - o2.type.ordinal
+        }
+    }
+
+    override fun compareTo(other: PanelElement): Int {
+        return if (type.ordinal == other.type.ordinal) {
+            x - other.x
+        } else {
+            type.ordinal - other.type.ordinal
+        }
+    }
 
     companion object {
 
@@ -666,5 +704,7 @@ class PanelElement : PanelElementCore {
             }
 
         }
+
+
     }
 }

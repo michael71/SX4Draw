@@ -13,9 +13,9 @@ import javax.xml.bind.annotation.XmlType
  *
  * @author mblank
  */
-@XmlRootElement(name = "sensor_us")
+@XmlRootElement(name = "routebutton")
 @XmlType
-class SensorUS : GenericPE {
+class RouteButton : GenericPE {
 
     @get:XmlAttribute
     override var name : String? = null
@@ -27,8 +27,7 @@ class SensorUS : GenericPE {
     override var y: Int = 0
 
     @get:XmlAttribute
-    var adr = INVALID_INT
-
+    var adr= 1200
 
     constructor() {}
 
@@ -38,7 +37,22 @@ class SensorUS : GenericPE {
         }
         this.x = pe.x
         this.y = pe.y
-        this.adr = pe.adr
+        autoAddress()
     }
 
+    override fun getAddr() : Int {
+        return adr
+    }
+
+    private fun autoAddress() {
+        var a = 1200  // minumum for route buttons
+        for (pe in SX4Draw.panelElementsNew) {
+            if (pe.gpe is RouteButton) {
+                if (pe.gpe.getAddr() >= a) {
+                    a = pe.gpe.getAddr() + 1
+                }
+            }
+        }
+        adr = a
+    }
 }
