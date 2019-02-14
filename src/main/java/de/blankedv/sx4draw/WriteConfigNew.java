@@ -54,6 +54,7 @@ public class WriteConfigNew {
 
         } catch (Exception e) {
             System.out.println("ERROR "+e.getMessage());
+            e.printStackTrace();
         }
 
 

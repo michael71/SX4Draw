@@ -27,6 +27,10 @@ import javafx.scene.shape.Line
 import javafx.scene.shape.Shape
 import javafx.scene.shape.StrokeLineCap
 import javafx.util.Pair
+import javax.xml.bind.annotation.XmlAttribute
+import javax.xml.bind.annotation.XmlElement
+import javax.xml.bind.annotation.XmlRootElement
+import javax.xml.bind.annotation.XmlType
 
 
 /**
@@ -34,21 +38,13 @@ import javafx.util.Pair
  *
  * @author mblank
  */
-class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
+@XmlRootElement(name = "panel")
+@XmlType
+class PanelElement : PanelElementCore {
 
-    var name = ""
-    var type = TRACK
-    var x: Int = 0 // starting point
-    var y: Int = 0
-    var x2 = INVALID_INT // endpoint - x2 always >x
-    var y2 = INVALID_INT
-    var xt = INVALID_INT // "thrown" position for turnout
-    var yt = INVALID_INT
+
     protected var route = ""
-    //protected int orient = 0;
-    var inv = 0  // 0 == not inverted
-    var adr = INVALID_INT
-    var adr2 = INVALID_INT
+
     var shape: Shape = Line(0.0, 0.0, 1.0, 1.0)   // default shape
     var state = PEState.DEFAULT
         private set
@@ -389,22 +385,6 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
         gc.strokeText(sAddr, x.toDouble(), (y - YOFF + 10).toDouble())
     }
 
-
-    override fun compare(o1: PanelElement, o2: PanelElement): Int {
-        return if (o1.type.ordinal == o2.type.ordinal) {
-            o1.x - o2.x
-        } else {
-            o1.type.ordinal - o2.type.ordinal
-        }
-    }
-
-    override fun compareTo(other: PanelElement): Int {
-        return if (type.ordinal == other.type.ordinal) {
-            x - other.x
-        } else {
-            type.ordinal - other.type.ordinal
-        }
-    }
 
     companion object {
 

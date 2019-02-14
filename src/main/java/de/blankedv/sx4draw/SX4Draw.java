@@ -1184,6 +1184,7 @@ public class SX4Draw extends Application {
 
     private String writeFile(Stage stage, String path, boolean chooseName) {
 
+        layoutConfig.setPanelElements(panelElements);
         layoutConfig.setTrips(trips);
         layoutConfig.setName("123name");  //panelName
         WriteConfigNew.writeToXML(layoutConfig);
