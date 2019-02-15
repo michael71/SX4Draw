@@ -14,23 +14,35 @@ import java.util.ArrayList
 import java.util.Comparator
 
 import javafx.util.Pair
-import org.w3c.dom.NamedNodeMap
 import org.w3c.dom.Node
+import javax.xml.bind.annotation.XmlAttribute
+import javax.xml.bind.annotation.XmlRootElement
+import javax.xml.bind.annotation.XmlType
 
 /**
- * <route id="2201" btn1="1200" btn2="1203" route="854,1;853,0;852,0;765,2;767,0;761,0;781,0" sensors="924,928" offending=""></route>
+ * <route adr="2201" btn1="1200" btn2="1203" route="854,1;853,0;852,0;765,2;767,0;761,0;781,0" sensors="924,928"></route>
  * for editing route data
  *
  * @author mblank
  */
+@XmlRootElement(name = "route")
+@XmlType
 class Route : Comparator<Route>, Comparable<Route> {
 
-    var id = INVALID_INT
+    @get:XmlAttribute
+    var adr = INVALID_INT
+
+    @get:XmlAttribute
     var btn1 = INVALID_INT
+
+    @get:XmlAttribute
     var btn2 = INVALID_INT
+
+    @get:XmlAttribute
     var route = ""
+
+    @get:XmlAttribute
     var sensors = ""
-    var offending = ""
 
     // extract PEs from string information
     private val pEs: ArrayList<PanelElement>
@@ -72,17 +84,16 @@ class Route : Comparator<Route>, Comparable<Route> {
     }
 
     internal constructor(id: Int) {
-        this.id = id
+        this.adr = id
     }
 
     internal constructor(r: Route) {
 
-        this.id = r.id
+        this.adr = r.adr
         this.btn1 = r.btn1
         this.btn2 = r.btn2
         this.route = r.route
         this.sensors = r.sensors
-        this.offending = r.offending
     }
 
     /**
@@ -202,12 +213,12 @@ class Route : Comparator<Route>, Comparable<Route> {
     }
 
     override fun compare(o1: Route, o2: Route): Int {
-        return o1.id - o2.id
+        return o1.adr - o2.adr
 
     }
 
     override fun compareTo(other: Route): Int {
-        return id - other.id
+        return adr - other.adr
     }
 
     companion object {
@@ -219,8 +230,9 @@ class Route : Comparator<Route>, Comparable<Route> {
 
             for (i in 0 until attributes.length) {
                 val theAttribute = attributes.item(i)
-                if (theAttribute.nodeName == "id") {
-                    rt.id = Integer.parseInt(theAttribute.nodeValue)
+                if ((theAttribute.nodeName == "adr") ||
+                     (theAttribute.nodeName == "id") ) {
+                    rt.adr = Integer.parseInt(theAttribute.nodeValue)
                 } else if (theAttribute.nodeName == "btn1") {
                     rt.btn1 = Integer.parseInt(theAttribute.nodeValue)
                 } else if (theAttribute.nodeName == "btn2") {
@@ -229,11 +241,9 @@ class Route : Comparator<Route>, Comparable<Route> {
                     rt.route = theAttribute.nodeValue
                 } else if (theAttribute.nodeName == "sensors") {
                     rt.sensors = theAttribute.nodeValue
-                } else if (theAttribute.nodeName == "offending") {
-                    rt.offending = theAttribute.nodeValue
                 }
             }
-            if (rt.id != INVALID_INT) {
+            if (rt.adr != INVALID_INT) {
                 routes.add(rt)
             }
         }
@@ -241,8 +251,8 @@ class Route : Comparator<Route>, Comparable<Route> {
         fun getnewid(): Int {
             var newID = 2200  // start with 2200
             for (rt in routes) {
-                if (rt.id > newID) {
-                    newID = rt.id
+                if (rt.adr > newID) {
+                    newID = rt.adr
                 }
             }
             return newID + 1

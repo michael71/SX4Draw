@@ -22,46 +22,62 @@ import de.blankedv.sx4draw.SX4Draw.compRoutes
 
 import java.util.Comparator
 
-import org.w3c.dom.NamedNodeMap
 import org.w3c.dom.Node
+import javax.xml.bind.annotation.XmlAttribute
+import javax.xml.bind.annotation.XmlRootElement
+import javax.xml.bind.annotation.XmlType
 
 /**
- * * <comproute id="2300" btn1="1200" btn2="1204" routes="2201,2206" />
+ * * <comproute adr="2300" btn1="1200" btn2="1204" routes="2201,2206" />
  * @author mblank
  */
-data class CompRoute (var id: Int = 0, var btn1: Int = 0, var btn2: Int = 0, var routes: String = "")
+@XmlRootElement(name = "comproute")
+@XmlType
+data class CompRoute (
+        @get:XmlAttribute
+        var adr: Int = 0,
+
+        @get:XmlAttribute
+        var btn1: Int = 0,   // TODO remove btn1 and btn2 from comproute vars (already implicit in route#)
+
+        @get:XmlAttribute
+        var btn2: Int = 0,
+
+        @get:XmlAttribute
+        var routes: String = "")
                                      : Comparator<CompRoute>, Comparable<CompRoute> {
 
 
     override fun compare(o1: CompRoute, o2: CompRoute): Int {
-        return o1.id - o2.id
+        return o1.adr - o2.adr
     }
 
 
     override fun compareTo(other: CompRoute): Int {
-        return id - other.id
+        return adr - other.adr
     }
 
     companion object {
 
         fun add(a: Node) {
-            val rt = CompRoute()
+            val crt = CompRoute()
             val attributes = a.attributes
 
             for (i in 0 until attributes.length) {
                 val theAttribute = attributes.item(i)
-                if (theAttribute.nodeName == "id") {
-                    rt.id = Integer.parseInt(theAttribute.nodeValue)
+                if ((theAttribute.nodeName == "adr") ||
+                        (theAttribute.nodeName == "id") ) {
+                    crt.adr = Integer.parseInt(theAttribute.nodeValue)
                 } else if (theAttribute.nodeName == "btn1") {
-                    rt.btn1 = Integer.parseInt(theAttribute.nodeValue)
+                    crt.btn1 = Integer.parseInt(theAttribute.nodeValue)
                 } else if (theAttribute.nodeName == "btn2") {
-                    rt.btn2 = Integer.parseInt(theAttribute.nodeValue)
+                    crt.btn2 = Integer.parseInt(theAttribute.nodeValue)
                 } else if (theAttribute.nodeName == "routes") {
-                    rt.routes = theAttribute.nodeValue
+                    crt.routes = theAttribute.nodeValue
                 }
             }
-            if (rt.id != INVALID_INT) {
-                compRoutes.add(rt)
+            if (crt.adr != INVALID_INT) {
+                compRoutes.add(crt)
             }
         }
     }

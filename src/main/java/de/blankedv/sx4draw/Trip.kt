@@ -1,5 +1,5 @@
 /*
- *<trip id="3100" routeid="2300" sens1="924" sens2="902" loco="29,1,126" stopdelay="1500" />
+ *<trip adr="3100" routeid="2300" sens1="924" sens2="902" loco="29,1,126" stopdelay="1500" />
  */
 package de.blankedv.sxdraw
 
@@ -16,7 +16,7 @@ import javax.xml.bind.annotation.*
  * @author mblank
  */
 @XmlRootElement(name = "trip")
-@XmlType() //TODO Does not work: propOrder = {"id", "routeid", "sens1", "sens2", "loco", "stopdelay"})
+@XmlType() //TODO Does not work: propOrder = {"adr", "routeid", "sens1", "sens2", "loco", "stopdelay"})
 
 class Trip : Comparator<Trip>, Comparable<Trip> {
 
@@ -58,7 +58,7 @@ class Trip : Comparator<Trip>, Comparable<Trip> {
 
             for (i in 0 until attributes.length) {
                 val theAttribute = attributes.item(i)
-                if (theAttribute.nodeName == "id") {
+                if (theAttribute.nodeName == "adr") {
                     trip.id = Integer.parseInt(theAttribute.nodeValue)
                 } else if (theAttribute.nodeName == "sens1") {
                     trip.sens1 = Integer.parseInt(theAttribute.nodeValue)

@@ -96,13 +96,7 @@ public class ReadConfig {
 
         items = root.getElementsByTagName("panel");
         if (items.getLength() == 0) {
-            return;
-        }
-
-        String panelProtocol = parsePanelAttribute(items.item(0), "protocol");
-
-        if (CFG_DEBUG) {
-            System.out.println("panelProtocol =" + panelProtocol);
+             return;
         }
 
         panelName = parsePanelAttribute(items.item(0), "name");

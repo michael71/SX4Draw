@@ -212,7 +212,7 @@ public class RoutesTable {
                 }
             }); */
 
-        idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
+        idCol.setCellValueFactory(new PropertyValueFactory<>("adr"));
         btn1Col.setCellValueFactory(new PropertyValueFactory<>("btn1"));
         btn2Col.setCellValueFactory(new PropertyValueFactory<>("btn2"));
         routeCol.setCellValueFactory(new PropertyValueFactory<>("route"));

@@ -20,7 +20,7 @@ import static de.blankedv.sx4draw.Constants.DEBUG;
  */
 public class WriteConfigNew {
 
-    public static final String FILENAME_XML = "output_panel_test.xml";
+    public static final String FILENAME_XML = "panel_test_new.xml";
 
     static StringWriter writer;
     private static String localPanelName = "";

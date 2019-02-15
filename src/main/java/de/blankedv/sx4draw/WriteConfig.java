@@ -173,7 +173,7 @@ public class WriteConfig {
             Collections.sort(rtList);
             for (Route rt : rtList) {
                 writeStart("route");
-                writeAttribute("id", rt.getId());
+                writeAttribute("adr", rt.getAdr());
                 if (rt.getBtn1() != INVALID_INT) {
                     writeAttribute("btn1", rt.getBtn1());
                 }
@@ -182,7 +182,6 @@ public class WriteConfig {
                 }
                 writeAttribute("route", rt.getRoute());
                 writeAttribute("sensors", rt.getSensors());
-                writeAttribute("offending", rt.getOffending());
                 writeClose();
 
             }
@@ -193,7 +192,7 @@ public class WriteConfig {
             Collections.sort(crList);
             for (CompRoute rt : crList) {
                 writeStart("comproute");
-                writeAttribute("id", rt.getId());
+                writeAttribute("adr", rt.getAdr());
                 if (rt.getBtn1() != INVALID_INT) {
                     writeAttribute("btn1", rt.getBtn1());
                 }
@@ -210,7 +209,7 @@ public class WriteConfig {
             Collections.sort(tripsList);
             for (Trip rt : tripsList) {
                 writeStart("trip");
-                writeAttribute("id", rt.getId());
+                writeAttribute("adr", rt.getId());
                 writeAttribute("routeid", rt.getRouteid());
                 writeAttribute("sens1", rt.getSens1());
                 writeAttribute("sens2", rt.getSens2());
@@ -224,7 +223,7 @@ public class WriteConfig {
             Collections.sort(ttList);
             for (Timetable rt : ttList) {
                 writeStart("timetable");
-                writeAttribute("id", rt.getId());
+                writeAttribute("adr", rt.getId());
                 writeAttribute("time", rt.getTime());
                 writeAttribute("trip", rt.getTrip());
                 writeAttribute("next", rt.getNext());

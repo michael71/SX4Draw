@@ -121,6 +121,7 @@ public class SX4Draw extends Application {
     private static final ToggleGroup toggleGroup = new ToggleGroup();
 
     private final LayoutConfig layoutConfig = new LayoutConfig();
+    public static final PanelConfig panelConfig = new PanelConfig();
 
     final CheckMenuItem dispAddresses = new CheckMenuItem("Adressen anzeigen");
     final CheckMenuItem rasterOn = new CheckMenuItem("Raster");
@@ -1131,7 +1132,7 @@ public class SX4Draw extends Application {
         if (currentRoute == null) {
             // initialize new route
             currentRoute = new Route(Route.Companion.getnewid());
-            System.out.println("init route with id=" + currentRoute.getId());
+            System.out.println("init route with adr=" + currentRoute.getAdr());
             if (rtbtn != null) {  // first button
                 currentRoute.setBtn1(rtbtn.getAdr());
                 rtbtn.createShapeAndSetState(PEState.MARKED);
@@ -1160,7 +1161,7 @@ public class SX4Draw extends Application {
                 routes.add(new Route(currentRoute));  // add a new route from btn1 to btn2
 
                 Alert alert = new Alert(AlertType.INFORMATION);
-                alert.setTitle("Fahrstraße "+currentRoute.getId()+ " abgeschlossen.");
+                alert.setTitle("Fahrstraße "+currentRoute.getAdr()+ " abgeschlossen.");
                 alert.setHeaderText(null);
                 alert.setContentText("Die Signalstellungen mssen noch manuell korrigiert werden!");
                 alert.showAndWait();
@@ -1185,8 +1186,11 @@ public class SX4Draw extends Application {
 
     private String writeFile(Stage stage, String path, boolean chooseName) {
 
-        layoutConfig.setPanelElements(panelElements);
-        layoutConfig.setTrips(trips);
+        panelConfig.setPanelElements(panelElements);
+        panelConfig.setRoutes(routes, compRoutes);
+        panelConfig.setTrips(trips);
+        panelConfig.setName(panelName);
+        layoutConfig.setPanelCfg(panelConfig);
         layoutConfig.setName("123name");  //panelName
         WriteConfigNew.writeToXML(layoutConfig);
 

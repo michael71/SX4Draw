@@ -1,5 +1,5 @@
 /*
- *<timetable id="3300" time="0,20,40" trip="3100,3101,0" next=""/>
+ *<timetable adr="3300" time="0,20,40" trip="3100,3101,0" next=""/>
  */
 package de.blankedv.sx4draw
 
@@ -33,7 +33,7 @@ class Timetable  : Comparator<Timetable>, Comparable<Timetable> {
     var next : String? = ""
 
     override fun compare(o1: Timetable, o2: Timetable): Int {
-        // if id can be =null use:   val o2id = (o2.id)?: -1
+        // if adr can be =null use:   val o2id = (o2.adr)?: -1
         return o1.id - o2.id
     }
 
@@ -50,7 +50,7 @@ class Timetable  : Comparator<Timetable>, Comparable<Timetable> {
 
             for (i in 0 until attributes.length) {
                 val theAttribute = attributes.item(i)
-                if (theAttribute.nodeName == "id") {
+                if (theAttribute.nodeName == "adr") {
                     tt.id = Integer.parseInt(theAttribute.nodeValue)
                 } else if (theAttribute.nodeName == "time") {
                     tt.time = theAttribute.nodeValue
