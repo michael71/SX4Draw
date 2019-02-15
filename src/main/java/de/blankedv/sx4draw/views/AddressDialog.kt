@@ -15,19 +15,19 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package de.blankedv.sx4draw
+package de.blankedv.sx4draw.views
 
 
-import de.blankedv.sx4draw.SX4Draw.PEType
+import de.blankedv.sx4draw.views.SX4Draw.PEType
 import de.blankedv.sx4draw.Constants.LBMIN
-import de.blankedv.sx4draw.ReadConfig.YOFF
+import de.blankedv.sx4draw.GenericAddress
+import de.blankedv.sx4draw.PanelElement
+import de.blankedv.sx4draw.config.ReadConfig.YOFF
 
 import javafx.beans.value.ChangeListener
-import javafx.beans.value.ObservableValue
 import javafx.collections.FXCollections
 import javafx.geometry.Insets
 import javafx.scene.Scene
-import javafx.scene.control.Alert
 import javafx.scene.control.Button
 import javafx.scene.control.CheckBox
 import javafx.scene.control.ChoiceBox

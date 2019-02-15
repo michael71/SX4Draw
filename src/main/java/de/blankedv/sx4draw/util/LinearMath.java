@@ -16,11 +16,13 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.blankedv.sx4draw;
+package de.blankedv.sx4draw.util;
 
-import de.blankedv.sx4draw.SX4Draw.PEType;
+import de.blankedv.sx4draw.PanelElement;
+import de.blankedv.sx4draw.views.SX4Draw.PEType;
+import de.blankedv.sx4draw.model.IntPoint;
 
-import static de.blankedv.sx4draw.ReadConfig.YOFF;
+import static de.blankedv.sx4draw.config.ReadConfig.YOFF;
 //import java.awt.Point;
 
 public class LinearMath {

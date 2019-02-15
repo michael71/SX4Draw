@@ -1,9 +1,9 @@
-package de.blankedv.sx4draw;
+package de.blankedv.sx4draw.model;
 
 import de.blankedv.sx4draw.Constants.INVALID_INT
+import de.blankedv.sx4draw.PanelElementNew
 import javafx.util.Pair
 import java.util.Comparator
-import javax.xml.bind.annotation.XmlAttribute
 
 abstract class GenericPE : Comparator<GenericPE>, Comparable<GenericPE> {
 

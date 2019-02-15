@@ -6,9 +6,10 @@
 package de.blankedv.sx4draw
 
 import de.blankedv.sx4draw.Constants.INVALID_INT
-import de.blankedv.sx4draw.SX4Draw.routes
+import de.blankedv.sx4draw.views.SX4Draw.routes
 
 import de.blankedv.sx4draw.PanelElement.PEState
+import de.blankedv.sx4draw.views.SX4Draw
 
 import java.util.ArrayList
 import java.util.Comparator

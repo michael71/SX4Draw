@@ -15,10 +15,10 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package de.blankedv.sx4draw
+package de.blankedv.sx4draw.model
 
 import de.blankedv.sx4draw.Constants.INVALID_INT
-import de.blankedv.sx4draw.SX4Draw.compRoutes
+import de.blankedv.sx4draw.views.SX4Draw.compRoutes
 
 import java.util.Comparator
 

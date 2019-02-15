@@ -34,5 +34,12 @@ object Constants {
     const val RECT_X = 1600
     const val RECT_Y = 1000
 
+    const val ADDR0_ROUTEBUTTON = 3000
+    const val ADDR0_ROUTE = 3200
+    const val ADDR0_COMPROUTE = 3400
+    const val ADDR0_TRIP = 5000
+    const val ADDR0_TIMETABLE = 5600
+    const val ADDR0_SIGNAL = 4000
+
 
 }

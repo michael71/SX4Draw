@@ -1,34 +1,11 @@
 package de.blankedv.sx4draw
 
-import de.blankedv.sx4draw.SX4Draw.PEType
-import de.blankedv.sx4draw.SX4Draw.PEType.SIGNAL
-import de.blankedv.sx4draw.SX4Draw.PEType.TRACK
-import de.blankedv.sx4draw.SX4Draw.PEType.ROUTEBUTTON
-import de.blankedv.sx4draw.SX4Draw.PEType.TURNOUT
-import de.blankedv.sx4draw.SX4Draw.PEType.SENSOR
-import de.blankedv.sx4draw.Constants.SXMAX_USED
-import de.blankedv.sx4draw.Constants.LBMIN
-import de.blankedv.sx4draw.Constants.LBMAX
 import de.blankedv.sx4draw.Constants.INVALID_INT
-import de.blankedv.sx4draw.Constants.DEBUG
-import de.blankedv.sx4draw.Constants.RASTER
-import de.blankedv.sx4draw.Constants.RECT_X
-import de.blankedv.sx4draw.Constants.RECT_Y
-import de.blankedv.sx4draw.SX4Draw.panelElements
-import de.blankedv.sx4draw.ReadConfig.YOFF
+import de.blankedv.sx4draw.model.GenericPE
+import de.blankedv.sx4draw.model.IntPoint
 
-import java.util.ArrayList
-import java.util.Comparator
-
-import javafx.scene.canvas.GraphicsContext
-import javafx.scene.paint.Color
-import javafx.scene.shape.Circle
-import javafx.scene.shape.Line
-import javafx.scene.shape.Shape
-import javafx.scene.shape.StrokeLineCap
 import javafx.util.Pair
 import javax.xml.bind.annotation.XmlAttribute
-import javax.xml.bind.annotation.XmlElement
 import javax.xml.bind.annotation.XmlRootElement
 import javax.xml.bind.annotation.XmlType
 

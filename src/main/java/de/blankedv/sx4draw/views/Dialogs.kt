@@ -14,13 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.blankedv.sx4draw
+package de.blankedv.sx4draw.views
 
 
 import de.blankedv.sx4draw.Constants.LBMAX
 import de.blankedv.sx4draw.Constants.LBMIN
 import de.blankedv.sx4draw.Constants.SXMAX_USED
-import de.blankedv.sx4draw.SX4Draw.panelElements
+import de.blankedv.sx4draw.GenericAddress
+import de.blankedv.sx4draw.PanelElement
+import de.blankedv.sx4draw.views.SX4Draw.panelElements
 
 
 import javafx.application.Application

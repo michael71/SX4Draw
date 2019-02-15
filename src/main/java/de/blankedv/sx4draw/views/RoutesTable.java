@@ -3,11 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.blankedv.sx4draw;
+package de.blankedv.sx4draw.views;
 
-import static de.blankedv.sx4draw.SX4Draw.panelName;
-import static de.blankedv.sx4draw.SX4Draw.routes;
+import static de.blankedv.sx4draw.views.SX4Draw.panelName;
+import static de.blankedv.sx4draw.views.SX4Draw.routes;
 
+import de.blankedv.sx4draw.Route;
+import de.blankedv.sx4draw.util.Utils;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.TableColumn;
@@ -17,15 +19,12 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableRow;
 import javafx.util.Callback;
-import javafx.util.Duration;
 import javafx.util.StringConverter;
 
 /**

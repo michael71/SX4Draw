@@ -1,12 +1,17 @@
-package de.blankedv.sx4draw;
+package de.blankedv.sx4draw.config;
 
+import de.blankedv.sx4draw.PanelElement;
+import de.blankedv.sx4draw.Route;
+import de.blankedv.sx4draw.model.Timetable;
+import de.blankedv.sx4draw.model.CompRoute;
+import de.blankedv.sx4draw.model.Loco;
 import de.blankedv.sxdraw.Trip;
 
 import static de.blankedv.sx4draw.Constants.DEBUG;
 import static de.blankedv.sx4draw.Constants.INVALID_INT;
 
-import static de.blankedv.sx4draw.ReadConfig.YOFF;
-import static de.blankedv.sx4draw.SX4Draw.*;
+import static de.blankedv.sx4draw.config.ReadConfig.YOFF;
+import static de.blankedv.sx4draw.views.SX4Draw.*;
 
 import java.io.FileWriter;
 import java.io.IOException;

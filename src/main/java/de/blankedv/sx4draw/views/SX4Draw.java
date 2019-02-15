@@ -16,9 +16,17 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.blankedv.sx4draw;
+package de.blankedv.sx4draw.views;
 
+import de.blankedv.sx4draw.*;
 import de.blankedv.sx4draw.PanelElement.PEState;
+import de.blankedv.sx4draw.config.*;
+import de.blankedv.sx4draw.model.CompRoute;
+import de.blankedv.sx4draw.model.IntPoint;
+import de.blankedv.sx4draw.model.Loco;
+import de.blankedv.sx4draw.model.Timetable;
+import de.blankedv.sx4draw.util.Calc;
+import de.blankedv.sx4draw.util.Utils;
 import de.blankedv.sxdraw.Trip;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -66,13 +74,13 @@ import java.util.prefs.Preferences;
 import static de.blankedv.sx4draw.Constants.*;
 import static de.blankedv.sx4draw.PanelElement.SENSORWIDTH;
 import static de.blankedv.sx4draw.PanelElement.TRACKWIDTH;
-import static de.blankedv.sx4draw.ReadConfig.YOFF;
-import static de.blankedv.sx4draw.SX4Draw.PEType.*;
+import static de.blankedv.sx4draw.config.ReadConfig.YOFF;
+import static de.blankedv.sx4draw.views.SX4Draw.PEType.*;
 
 public class SX4Draw extends Application {
 
-    public static double vNumber = 0.39;
-    public static String vString = "11 Feb 2019";
+    public static double vNumber = 0.40;
+    public static String vString = "15 Feb 2019";
     public static String version = vNumber + " - " +vString;
 
     // FIXED: weichengleichheit nicht auf den Pixel genau
@@ -135,7 +143,7 @@ public class SX4Draw extends Application {
     }
 
     public enum PEType {
-        TRACK, SENSOR, SIGNAL, TURNOUT, ROUTEBUTTON
+        TRACK, SENSOR, SENSOR_US, SIGNAL, TURNOUT, ROUTEBUTTON
     }
 
     public enum RT {
@@ -266,13 +274,13 @@ public class SX4Draw extends Application {
                         line = startNewLine(start, TRACKWIDTH);
                         break;
                     case ADD_SIGNAL:
-                        addElement(PEType.SIGNAL, poi, lineGroup);
+                        addElement(SIGNAL, poi, lineGroup);
                         break;
                     case ADD_ROUTEBTN:
                         addElement(ROUTEBUTTON, poi, lineGroup);
                         break;
                     case ADD_SENSOR_US:
-                        addElement(PEType.SENSOR, poi, lineGroup);
+                        addElement(SENSOR_US, poi, lineGroup);
                         break;
                     case ADD_ROUTE:
                         createRoute(poi);
@@ -594,7 +602,7 @@ public class SX4Draw extends Application {
         btnAddRoute.setText("Fahrstr.");
         btnAddRoute.setGraphic(plusIcon5);
         btnAddRoute.setOnAction((ActionEvent event) -> {
-            if (PanelElement.Companion.addressCheck()) {
+            if (PanelElement.Companion.addressAvail()) {
                 currentGUIState = GUIState.ADD_ROUTE;
                 canvas.setCursor(Cursor.CLOSED_HAND);
             } else {
@@ -1117,7 +1125,7 @@ public class SX4Draw extends Application {
 
     private void addElement(PEType t, IntPoint p, Group lg) {
         IntPoint end = IntPoint.Companion.toRaster(p, getRaster());
-        // avoid "double signal on same point
+        // avoid "double" element on same point
         if (!isPETypeOn(t, end)) {
             PanelElement pe = new PanelElement(t, end);
             lg.getChildren().add(pe.getShape());

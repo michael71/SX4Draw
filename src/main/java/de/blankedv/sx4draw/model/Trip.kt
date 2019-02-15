@@ -4,8 +4,9 @@
 package de.blankedv.sxdraw
 
 
+import de.blankedv.sx4draw.Constants.ADDR0_TRIP
 import de.blankedv.sx4draw.Constants.INVALID_INT
-import de.blankedv.sx4draw.SX4Draw.trips
+import de.blankedv.sx4draw.views.SX4Draw.trips
 import java.util.Comparator
 
 import org.w3c.dom.Node
@@ -29,7 +30,7 @@ class Trip : Comparator<Trip>, Comparable<Trip> {
     var sens1 = INVALID_INT
 
     @get:XmlAttribute
-    var sens2  = INVALID_INT
+    var sens2 = INVALID_INT
 
     @get:XmlAttribute
     var loco = ""
@@ -38,6 +39,18 @@ class Trip : Comparator<Trip>, Comparable<Trip> {
     var stopdelay = INVALID_INT
 
     internal constructor()
+
+    fun autoAddress() {
+        if (adr != INVALID_INT) return
+
+        var a = ADDR0_TRIP  // minumum for trips
+        for (tr in trips) {
+            if (tr.adr >= a) {
+                a = tr.adr + 1
+            }
+        }
+        adr = a
+    }
 
     override fun compare(o1: Trip, o2: Trip): Int {
         return o1.adr - o2.adr
@@ -58,7 +71,7 @@ class Trip : Comparator<Trip>, Comparable<Trip> {
             for (i in 0 until attributes.length) {
                 val theAttribute = attributes.item(i)
                 if ((theAttribute.nodeName == "id") ||
-                        (theAttribute.nodeName == "adr")  )  {
+                        (theAttribute.nodeName == "adr")) {
                     trip.adr = Integer.parseInt(theAttribute.nodeValue)
                 } else if (theAttribute.nodeName == "sens1") {
                     trip.sens1 = Integer.parseInt(theAttribute.nodeValue)

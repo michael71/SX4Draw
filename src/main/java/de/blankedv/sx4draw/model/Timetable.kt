@@ -1,11 +1,13 @@
 /*
  *<timetable adr="3300" time="0,20,40" trip="3100,3101,0" next=""/>
  */
-package de.blankedv.sx4draw
+package de.blankedv.sx4draw.model
 
 
+import de.blankedv.sx4draw.Constants
 import de.blankedv.sx4draw.Constants.INVALID_INT
-import de.blankedv.sx4draw.SX4Draw.timetables
+import de.blankedv.sx4draw.views.SX4Draw
+import de.blankedv.sx4draw.views.SX4Draw.timetables
 import java.util.Comparator
 
 import org.w3c.dom.Node
@@ -31,6 +33,22 @@ class Timetable  : Comparator<Timetable>, Comparable<Timetable> {
 
     @get:XmlAttribute
     var next : String? = ""
+
+    constructor() {
+    }
+
+
+    fun autoAddress() {
+    if (adr != INVALID_INT) return
+
+    var a = Constants.ADDR0_TIMETABLE
+    for (tt in SX4Draw.timetables) {
+        if (tt.adr >= a) {
+            a = tt.adr + 1
+        }
+    }
+    adr = a
+}
 
     override fun compare(o1: Timetable, o2: Timetable): Int {
         // if adr can be =null use:   val o2id = (o2.adr)?: -1

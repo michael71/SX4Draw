@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.blankedv.sx4draw;
+package de.blankedv.sx4draw.config;
 
 
 /*
@@ -12,28 +12,26 @@ package de.blankedv.sx4draw;
  * and open the template in the editor.
  */
 
-import static de.blankedv.sx4draw.Constants.INVALID_INT;
-import static de.blankedv.sx4draw.SX4Draw.*;
+import de.blankedv.sx4draw.PanelElement;
+import de.blankedv.sx4draw.model.Position;
+import de.blankedv.sx4draw.Route;
+import de.blankedv.sx4draw.views.SX4Draw.*;
+import de.blankedv.sx4draw.model.Timetable;
+import de.blankedv.sx4draw.model.CompRoute;
+import de.blankedv.sx4draw.model.Loco;
+import de.blankedv.sxdraw.Trip;
+import org.w3c.dom.*;
 
-import de.blankedv.sx4draw.SX4Draw.PEType;
-import de.blankedv.sx4draw.SX4Draw.RT;
-
-import java.io.File;
-import java.io.IOException;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
-import de.blankedv.sxdraw.Trip;
-import org.xml.sax.SAXException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import static de.blankedv.sx4draw.Constants.INVALID_INT;
+import static de.blankedv.sx4draw.views.SX4Draw.*;
+import static de.blankedv.sx4draw.config.WriteConfigNew.FILENAME_XML;
 
 /**
  * utility function for the mapping of lanbahn addresses to DCC addresses (and
@@ -41,7 +39,7 @@ import org.w3c.dom.NodeList;
  *
  * @author mblank
  */
-public class ReadConfig {
+public class ReadConfigNew {
 
     //TODO read/write locolist (see SX4)
 
@@ -53,29 +51,19 @@ public class ReadConfig {
 
     // code template taken from lanbahnPanel
     public static String readXML(String fname) {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder;
 
         try {
-            builder = factory.newDocumentBuilder();
-        } catch (ParserConfigurationException e1) {
-            System.out.println("ParserConfigException Exception - " + e1.getMessage());
-            return "ParserConfigException";
-        }
-        Document doc;
-        try {
-            doc = builder.parse(new File(fname));
-            parsePanelElements(doc);
-            parseLocoList(doc);
-        } catch (SAXException e) {
-            System.out.println("SAX Exception - " + e.getMessage());
-            return "SAX Exception - " + e.getMessage();
-        } catch (IOException e) {
-            System.out.println("IO Exception - " + e.getMessage());
-            return "IO Exception - " + e.getMessage();
+        JAXBContext context = JAXBContext.newInstance(LayoutConfig.class);
+        Unmarshaller um = context.createUnmarshaller();
+        LayoutConfig lc = (LayoutConfig) um.unmarshal(new FileReader(
+                FILENAME_XML));
+        /* TODO ArrayList<Track> tracks = lc.get();
+         for (Track tr : tracks) {
+            System.out.println("track x=" +tr.getX());
+        } */
         } catch (Exception e) {
-            System.out.println("other Exception - " + e.getMessage());
-            return "other Exception - " + e.getMessage();
+            System.out.println("ERROR "+e.getMessage());
+            e.printStackTrace();
         }
 
         return "OK";
@@ -96,7 +84,13 @@ public class ReadConfig {
 
         items = root.getElementsByTagName("panel");
         if (items.getLength() == 0) {
-             return;
+            return;
+        }
+
+        String panelProtocol = parsePanelAttribute(items.item(0), "protocol");
+
+        if (CFG_DEBUG) {
+            System.out.println("panelProtocol =" + panelProtocol);
         }
 
         panelName = parsePanelAttribute(items.item(0), "name");

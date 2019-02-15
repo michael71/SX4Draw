@@ -1,14 +1,10 @@
-package de.blankedv.sx4draw;
-
-import de.blankedv.sxdraw.Trip;
+package de.blankedv.sx4draw.config;
 
 import java.util.ArrayList;
 
 import javax.xml.bind.annotation.*;
 
-import static de.blankedv.sx4draw.SX4Draw.panelConfig;
-import static de.blankedv.sx4draw.SX4Draw.panelName;
-import static de.blankedv.sx4draw.WriteConfigNew.FILENAME_XML;
+import static de.blankedv.sx4draw.config.WriteConfigNew.FILENAME_XML;
 
 //This statement means that class "LayoutConfig.java" is the root-element
 @XmlRootElement(name = "layout-config")

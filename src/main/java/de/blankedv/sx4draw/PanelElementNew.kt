@@ -2,16 +2,18 @@ package de.blankedv.sx4draw
 
 import de.blankedv.sx4draw.Constants.LBMIN
 import de.blankedv.sx4draw.Constants.INVALID_INT
-import de.blankedv.sx4draw.ReadConfig.YOFF
-import de.blankedv.sx4draw.SX4Draw.*
+import de.blankedv.sx4draw.config.ReadConfig.YOFF
+import de.blankedv.sx4draw.views.SX4Draw.*
 
-import de.blankedv.sx4draw.SX4Draw.PEType.TRACK
-import de.blankedv.sx4draw.SX4Draw.PEType.SENSOR
-import de.blankedv.sx4draw.SX4Draw.PEType.TURNOUT
-import de.blankedv.sx4draw.SX4Draw.PEType.SIGNAL
+import de.blankedv.sx4draw.views.SX4Draw.PEType.TRACK
+import de.blankedv.sx4draw.views.SX4Draw.PEType.SENSOR
+import de.blankedv.sx4draw.views.SX4Draw.PEType.SIGNAL
+import de.blankedv.sx4draw.views.SX4Draw.PEType.ROUTEBUTTON
+import de.blankedv.sx4draw.model.GenericPE
+import de.blankedv.sx4draw.model.IntPoint
+import de.blankedv.sx4draw.model.Position
 
 import java.util.ArrayList
-import java.util.Comparator
 
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
@@ -81,6 +83,10 @@ class PanelElementNew  {
                 this.gpe = Signal(poi)
                 createShapeAndSetState(PEState.DEFAULT)
             }
+            ROUTEBUTTON -> {
+                this.gpe = RouteButton(poi)
+                createShapeAndSetState(PEState.DEFAULT)
+            }
         }
    }
 
@@ -140,17 +146,19 @@ class PanelElementNew  {
                 shape = Circle(g.x.toDouble(), g.y.toDouble(), 9.5, Color.DARKGREY)
                 defaultColor = Color.DARKGREY
             }
-            is Sensor -> {  //DE type of sensor
-                shape = Line(g.x.toDouble(), g.y.toDouble(), g.x2.toDouble(), g.y2.toDouble())
-                shape.strokeWidth = SENSORWIDTH
-                shape.strokeDashArray.addAll(15.0, 10.0)
-                shape.strokeLineCap = StrokeLineCap.ROUND
-                defaultColor = Color.YELLOW
+            is Sensor -> {
+                if (g.x2 != INVALID_INT) {//DE type of sensor
+                    shape = Line(g.x.toDouble(), g.y.toDouble(), g.x2.toDouble(), g.y2.toDouble())
+                    shape.strokeWidth = SENSORWIDTH
+                    shape.strokeDashArray.addAll(15.0, 10.0)
+                    shape.strokeLineCap = StrokeLineCap.ROUND
+                    defaultColor = Color.YELLOW
+                } else {  //US Type SENSOR
+                    shape = Circle(g.x.toDouble(), g.y.toDouble(), 8.0, Color.ORANGE)
+                    defaultColor = Color.ORANGE
+                }
             }
-            is SensorUS -> { //US Type SENSOR
-                shape = Circle(g.x.toDouble(), g.y.toDouble(), 8.0, Color.ORANGE)
-                defaultColor = Color.ORANGE
-            }
+
             is Signal -> {
                 defaultColor = Color.BLACK
                 val ls = Line(g.x.toDouble(), g.y.toDouble(), g.x2.toDouble(), g.y2.toDouble())
@@ -261,7 +269,7 @@ class PanelElementNew  {
          * @param
          * @return
          */
-        fun addressCheck(): Boolean {
+        fun addressesAvail(): Boolean {
             var adrOK = 0
             var adrNOK = 0
             var percentage = 0.0

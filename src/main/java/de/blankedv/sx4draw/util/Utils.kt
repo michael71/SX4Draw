@@ -3,19 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.blankedv.sx4draw
+package de.blankedv.sx4draw.util
 
 import de.blankedv.sx4draw.Constants.INVALID_INT
+import de.blankedv.sx4draw.model.IntPoint
 import java.util.concurrent.atomic.AtomicLong
 
 import javafx.scene.control.TableView
-import javafx.util.Pair
 import java.net.URL
-import kotlin.reflect.KParameter
-import jdk.nashorn.internal.runtime.ScriptingFunctions.readLine
-import java.io.*
-import java.lang.NumberFormatException
-import java.nio.charset.Charset
 
 
 /**

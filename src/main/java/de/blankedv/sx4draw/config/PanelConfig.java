@@ -1,15 +1,15 @@
-package de.blankedv.sx4draw;
+package de.blankedv.sx4draw.config;
 
+import de.blankedv.sx4draw.*;
+import de.blankedv.sx4draw.model.CompRoute;
+import de.blankedv.sx4draw.model.Timetable;
+import de.blankedv.sx4draw.views.SX4Draw;
 import de.blankedv.sxdraw.Trip;
 import javafx.collections.ObservableList;
 
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
-
-import static de.blankedv.sx4draw.SX4Draw.panelName;
-import static de.blankedv.sx4draw.WriteConfigNew.FILENAME_XML;
-
 
 
 @XmlRootElement(name = "panel")

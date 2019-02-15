@@ -1,21 +1,21 @@
 package de.blankedv.sx4draw
 
-import de.blankedv.sx4draw.SX4Draw.PEType
-import de.blankedv.sx4draw.SX4Draw.PEType.SIGNAL
-import de.blankedv.sx4draw.SX4Draw.PEType.TRACK
-import de.blankedv.sx4draw.SX4Draw.PEType.ROUTEBUTTON
-import de.blankedv.sx4draw.SX4Draw.PEType.TURNOUT
-import de.blankedv.sx4draw.SX4Draw.PEType.SENSOR
-import de.blankedv.sx4draw.Constants.SXMAX_USED
+import de.blankedv.sx4draw.views.SX4Draw.PEType
+import de.blankedv.sx4draw.views.SX4Draw.PEType.SIGNAL
+import de.blankedv.sx4draw.views.SX4Draw.PEType.TRACK
+import de.blankedv.sx4draw.views.SX4Draw.PEType.ROUTEBUTTON
+import de.blankedv.sx4draw.views.SX4Draw.PEType.TURNOUT
+import de.blankedv.sx4draw.views.SX4Draw.PEType.SENSOR
 import de.blankedv.sx4draw.Constants.LBMIN
-import de.blankedv.sx4draw.Constants.LBMAX
 import de.blankedv.sx4draw.Constants.INVALID_INT
 import de.blankedv.sx4draw.Constants.DEBUG
-import de.blankedv.sx4draw.Constants.RASTER
-import de.blankedv.sx4draw.Constants.RECT_X
-import de.blankedv.sx4draw.Constants.RECT_Y
-import de.blankedv.sx4draw.SX4Draw.panelElements
-import de.blankedv.sx4draw.ReadConfig.YOFF
+import de.blankedv.sx4draw.views.SX4Draw.panelElements
+import de.blankedv.sx4draw.config.ReadConfig.YOFF
+import de.blankedv.sx4draw.model.GenericPE
+import de.blankedv.sx4draw.model.IntPoint
+import de.blankedv.sx4draw.model.Position
+import de.blankedv.sx4draw.util.Utils
+import de.blankedv.sx4draw.views.SX4Draw
 
 import java.util.ArrayList
 import java.util.Comparator
@@ -27,10 +27,6 @@ import javafx.scene.shape.Line
 import javafx.scene.shape.Shape
 import javafx.scene.shape.StrokeLineCap
 import javafx.util.Pair
-import javax.xml.bind.annotation.XmlAttribute
-import javax.xml.bind.annotation.XmlElement
-import javax.xml.bind.annotation.XmlRootElement
-import javax.xml.bind.annotation.XmlType
 
 
 /**
@@ -95,7 +91,7 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
     }
 
 
-    constructor(type: de.blankedv.sx4draw.SX4Draw.PEType, l: Line) {
+    constructor(type: SX4Draw.PEType, l: Line) {
         this.type = type
         this.x = l.startX.toInt()
         this.x2 = l.endX.toInt()
@@ -127,7 +123,7 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
         }
     }
 
-    constructor (gpe : GenericPE) {
+    constructor (gpe: GenericPE) {
         when (gpe) {
             is Track -> {
                 type = TRACK
@@ -145,8 +141,8 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
         this.y2 = closed.y
         this.xt = thrown.x
         this.yt = thrown.y
-        // NO ORDERING HERE
         name = ""
+        // NO x/x2 ORDERING FOR TURNOUTS !
         createShapeAndSetState(PEState.DEFAULT)
         autoAddress()
     }
@@ -160,6 +156,7 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
         this.xt = pos.xt
         this.yt = pos.yt
         name = ""
+        // NO x/x2 ORDERING FOR TURNOUTS !
         createShapeAndSetState(PEState.DEFAULT)
         autoAddress()
     }
@@ -459,7 +456,7 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
          * @param
          * @return
          */
-        fun addressCheck(): Boolean {
+        fun addressAvail(): Boolean {
             var adrOK = 0
             var adrNOK = 0
             var percentage = 0.0
