@@ -18,6 +18,9 @@ import javax.xml.bind.annotation.XmlType
 class RouteButton : GenericPE {
 
     @get:XmlAttribute
+    var adr= INVALID_INT
+
+    @get:XmlAttribute
     override var name : String? = null
 
     @get:XmlAttribute
@@ -25,9 +28,6 @@ class RouteButton : GenericPE {
 
     @get:XmlAttribute
     override var y: Int = 0
-
-    @get:XmlAttribute
-    var adr= 1200
 
     constructor() {}
 
@@ -37,7 +37,11 @@ class RouteButton : GenericPE {
         }
         this.x = pe.x
         this.y = pe.y
-        autoAddress()
+        if (pe.adr == INVALID_INT) {
+            autoAddress()
+        } else {
+            this.adr = pe.adr
+        }
     }
 
     override fun getAddr() : Int {

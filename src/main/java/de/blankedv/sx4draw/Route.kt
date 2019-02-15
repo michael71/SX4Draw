@@ -230,8 +230,8 @@ class Route : Comparator<Route>, Comparable<Route> {
 
             for (i in 0 until attributes.length) {
                 val theAttribute = attributes.item(i)
-                if ((theAttribute.nodeName == "adr") ||
-                     (theAttribute.nodeName == "id") ) {
+                if ((theAttribute.nodeName == "id") ||
+                     (theAttribute.nodeName == "adr") ) {
                     rt.adr = Integer.parseInt(theAttribute.nodeValue)
                 } else if (theAttribute.nodeName == "btn1") {
                     rt.btn1 = Integer.parseInt(theAttribute.nodeValue)

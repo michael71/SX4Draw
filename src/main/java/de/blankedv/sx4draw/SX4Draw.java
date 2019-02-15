@@ -148,7 +148,7 @@ public class SX4Draw extends Application {
     public static final ObservableList<CompRoute> compRoutes = FXCollections.observableArrayList();
     //public static final ObservableList<Trip> trips = FXCollections.observableArrayList();
     public static final ArrayList<Trip> trips = new ArrayList<>();
-    public static final ObservableList<Timetable> timetables = FXCollections.observableArrayList();
+    public static final ArrayList<Timetable> timetables = new ArrayList<>();
 
 
 
@@ -1188,7 +1188,7 @@ public class SX4Draw extends Application {
 
         panelConfig.setPanelElements(panelElements);
         panelConfig.setRoutes(routes, compRoutes);
-        panelConfig.setTrips(trips);
+        panelConfig.setTrips(trips, timetables);
         panelConfig.setName(panelName);
         layoutConfig.setPanelCfg(panelConfig);
         layoutConfig.setName("123name");  //panelName

@@ -65,8 +65,8 @@ data class CompRoute (
 
             for (i in 0 until attributes.length) {
                 val theAttribute = attributes.item(i)
-                if ((theAttribute.nodeName == "adr") ||
-                        (theAttribute.nodeName == "id") ) {
+                if ((theAttribute.nodeName == "id") ||
+                        (theAttribute.nodeName == "adr") ) {
                     crt.adr = Integer.parseInt(theAttribute.nodeValue)
                 } else if (theAttribute.nodeName == "btn1") {
                     crt.btn1 = Integer.parseInt(theAttribute.nodeValue)

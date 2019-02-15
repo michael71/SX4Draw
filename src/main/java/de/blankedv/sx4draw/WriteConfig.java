@@ -209,7 +209,7 @@ public class WriteConfig {
             Collections.sort(tripsList);
             for (Trip rt : tripsList) {
                 writeStart("trip");
-                writeAttribute("adr", rt.getId());
+                writeAttribute("adr", rt.getAdr());
                 writeAttribute("routeid", rt.getRouteid());
                 writeAttribute("sens1", rt.getSens1());
                 writeAttribute("sens2", rt.getSens2());
@@ -223,7 +223,7 @@ public class WriteConfig {
             Collections.sort(ttList);
             for (Timetable rt : ttList) {
                 writeStart("timetable");
-                writeAttribute("adr", rt.getId());
+                writeAttribute("adr", rt.getAdr());
                 writeAttribute("time", rt.getTime());
                 writeAttribute("trip", rt.getTrip());
                 writeAttribute("next", rt.getNext());

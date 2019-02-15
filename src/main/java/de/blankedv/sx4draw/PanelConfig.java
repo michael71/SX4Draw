@@ -13,7 +13,7 @@ import static de.blankedv.sx4draw.WriteConfigNew.FILENAME_XML;
 
 
 @XmlRootElement(name = "panel")
-@XmlType(propOrder = {"tracks", "turnouts", "sensors", "signals", "rts", "comprts", "trips"})
+@XmlType(propOrder = {"tracks", "turnouts", "sensors", "signals", "routebuttons", "rts", "comprts", "trips", "timetables"})
 public class PanelConfig {
 
     @XmlAttribute
@@ -35,6 +35,10 @@ public class PanelConfig {
     @XmlElement(name = "signal")
     private ArrayList<Signal> signals = new ArrayList<>();
 
+    @XmlElementWrapper(name = "routebuttons")
+    @XmlElement(name = "routebutton")
+    private ArrayList<RouteButton> routebuttons = new ArrayList<>();
+
     @XmlElementWrapper(name = "routes")
     @XmlElement(name = "route")
     private List<Route> rts;
@@ -47,13 +51,19 @@ public class PanelConfig {
     @XmlElement(name = "trip")
     private ArrayList<Trip> trips = new ArrayList<>();
 
+    @XmlElementWrapper(name = "timetables")
+    @XmlElement(name = "timetable")
+    private ArrayList<Timetable> timetables = new ArrayList<>();
+
+
 
     public void setName(String n) {
         name = n;
     }
 
-    public void setTrips(ArrayList<Trip> allTrips) {
+    public void setTrips(ArrayList<Trip> allTrips, ArrayList<Timetable> allTTs) {
         this.trips = allTrips;
+        this.timetables = allTTs;
 
     }
 
@@ -74,6 +84,7 @@ public class PanelConfig {
         setTurnouts(pes);
         setSensors(pes);
         setSignals(pes);
+        setRouteButtons(pes);
     }
 
     public void setRoutes(ObservableList<Route> routes, ObservableList<CompRoute> comproutes) {
@@ -107,6 +118,13 @@ public class PanelConfig {
         for (PanelElement pe : pes) {
             if (pe.getType() == SX4Draw.PEType.SIGNAL)
                 signals.add(new Signal(pe));
+        }
+    }
+
+    public void setRouteButtons(ArrayList<PanelElement> pes) {
+        for (PanelElement pe : pes) {
+            if (pe.getType() == SX4Draw.PEType.ROUTEBUTTON)
+                routebuttons.add(new RouteButton(pe));
         }
     }
 

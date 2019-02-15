@@ -5,9 +5,9 @@ package de.blankedv.sx4draw
 
 
 import de.blankedv.sx4draw.Constants.INVALID_INT
+import de.blankedv.sx4draw.SX4Draw.timetables
 import java.util.Comparator
 
-import org.w3c.dom.NamedNodeMap
 import org.w3c.dom.Node
 import javax.xml.bind.annotation.XmlAttribute
 import javax.xml.bind.annotation.XmlRootElement
@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlType
 class Timetable  : Comparator<Timetable>, Comparable<Timetable> {
 
     @get:XmlAttribute
-    var id : Int = INVALID_INT   // is mandatory
+    var adr : Int = INVALID_INT   // is mandatory
 
     @get:XmlAttribute
     var time : String? = ""
@@ -34,11 +34,11 @@ class Timetable  : Comparator<Timetable>, Comparable<Timetable> {
 
     override fun compare(o1: Timetable, o2: Timetable): Int {
         // if adr can be =null use:   val o2id = (o2.adr)?: -1
-        return o1.id - o2.id
+        return o1.adr - o2.adr
     }
 
     override fun compareTo(other: Timetable): Int {
-        return id - other.id
+        return adr - other.adr
     }
 
     companion object {
@@ -50,8 +50,9 @@ class Timetable  : Comparator<Timetable>, Comparable<Timetable> {
 
             for (i in 0 until attributes.length) {
                 val theAttribute = attributes.item(i)
-                if (theAttribute.nodeName == "adr") {
-                    tt.id = Integer.parseInt(theAttribute.nodeValue)
+                if ((theAttribute.nodeName == "id") ||
+                        (theAttribute.nodeName == "adr")  )  {
+                    tt.adr = Integer.parseInt(theAttribute.nodeValue)
                 } else if (theAttribute.nodeName == "time") {
                     tt.time = theAttribute.nodeValue
                 } else if (theAttribute.nodeName == "trip") {
@@ -60,8 +61,8 @@ class Timetable  : Comparator<Timetable>, Comparable<Timetable> {
                     tt.next = theAttribute.nodeValue
                 }
             }
-            if (tt.id != INVALID_INT) {
-               // timetables.add(tt)
+            if (tt.adr != INVALID_INT) {
+               timetables.add(tt)
             }
 
         }
