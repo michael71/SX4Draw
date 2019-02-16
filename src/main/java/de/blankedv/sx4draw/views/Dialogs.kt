@@ -16,7 +16,6 @@
  */
 package de.blankedv.sx4draw.views
 
-
 import de.blankedv.sx4draw.Constants.LBMAX
 import de.blankedv.sx4draw.Constants.LBMIN
 import de.blankedv.sx4draw.Constants.SXMAX_USED
@@ -100,7 +99,7 @@ object Dialogs {
             var found = false
             var foundPE: PanelElement? = null
             for (pe in panelElements) {
-                if (newAddress.addr != oldValue.addr && newAddress.addr == pe.adr) {
+                if (newAddress.addr != oldValue.addr && newAddress.addr == pe.gpe.getAddr()) {
                     found = true
                     foundPE = pe
                     foundPE!!.toggleShapeSelected()

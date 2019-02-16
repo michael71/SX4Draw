@@ -93,8 +93,8 @@ public class SX4Draw extends Application {
     // FIXED: für weichen INV funktion einbauen (in Fahrstrassenanzeige)
     // FIXED: ScrollPane einführen für Drawing bereich
 
+    //public static ArrayList<PanelElement> panelElements = new ArrayList<>();
     public static ArrayList<PanelElement> panelElements = new ArrayList<>();
-    public static ArrayList<PanelElementNew> panelElementsNew = new ArrayList<>();
     public static PanelElement lastPE = null;
     public static String panelName = "";
 
@@ -250,7 +250,7 @@ public class SX4Draw extends Application {
                     if (currentGUIState == GUIState.ADD_ROUTE) {
                         // abbruch
                         for (PanelElement sel : panelElements) {
-                            sel.createShapeAndSetState(PEState.DEFAULT);
+                            sel.createShapeAndSetState(PanelElement.PEState.DEFAULT);
                         }
                         //redrawPanelElements();
                         currentRoute = null; // reset
@@ -828,10 +828,10 @@ public class SX4Draw extends Application {
                     try {
                         int address = Integer.parseInt(addr);
                         for (PanelElement pe : panelElements) {
-                            if (((pe.getAdr() / 10) == address) || ((pe.getAdr2() / 10) == address)) {
-                                pe.createShapeAndSetState(PEState.SELECTED);
+                            if (((pe.gpe.getAddr() / 10) == address) || ((pe.gpe.getAddr2() / 10) == address)) {
+                                pe.createShapeAndSetState(PanelElement.PEState.SELECTED);
                             } else {
-                                pe.createShapeAndSetState(PEState.DEFAULT);
+                                pe.createShapeAndSetState(PanelElement.PEState.DEFAULT);
                             }
                         }
                     } catch (NumberFormatException e) {
@@ -841,10 +841,10 @@ public class SX4Draw extends Application {
                     try {
                         int address = Integer.parseInt(addr);
                         for (PanelElement pe : panelElements) {
-                            if ((pe.getAdr() == address) || (pe.getAdr2() == address)) {
-                                pe.createShapeAndSetState(PEState.SELECTED);
+                            if ((pe.gpe.getAddr() == address) || (pe.gpe.getAddr2() == address)) {
+                                pe.createShapeAndSetState(PanelElement.PEState.SELECTED);
                             } else {
-                                pe.createShapeAndSetState(PEState.DEFAULT);
+                                pe.createShapeAndSetState(PanelElement.PEState.DEFAULT);
                             }
                         }
                     } catch (NumberFormatException e) {
@@ -907,7 +907,7 @@ public class SX4Draw extends Application {
         Collections.sort(peListRev);
         Collections.sort(peListRev, Collections.reverseOrder());
         for (PanelElement pe : peListRev) {
-            Pair<Boolean, Integer> result = pe.isTouched(new IntPoint(x, y));
+            Pair<Boolean, Integer> result = pe.gpe.isTouched(new IntPoint(x, y));
             if (result.getKey()) {
                 return pe;
             }
@@ -1139,7 +1139,7 @@ public class SX4Draw extends Application {
         PanelElement rtbtn = getRouteBtn(poi);
         if (currentRoute == null) {
             // initialize new route
-            currentRoute = new Route(Route.Companion.getnewid());
+            currentRoute = new Route(Route.Companion.getAutoAddress());
             System.out.println("init route with adr=" + currentRoute.getAdr());
             if (rtbtn != null) {  // first button
                 currentRoute.setBtn1(rtbtn.getAdr());

@@ -46,7 +46,7 @@ class Route : Comparator<Route>, Comparable<Route> {
     var sensors = ""
 
     // extract PEs from string information
-    private val pEs: ArrayList<PanelElement>
+    private val pES: ArrayList<PanelElement>
         get() {
 
             val pes = ArrayList<PanelElement>()
@@ -103,16 +103,16 @@ class Route : Comparator<Route>, Comparable<Route> {
      * @param pe
      */
     fun addElement(pe: PanelElement) {
-        when (pe.type) {
-            SX4Draw.PEType.SENSOR -> if (sensors.isEmpty()) {
-                sensors = "" + pe.adr
+        when (pe.gpe::class) {
+            Sensor::class -> if (sensors.isEmpty()) {
+                sensors = "" + pe.gpe.getAddr()
             } else {
-                sensors = sensors + "," + pe.adr
+                sensors = sensors + "," + pe.gpe.getAddr()
             }
-            SX4Draw.PEType.TURNOUT, SX4Draw.PEType.SIGNAL -> if (route.isEmpty()) {
-                route = "" + pe.adr + ",0"
+            Turnout::class -> if (route.isEmpty()) {
+                route = "" + pe.gpe.getAddr() + ",0"
             } else {
-                route = route + ";" + pe.adr + ",0"
+                route = route + ";" + pe.gpe.getAddr() + ",0"
             }
             else -> {}
         }
@@ -124,21 +124,21 @@ class Route : Comparator<Route>, Comparable<Route> {
      * @param peSt
      */
     fun addElement(peSt: Pair<PanelElement, Int>) {
-        when (peSt.key.type) {
-            SX4Draw.PEType.SENSOR -> if (sensors.isEmpty()) {
-                sensors = "" + peSt.key.adr
+        when (peSt.key.gpe::class) {
+            Sensor::class -> if (sensors.isEmpty()) {
+                sensors = "" + peSt.key.gpe.getAddr()
             } else {
-                sensors = sensors + "," + peSt.key.adr
+                sensors = sensors + "," + peSt.key.gpe.getAddr()
             }
-            SX4Draw.PEType.TURNOUT -> if (route.isEmpty()) {
-                route = "" + peSt.key.adr + "," + peSt.value
+            Turnout::class -> if (route.isEmpty()) {
+                route = "" + peSt.key.gpe.getAddr() + "," + peSt.value
             } else {
-                route = route + ";" + peSt.key.adr + "," + peSt.value
+                route = route + ";" + peSt.key.gpe.getAddr() + "," + peSt.value
             }
-            SX4Draw.PEType.SIGNAL -> if (route.isEmpty()) {
-                route = "" + peSt.key.adr + ",0"
+            Signal::class -> if (route.isEmpty()) {
+                route = "" + peSt.key.gpe.getAddr() + ",0"
             } else {
-                route = route + ";" + peSt.key.adr + ",0"
+                route = route + ";" + peSt.key.gpe.getAddr() + ",0"
             }
             else -> {}
         }
@@ -150,7 +150,7 @@ class Route : Comparator<Route>, Comparable<Route> {
      * @param mark
      */
     fun setMarked(mark: Boolean) {
-        val pes = pEs  // implicit setRouteState
+        val pes = pES  // implicit setRouteState
         if (mark) {
             for (pe : PanelElement in pes) {
                 pe.createShapeAndSetState(PEState.MARKED)
@@ -187,7 +187,7 @@ class Route : Comparator<Route>, Comparable<Route> {
                         pe.createShapeAndSetState(PEState.STATE_1)
                         // TODO distinguish between 1 and 2 (=yellow)
                     }
-                    println("set pe.adr=" + pe.adr + " rst=" + rst)
+                    println("set pe.adr=" + pe.gpe.getAddr() + " rst=" + rst)
                 }
             } catch (e: Exception) {
                 // do nothing
@@ -249,7 +249,7 @@ class Route : Comparator<Route>, Comparable<Route> {
             }
         }
 
-        fun getnewid(): Int {
+        fun getAutoAddress(): Int {
             var newID = 2200  // start with 2200
             for (rt in routes) {
                 if (rt.adr > newID) {

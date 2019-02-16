@@ -5,6 +5,7 @@ import de.blankedv.sx4draw.Constants.INVALID_INT
 import de.blankedv.sx4draw.model.GenericPE
 import de.blankedv.sx4draw.model.IntPoint
 import de.blankedv.sx4draw.views.SX4Draw
+import de.blankedv.sx4draw.views.SX4Draw.panelElements
 
 import javax.xml.bind.annotation.XmlAttribute
 import javax.xml.bind.annotation.XmlRootElement
@@ -34,7 +35,7 @@ class RouteButton : GenericPE {
 
     constructor() {}
 
-    constructor (pe : PanelElement) {
+    /*constructor (pe : PanelElement) {
         if (!pe.name.isBlank()) {
             this.name = pe.name
         }
@@ -45,7 +46,7 @@ class RouteButton : GenericPE {
         } else {
             this.adr = pe.adr
         }
-    }
+    } */
 
     constructor (poi : IntPoint) {
         x = poi.x
@@ -59,7 +60,7 @@ class RouteButton : GenericPE {
 
     private fun autoAddress() {
         var a = ADDR0_ROUTEBUTTON  // minumum for route buttons
-        for (pe in SX4Draw.panelElementsNew) {
+        for (pe in panelElements) {
             if (pe.gpe is RouteButton) {
                 if (pe.gpe.getAddr() >= a) {
                     a = pe.gpe.getAddr() + 1

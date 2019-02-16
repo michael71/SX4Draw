@@ -22,6 +22,8 @@ import de.blankedv.sx4draw.views.SX4Draw.PEType
 import de.blankedv.sx4draw.Constants.LBMIN
 import de.blankedv.sx4draw.GenericAddress
 import de.blankedv.sx4draw.PanelElement
+import de.blankedv.sx4draw.Signal
+import de.blankedv.sx4draw.Turnout
 import de.blankedv.sx4draw.config.ReadConfig.YOFF
 
 import javafx.beans.value.ChangeListener
@@ -55,9 +57,9 @@ object AddressDialog {
 
         genAddress = GenericAddress(initVal)
 
-        val type = pe.type
-        val title = ("Adresse " + type.name[0]
-                + type.name.toLowerCase().substring(1) + " Pos.= " + pe.x + "," + (pe.y - YOFF))
+
+        val title = ("Adresse " + pe.gpe::class.simpleName
+                 + " Pos.= " + pe.gpe.x + "," + (pe.gpe.y - YOFF))
         val in1000 = initVal.addr / 1000
         val in100 = (initVal.addr - in1000 * 1000) / 100
         val in10 = (initVal.addr - in1000 * 1000 - in100 * 100) / 10
@@ -74,7 +76,7 @@ object AddressDialog {
         val lblInv = Label(" invertiert")
 
         // select inv (ONLY for TURNOUT)
-        if (type == PEType.TURNOUT) {
+        if (pe.gpe::class == Turnout::class) {
             genAddress.inv = initVal.inv
             inv.isSelected = (initVal.inv != 0)
           } else {
@@ -90,7 +92,7 @@ object AddressDialog {
 
         val lblOrient = Label(" Orient.")
 
-        if (type == PEType.SIGNAL) {
+        if (pe.gpe::class == Signal::class) {
             genAddress.orient = initVal.orient
             orient.selectionModel.select(genAddress.orient)
         } else {

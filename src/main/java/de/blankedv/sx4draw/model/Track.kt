@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlType
 class Track : GenericPE {
 
     @get:XmlAttribute
-    override var name : String? = null
+    override var name: String? = null
 
     @get:XmlAttribute
     override var x: Int = 0 // starting point
@@ -36,9 +36,11 @@ class Track : GenericPE {
     @get:XmlAttribute
     var y2 = INVALID_INT
 
+    override val ord = 0
+
     constructor()
 
-    constructor(l : Line) {
+    constructor(l: Line) {
         this.x = l.startX.toInt()
         this.x2 = l.endX.toInt()
         this.y = l.startY.toInt()
@@ -46,25 +48,46 @@ class Track : GenericPE {
         orderX()
     }
 
-    constructor (pe : PanelElement) {
-        if (!pe.name.isBlank()) {
-            this.name = pe.name
-        }
-        this.x = pe.x
-        this.y = pe.y
-        this.x2 = pe.x2
-        this.y2 = pe.y2
+    /* constructor (pe : PanelElement) {
+         if (!pe.name.isBlank()) {
+             this.name = pe.name
+         }
+         this.x = pe.x
+         this.y = pe.y
+         this.x2 = pe.x2
+         this.y2 = pe.y2
+     } */
+
+    override fun translate(d: IntPoint) {
+        x += d.x
+        y += d.y
+        x2 += d.x
+        y2 += d.y
+    }
+
+    override fun scalePlus() {
+        x = 2 * x
+        y = 2 * y
+        x2 = 2 * x2
+        y2 = 2 * y2
+    }
+
+    override fun scaleMinus() {
+        x = x / 2
+        y = y / 2
+            x2 = x2 / 2
+            y2 = y2 / 2
     }
 
     override fun isTouched(touch: IntPoint): Pair<Boolean, Int> {
 
         val ymin = Math.min(y, y2)
         val ymax = Math.max(y, y2)
-        return if (touch.x >= x - PanelElementNew.TOUCH_RADIUS
-                && touch.x <= x2 + PanelElementNew.TOUCH_RADIUS
-                && touch.y >= ymin - PanelElementNew.TOUCH_RADIUS
-                && touch.y <= ymax + PanelElementNew.TOUCH_RADIUS) {
-            if (Utils.calcDistanceFromLine(IntPoint(x, y), IntPoint(x2, y2), touch) < PanelElementNew.TOUCH_RADIUS) {
+        return if (touch.x >= x - PanelElement.TOUCH_RADIUS
+                && touch.x <= x2 + PanelElement.TOUCH_RADIUS
+                && touch.y >= ymin - PanelElement.TOUCH_RADIUS
+                && touch.y <= ymax + PanelElement.TOUCH_RADIUS) {
+            if (Utils.calcDistanceFromLine(IntPoint(x, y), IntPoint(x2, y2), touch) < PanelElement.TOUCH_RADIUS) {
                 Pair(true, 0)
             } else {
                 Pair(false, 0)

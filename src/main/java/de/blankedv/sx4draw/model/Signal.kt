@@ -6,6 +6,7 @@ import de.blankedv.sx4draw.views.SX4Draw.*
 import de.blankedv.sx4draw.model.GenericPE
 import de.blankedv.sx4draw.model.IntPoint
 import de.blankedv.sx4draw.util.Utils
+import java.lang.NumberFormatException
 
 import javax.xml.bind.annotation.XmlAttribute
 import javax.xml.bind.annotation.XmlRootElement
@@ -22,7 +23,7 @@ import javax.xml.bind.annotation.XmlType
 class Signal : GenericPE {
 
     @get:XmlAttribute
-    override var name : String? = null
+    override var name: String? = null
 
     @get:XmlAttribute
     override var x: Int = 0 // starting point
@@ -39,10 +40,11 @@ class Signal : GenericPE {
     @get:XmlAttribute(name = "adr")
     var adrStr = ""
 
+    override val ord = 2
 
     constructor() {}
 
-    constructor(poi : IntPoint) {
+    constructor(poi: IntPoint) {
         x = poi.x
         y = poi.y
         val d = Utils.signalOrientToDXY2(0) // 0 (= 0 grad) is default orientation for signal
@@ -52,7 +54,7 @@ class Signal : GenericPE {
     }
 
 
-    constructor (pe : PanelElement) {
+    /*constructor (pe : PanelElementNew) {
         if (!pe.name.isBlank()) {
             this.name = pe.name
         }
@@ -64,11 +66,40 @@ class Signal : GenericPE {
         if (pe.adr2 != INVALID_INT) {
             this.adrStr += "," + pe.adr2
         }
+    } */
+
+    override fun translate(d: IntPoint) {
+        x += d.x
+        y += d.y
+        x2 += d.x
+        y2 += d.y
+    }
+
+    override fun scalePlus() {
+        val dx = x
+        val dy = y
+        x = 2 * x
+        y = 2 * y
+
+        // do not scale x2/y2 BUT TRANSLATE
+        x2 += dx
+        y2 += dy
+    }
+
+    override fun scaleMinus() {
+        val dx = x
+        val dy = y
+        x = x / 2
+        y = y / 2
+
+        // do not scale x2/y2 BUT TRANSLATE
+        x2 -= dx
+        y2 -= dy
     }
 
     private fun autoAddress() {
         var a = ADDR0_SIGNAL // default for signal
-        for (pe in panelElementsNew) {
+        for (pe in panelElements) {
             if (pe.gpe is Signal) {
                 if (pe.gpe.getAddr() >= a) {
                     a = pe.gpe.getAddr() + 1
@@ -76,6 +107,28 @@ class Signal : GenericPE {
             }
         }
         adrStr = "" + a
+    }
+
+    override fun getAddr(): Int {
+        val aArry = adrStr.split(",")
+        var a = INVALID_INT
+        try {
+            a = aArry[0].toInt()
+        } catch (e: NumberFormatException) {
+
+        }
+        return a
+    }
+
+    override fun getAddr2(): Int {
+        val aArry = adrStr.split(",")
+        var a = INVALID_INT
+        try {
+            a = aArry[1].toInt()
+        } catch (e: NumberFormatException) {
+
+        }
+        return a
     }
 
     companion object {

@@ -20,7 +20,7 @@ import javax.xml.bind.annotation.XmlType
 class Turnout : GenericPE {
 
     @get:XmlAttribute
-    override var name : String? = null
+    override var name: String? = null
 
     // if defined in GenericPE, the order in the XML output does not look nice ("x" would be at the end)
     @get:XmlAttribute
@@ -42,10 +42,12 @@ class Turnout : GenericPE {
     var yt = INVALID_INT
 
     @get:XmlAttribute
-    var inv : Int? = null  // 0 or null == not inverted
+    var inv: Int? = null  // 0 or null == not inverted
 
     @get:XmlAttribute
     var adr = 800
+
+    override val ord = 2
 
     constructor()
 
@@ -58,7 +60,7 @@ class Turnout : GenericPE {
         yt = thrown.y
     }
 
-    constructor (pe : PanelElement) {
+    /*constructor (pe : PanelElement) {
         if (!pe.name.isBlank()) {
             this.name = pe.name
         }
@@ -72,28 +74,43 @@ class Turnout : GenericPE {
         if (pe.inv != 0) {
             this.inv = pe.inv
         }
+    } */
+
+    override fun scalePlus() {
+        val dx = x
+        val dy = y
+        x = 2 * x
+        y = 2 * y
+
+        // do not scale x2/y2 BUT TRANSLATE
+
+        x2 += dx
+        y2 += dy
+        xt += dx
+        yt += dy
+
     }
 
 
-    override fun isTouched(touch : IntPoint) : Pair<Boolean, Int> {
+    override fun isTouched(touch: IntPoint): Pair<Boolean, Int> {
         // check first for (x2,y2) touch (state 0)
-        return if (touch.x >= x2 - PanelElementNew.TOUCH_RADIUS
-                && touch.x <= x2 + PanelElementNew.TOUCH_RADIUS
-                && touch.y >= y2 - PanelElementNew.TOUCH_RADIUS
-                && touch.y <= y2 + PanelElementNew.TOUCH_RADIUS) {
+        return if (touch.x >= x2 - PanelElement.TOUCH_RADIUS
+                && touch.x <= x2 + PanelElement.TOUCH_RADIUS
+                && touch.y >= y2 - PanelElement.TOUCH_RADIUS
+                && touch.y <= y2 + PanelElement.TOUCH_RADIUS) {
             Pair(true, 0)
 
-        } else if (touch.x >= xt - PanelElementNew.TOUCH_RADIUS // thrown, state1
+        } else if (touch.x >= xt - PanelElement.TOUCH_RADIUS // thrown, state1
 
-                && touch.x <= xt + PanelElementNew.TOUCH_RADIUS
-                && touch.y >= yt - PanelElementNew.TOUCH_RADIUS
-                && touch.y <= yt + PanelElementNew.TOUCH_RADIUS) {
+                && touch.x <= xt + PanelElement.TOUCH_RADIUS
+                && touch.y >= yt - PanelElement.TOUCH_RADIUS
+                && touch.y <= yt + PanelElement.TOUCH_RADIUS) {
             Pair(true, 1)  // thrown state
-        } else if (touch.x >= x - PanelElementNew.TOUCH_RADIUS // near center
+        } else if (touch.x >= x - PanelElement.TOUCH_RADIUS // near center
 
-                && touch.x <= x + PanelElementNew.TOUCH_RADIUS
-                && touch.y >= y - PanelElementNew.TOUCH_RADIUS
-                && touch.y <= y + PanelElementNew.TOUCH_RADIUS) {
+                && touch.x <= x + PanelElement.TOUCH_RADIUS
+                && touch.y >= y - PanelElement.TOUCH_RADIUS
+                && touch.y <= y + PanelElement.TOUCH_RADIUS) {
             Pair(true, 0)
         } else {
             Pair(false, 0)
