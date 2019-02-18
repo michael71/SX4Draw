@@ -107,4 +107,18 @@ public class PanelConfig {
         comprts = comproutes;
     }
 
+    public void clear() {
+        name = "?";
+
+        tracks.clear();
+        turnouts.clear();
+        sensors.clear();
+        routebuttons.clear();
+        signals.clear();
+
+        rts.clear();
+        comprts.clear();
+        trips.clear();
+        timetables.clear();
+    }
 }

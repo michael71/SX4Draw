@@ -19,7 +19,9 @@ package de.blankedv.sx4draw.util;
 
 
 import de.blankedv.sx4draw.PanelElement;
-import de.blankedv.sx4draw.views.SX4Draw.PEType;
+import de.blankedv.sx4draw.Track;
+import de.blankedv.sx4draw.Turnout;
+import de.blankedv.sx4draw.model.GenericPE;
 
 import static de.blankedv.sx4draw.views.SX4Draw.panelElements;
 import static de.blankedv.sx4draw.config.ReadConfig.YOFF;
@@ -33,14 +35,16 @@ public class Calc {
         // check for intersection of track, if new, add a turnout with unknown SX address
         for (int i = 0; i < panelElements.size(); i++) {
             PanelElement p = panelElements.get(i);
-
+            GenericPE p1 = p.gpe;
+            if (!(p1 instanceof Track)) break;
             for (int j = i + 1; j < panelElements.size(); j++) {
                 PanelElement q = panelElements.get(j);
-
+                GenericPE q1 = q.gpe;
+                if (!(q1 instanceof Track)) break;
                 //System.out.println("checkin tracks at "+p.x+","+p.y+ " and "+q.x+","+ q.y);
-                PanelElement turnout = LinearMath.trackIntersect(p, q);
+                Turnout tu = LinearMath.trackIntersect((Track)p1, (Track)q1);
 
-                if (turnout != null) {
+                if (tu != null) {
                     // there is an intersection => make new turnoout
                     //if (DEBUG) {
                     //    System.out.println("(i,j)=(" + i + "," + j + ") new? turnout found at x="
@@ -51,22 +55,26 @@ public class Calc {
                     // check whether this turnout is already known
                     boolean known = false;
                     for (PanelElement e : panelElements) {
-                        if ((e.getType() == PEType.TURNOUT) && (e.getX() == turnout.getX()) && (e.getY() == turnout.getY())
-                                // at the approximately the same position => match
-                                && ((Math.abs(e.getX2() - turnout.getX2()) <= 5) && (Math.abs(e.getY2() - turnout.getY2()) <= 5) &&
-                                (Math.abs(e.getXt() - turnout.getXt()) <= 5) && (Math.abs(e.getYt() - turnout.getYt()) <= 5))
-                                // thrown vs. closed position reversed => match
-                                || ((Math.abs(e.getX2() - turnout.getXt()) <= 5) && (Math.abs(e.getY2() - turnout.getYt()) <= 5) &&
-                                (Math.abs(e.getXt() - turnout.getX2()) <= 5) && (Math.abs(e.getYt() - turnout.getY2()) <= 5))) {
-
-                            known = true;
-                            break;
+                        GenericPE g = e.gpe;
+                        if (g instanceof Turnout) {
+                            Turnout t2 = (Turnout) g;
+                            if ( (t2.getX() == tu.getX()) && (t2.getY() == tu.getY())
+                                    // at the approximately the same position => match
+                                  && (
+                                    ((Math.abs(t2.getX2() - tu.getX2()) <= 5) && (Math.abs(t2.getY2() - tu.getY2()) <= 5) &&
+                                    (Math.abs(t2.getXt() - tu.getXt()) <= 5) && (Math.abs(t2.getYt() - tu.getYt()) <= 5))
+                                    // thrown vs. closed position reversed => match
+                                    || ((Math.abs(t2.getX2() - tu.getXt()) <= 5) && (Math.abs(t2.getY2() - tu.getYt()) <= 5) &&
+                                    (Math.abs(t2.getXt() - tu.getX2()) <= 5) && (Math.abs(t2.getYt() - tu.getY2()) <= 5) ) )
+                               ) {
+                                known = true;
+                                break;
+                            }
                         }
                     }
                     if (!known) {
-                        System.out.println("adding turnout at " + turnout.getX() + "," + (turnout.getY() - YOFF));
-                        turnout.setAdr(1);  // dummy address to have an address stored as placeholder in XML File
-                        panelElements.add(turnout);  // with unknown SX address
+                        System.out.println("adding turnout at " + tu.getX() + "," + (tu.getY() - YOFF));
+                        panelElements.add(new PanelElement(tu));  // with unknown SX address
                     } else {
                         // System.out.println("already known at " + turnout.x + "," + (turnout.y- YOFF));
                     }

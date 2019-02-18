@@ -84,6 +84,11 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
         }
     }
 
+    constructor(tu: Turnout) {
+        this.gpe = tu
+        createShapeAndSetState(PEState.DEFAULT)
+    }
+
 
     private fun createShape() {
         val g = gpe

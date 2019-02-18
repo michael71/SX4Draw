@@ -12,26 +12,15 @@ package de.blankedv.sx4draw.config;
  * and open the template in the editor.
  */
 
-import de.blankedv.sx4draw.PanelElement;
-import de.blankedv.sx4draw.model.Position;
-import de.blankedv.sx4draw.Route;
 import de.blankedv.sx4draw.views.SX4Draw.*;
-import de.blankedv.sx4draw.model.Timetable;
-import de.blankedv.sx4draw.model.CompRoute;
-import de.blankedv.sx4draw.model.Loco;
-import de.blankedv.sxdraw.Trip;
-import org.w3c.dom.*;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import java.io.FileReader;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static de.blankedv.sx4draw.Constants.INVALID_INT;
-import static de.blankedv.sx4draw.views.SX4Draw.*;
-import static de.blankedv.sx4draw.config.WriteConfigNew.FILENAME_XML;
+import static de.blankedv.sx4draw.config.WriteConfig.FILENAME_XML;
 
 /**
  * utility function for the mapping of lanbahn addresses to DCC addresses (and

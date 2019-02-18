@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import javax.xml.bind.annotation.*;
 
-import static de.blankedv.sx4draw.config.WriteConfigNew.FILENAME_XML;
+import static de.blankedv.sx4draw.config.WriteConfig.FILENAME_XML;
 
 //This statement means that class "LayoutConfig.java" is the root-element
 @XmlRootElement(name = "layout-config")
@@ -15,7 +15,10 @@ public class LayoutConfig {
     private String name = "noName";
 
     @XmlAttribute
-    private String filename = FILENAME_XML;
+    public String filename = FILENAME_XML;
+
+    @XmlAttribute
+    public String version = "";
 
     @XmlElementWrapper(name = "panels")
     @XmlElement(name = "panel")
@@ -29,8 +32,16 @@ public class LayoutConfig {
         this.name = name;
     }
 
+    public void setVersion(String v) {
+        this.version = v;
+    }
+
     public void setPanelCfg(PanelConfig pc) {
     panelCfg.add(pc);
 
+    }
+
+    public void clear() {
+        panelCfg = new ArrayList<>();
     }
 }

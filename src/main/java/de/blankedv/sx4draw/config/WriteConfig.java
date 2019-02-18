@@ -1,26 +1,13 @@
 package de.blankedv.sx4draw.config;
 
-import de.blankedv.sx4draw.PanelElement;
-import de.blankedv.sx4draw.Route;
-import de.blankedv.sx4draw.model.Timetable;
-import de.blankedv.sx4draw.model.CompRoute;
-import de.blankedv.sx4draw.model.Loco;
-import de.blankedv.sxdraw.Trip;
+import de.blankedv.sx4draw.config.LayoutConfig;
 
-import static de.blankedv.sx4draw.Constants.DEBUG;
-import static de.blankedv.sx4draw.Constants.INVALID_INT;
-
-import static de.blankedv.sx4draw.config.ReadConfig.YOFF;
-import static de.blankedv.sx4draw.views.SX4Draw.*;
-
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.StringWriter;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 
 /**
@@ -31,6 +18,8 @@ import java.util.Date;
  */
 public class WriteConfig {
 
+    public static final String FILENAME_XML = "panel_test_new.xml";
+
     static StringWriter writer;
     private static String localPanelName = "";
 
@@ -40,67 +29,35 @@ public class WriteConfig {
      * saves all PanelElements to an XML file configFilename will have ".(date)"
      * appended, if no filename given
      *
-     * @param fname File Name (can be empty)
-     * @param pName Panel Name (can be empty)
+     *
+     *
      * @return true, if succeeds - false, if not.
      */
-    public static boolean writeToXML(String fname, String pName) {
-        if (pName.isEmpty()) {
-            localPanelName = "paneltest";
-        } else {
-            localPanelName = pName;
-        }
+    public static boolean writeToXML(String fname, LayoutConfig lc) {
 
-        FileWriter fWriter = null;
-        SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");
-        String version = df.format(new Date());
+
+
+
         try {
-            fWriter = new FileWriter(fname);
-            fWriter.write(writeXml(localPanelName, fname, version));
-            fWriter.flush();
-            fWriter.close();
+            JAXBContext context = JAXBContext.newInstance(LayoutConfig.class);
+            Marshaller m = context.createMarshaller();
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
-            if (DEBUG) {
-                System.out.println("Config File " + fname + " saved! ");
-            }
-            //configHasChanged = false; // reset flag
+            // Write to System.out
+            m.marshal(lc, System.out);
+
+            // Write to File
+            m.marshal(lc, new File(fname));
 
         } catch (Exception e) {
-            System.out.println("fname = " + fname);
-            System.out.println("ERROR: " + e.getMessage());
-            return false;
-        } finally {
-            if (fWriter != null) {
-                try {
-                    fWriter.close();
-                } catch (IOException e) {
-                    System.out.println("ERROR: could not close output file!");
-                }
-            }
+            System.out.println("ERROR "+e.getMessage());
+            e.printStackTrace();
         }
+
 
         return true;
     }
 
-    private static void writeStart(String tagname) {
-        writer.write("<" + tagname);
-    }
-
-    private static void writeClose() {
-        writer.write(" />\n");
-    }
-
-    private static void writeCloseTag(String tagname) {
-        writer.write("</" + tagname + ">\n");
-    }
-
-    private static void writeAttribute(String name, int val) {
-        writer.write(" " + name + "=\"" + val + "\"");
-    }
-
-    private static void writeAttribute(String name, String sval) {
-        writer.write(" " + name + "=\"" + sval + "\"");
-    }
 
     /**
      * writeConfigToXML
@@ -111,135 +68,29 @@ public class WriteConfig {
      * @param
      * @return true, if succeeds - false, if not.
      */
-    private static String writeXml(String panelName, String fullFilename, String version) {
+    private static String writeXml(LayoutConfig layoutConfig, String panelName, String fullFilename, String version) {
 
-        writer = new StringWriter();
+// create JAXB context and instantiate marshaller
 
-        Path p = Paths.get(fullFilename);
-        String filename = p.getFileName().toString();
 
-        writer.write("<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>\n");
-        writer.write("<layout-config filename=\"" + filename + "\">\n");
-        writer.write("<locolist name=\"" + locolistName + "\" version=\"" + version+ "\">\n");
-
-        if (!allLocos.isEmpty()) {
-            //ArrayList<Loco> locosList = new ArrayList<>(allLocos);
-            //Collections.sort(locosList);
-            for (Loco lo : allLocos) {
-                writeStart("loco");
-                writeAttribute("adr", lo.getAddr());
-                writeAttribute("name", lo.getName());
-                writeAttribute("mass", lo.getMass());
-                writeAttribute("vmax", lo.getVmax());
-                writeClose();
-            }
-        }
-        writer.write("</locolist>\n");
-
-        writer.write("<panel name=\"" + panelName + "\" version=\"" + version + "\">\n");
-
-        ArrayList<PanelElement> peList = new ArrayList<>(panelElements);
-        Collections.sort(peList);
-        // now write all panel elements to the file
-        for (PanelElement pe : peList) {
-            // if (DEBUG) {
-            //    System.out.println("writing panel element " + pe.toString());
-            //}
-            writeStart(pe.getType().name().toLowerCase());
-            if (pe.getName().length() > 0) {
-                writeAttribute("name=", pe.getName());
-            }
-            writeAttribute("x", pe.getX());
-            writeAttribute("y", pe.getY() - YOFF);
-            if (pe.getX2() != INVALID_INT) { // save only valid attributes
-                writeAttribute("x2", pe.getX2());
-                writeAttribute("y2", pe.getY2() - YOFF);
-            }
-            if (pe.getXt() != INVALID_INT) {
-                writeAttribute("xt", pe.getXt());
-                writeAttribute("yt", pe.getYt() - YOFF);
-            }
-            if (pe.getAdr2() != INVALID_INT) {
-                if (pe.getAdr() != INVALID_INT) {
-                    writeAttribute("adr", pe.getAdr() + "," + pe.getAdr2());
-                }
-            } else if (pe.getAdr() != INVALID_INT) {
-                writeAttribute("adr", pe.getAdr());
-            }
-
-            if (pe.getInv() != 0) {
-                writeAttribute("inv", pe.getAdr());
-            }
-            writeClose();
+/*
+        // get variables from our xml file, created before
+        System.out.println();
+        System.out.println("Output from our XML File: ");
+        Unmarshaller um = context.createUnmarshaller();
+        Bookstore bookstore2 = (Bookstore) um.unmarshal(new FileReader(
+                FILENAME_XML));
+        ArrayList<Book> list = bookstore2.getBooksList();
+        for (Book book : list) {
+            System.out.println("Book: " + book.getName() + " from "
+                    + book.getAuthor());
         }
 
-        if (!routes.isEmpty()) {
-            ArrayList<Route> rtList = new ArrayList<>(routes);
-            Collections.sort(rtList);
-            for (Route rt : rtList) {
-                writeStart("route");
-                writeAttribute("adr", rt.getAdr());
-                if (rt.getBtn1() != INVALID_INT) {
-                    writeAttribute("btn1", rt.getBtn1());
-                }
-                if (rt.getBtn2() != INVALID_INT) {
-                    writeAttribute("btn2", rt.getBtn2());
-                }
-                writeAttribute("route", rt.getRoute());
-                writeAttribute("sensors", rt.getSensors());
-                writeClose();
-
-            }
-        }
-
-        if (!compRoutes.isEmpty()) {
-            ArrayList<CompRoute> crList = new ArrayList<>(compRoutes);
-            Collections.sort(crList);
-            for (CompRoute rt : crList) {
-                writeStart("comproute");
-                writeAttribute("adr", rt.getAdr());
-                if (rt.getBtn1() != INVALID_INT) {
-                    writeAttribute("btn1", rt.getBtn1());
-                }
-                if (rt.getBtn2() != INVALID_INT) {
-                    writeAttribute("btn2", rt.getBtn2());
-                }
-                writeAttribute("routes", rt.getRoutes());
-                writeClose();
-            }
-        }
-
-        if (!trips.isEmpty()) {
-            ArrayList<Trip> tripsList = new ArrayList<>(trips);
-            Collections.sort(tripsList);
-            for (Trip rt : tripsList) {
-                writeStart("trip");
-                writeAttribute("adr", rt.getAdr());
-                writeAttribute("routeid", rt.getRouteid());
-                writeAttribute("sens1", rt.getSens1());
-                writeAttribute("sens2", rt.getSens2());
-                writeAttribute("loco", rt.getLoco());
-                writeAttribute("stopdelay", rt.getStopdelay());
-                writeClose();
-            }
-        }
-        if (!timetables.isEmpty()) {
-            ArrayList<Timetable> ttList = new ArrayList<>(timetables);
-            Collections.sort(ttList);
-            for (Timetable rt : ttList) {
-                writeStart("timetable");
-                writeAttribute("adr", rt.getAdr());
-                writeAttribute("time", rt.getTime());
-                writeAttribute("trip", rt.getTrip());
-                writeAttribute("next", rt.getNext());
-                writeClose();
-            }
-        }
-
-        writer.write("</panel>\n");
-        writer.write("</layout-config>\n");
-
-        return writer.toString();
+        //writer.write("<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>\n");
+        //writer.write("<layout-config filename=\"" + filename + "\">\n");
+        //writer.write("<locolist name=\"" + locolistName + "\" version=\"" + version+ "\">\n");
+    */
+        return "OK";
 
     }
 

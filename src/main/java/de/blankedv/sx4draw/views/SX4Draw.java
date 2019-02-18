@@ -1199,14 +1199,6 @@ public class SX4Draw extends Application {
 
     private String writeFile(Stage stage, String path, boolean chooseName) {
 
-        panelConfig.setPanelElements(panelElements);
-        panelConfig.setRoutes(routes, compRoutes);
-        panelConfig.setTrips(trips, timetables);
-        panelConfig.setName(panelName);
-        layoutConfig.setPanelCfg(panelConfig);
-        layoutConfig.setName("123name");  //panelName
-        WriteConfigNew.writeToXML(layoutConfig);
-
         if (chooseName) {
             //System.out.println("path=" + path);
             FileChooser fileChooser = new FileChooser();
@@ -1234,7 +1226,9 @@ public class SX4Draw extends Application {
                 if (!fn.endsWith(".xml")) {
                     fn = fn + ".xml";
                 }
-                WriteConfig.writeToXML(fn, panelName);
+
+                prepareLCAndWrite(fn);
+                //WriteConfig.writeToXML(fn, panelName);  // OLD
                 currentFileName = selectedFile.getName();
                 return selectedFile.getParent();
             } else {
@@ -1251,10 +1245,27 @@ public class SX4Draw extends Application {
             SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");
             String version = df.format(new Date());
             String fName = file.getAbsolutePath() + File.separator + "panel.xml" + "." + version;
-            WriteConfig.writeToXML(fName, panelName);
+            prepareLCAndWrite(fName);
             return "";
         }
     }
+
+    private void prepareLCAndWrite(String fn) {
+        panelConfig.clear();
+        panelConfig.setPanelElements(panelElements);
+        panelConfig.setRoutes(routes, compRoutes);
+        panelConfig.setTrips(trips, timetables);
+        panelConfig.setName(panelName);
+        layoutConfig.clear();
+        layoutConfig.setPanelCfg(panelConfig);
+        layoutConfig.setName(panelName);  //panelName
+        SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");
+        String version = df.format(new Date());
+        layoutConfig.setVersion(version);
+
+        WriteConfig.writeToXML(fn, layoutConfig);
+    }
+
 
     private String openFile(Stage stage, String path) {
 

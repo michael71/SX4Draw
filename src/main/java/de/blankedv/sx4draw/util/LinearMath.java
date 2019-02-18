@@ -19,6 +19,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 package de.blankedv.sx4draw.util;
 
 import de.blankedv.sx4draw.PanelElement;
+import de.blankedv.sx4draw.Track;
+import de.blankedv.sx4draw.Turnout;
 import de.blankedv.sx4draw.views.SX4Draw.PEType;
 import de.blankedv.sx4draw.model.IntPoint;
 
@@ -38,12 +40,9 @@ public class LinearMath {
      * license). http://www.ahristov.com (c) 2012 Michael Blank, for lines with
      * endpoints
      */
-    public static PanelElement trackIntersect(PanelElement e, PanelElement f) {
+    public static Turnout trackIntersect(Track e, Track f) {
 
         // only look for crossing track elements
-        if ((e.getType() != PEType.TRACK) || (f.getType() != PEType.TRACK)) {
-            return null;
-        }
 
         int x1, y1, x2, y2, x3, y3, x4, y4;
 
@@ -106,7 +105,8 @@ public class LinearMath {
                 // delta-x immer negativ
                 doubleslip = false;
                 // swap e and f => e is always "durchgehendes Gleis" (=close)
-                PanelElement temp = new PanelElement(e);
+                Track temp = new Track();
+                temp = e;
                 e = f;
                 f = temp;
                 if (DEBUG_MATH) System.out.println("swap e/f");
@@ -189,10 +189,10 @@ public class LinearMath {
                     // gleise kreuzen bei 90grad => keine Weiche
                     return null;
                 } else if (d1 < d2) {
-                    return new PanelElement(PEType.TURNOUT, px, new IntPoint(xc1, yc1),
+                    return new Turnout( px, new IntPoint(xc1, yc1),
                             new IntPoint(xt, yt));
                 } else {
-                    return new PanelElement(PEType.TURNOUT, px, new IntPoint(xc2, yc2),
+                    return new Turnout( px, new IntPoint(xc2, yc2),
                             new IntPoint(xt, yt));
                 }
             } else {
