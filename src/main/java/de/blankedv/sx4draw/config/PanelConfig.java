@@ -79,53 +79,32 @@ public class PanelConfig {
     }
 
     public void setPanelElements(ArrayList<PanelElement> pes) {
+        for (PanelElement pe : pes) {
+            switch (pe.getType()) {
+                case TRACK:
+                    tracks.add((Track)pe.gpe);
+                    break;
+                case TURNOUT:
+                    turnouts.add((Turnout)pe.gpe);
+                    break;
+                case SENSOR:
+                    sensors.add((Sensor)pe.gpe);
+                    break;
+                case SIGNAL:
+                    signals.add((Signal)pe.gpe);
+                    break;
+                case ROUTEBUTTON:
+                    routebuttons.add((RouteButton)pe.gpe);
+                    break;
 
-        setTracks(pes);
-        setTurnouts(pes);
-        setSensors(pes);
-        setSignals(pes);
-        setRouteButtons(pes);
+            }
+
+        }
     }
 
     public void setRoutes(ObservableList<Route> routes, ObservableList<CompRoute> comproutes) {
         rts = routes;
         comprts = comproutes;
-    }
-
-    public void setTracks(ArrayList<PanelElement> pes) {
-        for (PanelElement pe : pes) {
-            if (pe.getType() == SX4Draw.PEType.TRACK)
-                tracks.add(new Track(pe));
-        }
-    }
-
-    public void setTurnouts(ArrayList<PanelElement> pes) {
-        for (PanelElement pe : pes) {
-            if (pe.getType() == SX4Draw.PEType.TURNOUT)
-                turnouts.add(new Turnout(pe));
-        }
-    }
-
-    public void setSensors(ArrayList<PanelElement> pes) {
-        for (PanelElement pe : pes) {
-            if (pe.getType() == SX4Draw.PEType.SENSOR)
-                sensors.add(new Sensor(pe));
-        }
-    }
-
-
-    public void setSignals(ArrayList<PanelElement> pes) {
-        for (PanelElement pe : pes) {
-            if (pe.getType() == SX4Draw.PEType.SIGNAL)
-                signals.add(new Signal(pe));
-        }
-    }
-
-    public void setRouteButtons(ArrayList<PanelElement> pes) {
-        for (PanelElement pe : pes) {
-            if (pe.getType() == SX4Draw.PEType.ROUTEBUTTON)
-                routebuttons.add(new RouteButton(pe));
-        }
     }
 
 }

@@ -49,6 +49,13 @@ class Sensor : GenericPE {
         orderX()
     }
 
+    constructor(poi: IntPoint) {
+        this.x = poi.x
+        this.x2 = INVALID_INT
+        this.y = poi.y
+        this.y2 = INVALID_INT
+    }
+
     /*constructor (pe : PanelElementNew) {
         if (!pe.name.isBlank()) {
             this.name = pe.name

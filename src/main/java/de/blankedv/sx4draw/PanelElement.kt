@@ -5,10 +5,7 @@ import de.blankedv.sx4draw.Constants.INVALID_INT
 import de.blankedv.sx4draw.config.ReadConfig.YOFF
 import de.blankedv.sx4draw.views.SX4Draw.*
 
-import de.blankedv.sx4draw.views.SX4Draw.PEType.TRACK
-import de.blankedv.sx4draw.views.SX4Draw.PEType.SENSOR
-import de.blankedv.sx4draw.views.SX4Draw.PEType.SIGNAL
-import de.blankedv.sx4draw.views.SX4Draw.PEType.ROUTEBUTTON
+import de.blankedv.sx4draw.views.SX4Draw.PEType.*
 import de.blankedv.sx4draw.model.GenericPE
 import de.blankedv.sx4draw.model.IntPoint
 import de.blankedv.sx4draw.model.Position
@@ -39,7 +36,6 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
 
     var shape: Shape = Line(0.0, 0.0, 1.0, 1.0)   // default shape
     var state = PEState.DEFAULT
-        private set
 
     protected var defaultColor = Color.ALICEBLUE
 
@@ -57,23 +53,18 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
 
     constructor(type: PEType, l: Line) {
         when (type) {
-            TRACK -> this.gpe = Track(l)
-            SENSOR -> this.gpe = Sensor(l)
+            TRACK -> {
+                this.gpe = Track(l)
+                createShapeAndSetState(PEState.DEFAULT)
+            }
+            SENSOR -> {
+                this.gpe = Sensor(l)
+                createShapeAndSetState(PEState.DEFAULT)
+            }
         }
 
         //orderXY()
         createShapeAndSetState(PEState.DEFAULT)
-    }
-
-    constructor(poi: IntPoint, closed: IntPoint, thrown: IntPoint) {
-        this.gpe = Turnout(poi, closed, thrown)
-        createShapeAndSetState(PEState.DEFAULT)
-    }
-
-    constructor(type: PEType, pos: Position) {
-        System.out.println("UNHandled type=" + type)
-        //createShapeAndSetState(PEState.DEFAULT)
-        //autoAddress()
     }
 
     constructor(type: PEType, poi: IntPoint) {
@@ -86,8 +77,12 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
                 this.gpe = RouteButton(poi)
                 createShapeAndSetState(PEState.DEFAULT)
             }
+            SENSOR -> {  // US type
+                this.gpe = Sensor(poi)
+                createShapeAndSetState(PEState.DEFAULT)
+            }
         }
-   }
+    }
 
 
     private fun createShape() {
@@ -203,7 +198,23 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
         }
     }
 
-
+    fun getType(): PEType {
+        val g = gpe
+        when (g) {
+            is Track -> return TRACK
+            is Sensor -> {
+                if (g.x2 != INVALID_INT) {
+                    return SENSOR
+                } else {
+                    return SENSOR_US
+                }
+            }
+            is Signal -> return SIGNAL
+            is RouteButton -> return ROUTEBUTTON
+            is Turnout -> return TURNOUT
+        }
+        return TRACK
+    }
 
     fun toggleShapeSelected() {
         if (state != PEState.SELECTED) {
@@ -288,7 +299,7 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
             var adrNOK = 0
             var percentage = 0.0
             for (pe in panelElements) {
-                if ( !(pe.gpe is Track) && (pe.gpe is RouteButton)) {
+                if (!(pe.gpe is Track) && (pe.gpe is RouteButton)) {
                     if (pe.gpe.getAddr() != INVALID_INT
                             && pe.gpe.getAddr() != 0
                             && pe.gpe.getAddr() != 1) {
@@ -311,7 +322,7 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
         fun normPositions() {
 
             // in WriteConfig the NEW values are written !!
-        /*  TODO
+            /*  TODO
             var xmin = INVALID_INT
             var xmax = INVALID_INT
             var ymin = INVALID_INT
@@ -452,4 +463,5 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
                 pe.createShapeAndSetState(PEState.DEFAULT)
             }
         }
+    }
 }

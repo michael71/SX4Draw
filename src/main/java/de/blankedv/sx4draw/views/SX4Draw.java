@@ -128,7 +128,7 @@ public class SX4Draw extends Application {
     private static final Button btnDelete = new Button();
     private static final ToggleGroup toggleGroup = new ToggleGroup();
 
-    private final LayoutConfig layoutConfig = new LayoutConfig();
+    private LayoutConfig layoutConfig = new LayoutConfig();
     public static final PanelConfig panelConfig = new PanelConfig();
 
     final CheckMenuItem dispAddresses = new CheckMenuItem("Adressen anzeigen");
@@ -602,7 +602,7 @@ public class SX4Draw extends Application {
         btnAddRoute.setText("Fahrstr.");
         btnAddRoute.setGraphic(plusIcon5);
         btnAddRoute.setOnAction((ActionEvent event) -> {
-            if (PanelElement.Companion.addressAvail()) {
+            if (PanelElement.Companion.addressesAvail()) {
                 currentGUIState = GUIState.ADD_ROUTE;
                 canvas.setCursor(Cursor.CLOSED_HAND);
             } else {
@@ -920,8 +920,8 @@ public class SX4Draw extends Application {
         Collections.sort(peListRev);
         Collections.sort(peListRev, Collections.reverseOrder());
         for (PanelElement pe : peListRev) {
-            if (pe.getType() != PEType.TRACK) {
-                Pair<Boolean, Integer> result = pe.isTouched(new IntPoint(x, y));
+            if (!(pe.gpe instanceof Track)) {
+                Pair<Boolean, Integer> result = pe.gpe.isTouched(new IntPoint(x, y));
                 if (result.getKey()) {
                     return pe;
                 }
@@ -935,8 +935,8 @@ public class SX4Draw extends Application {
         Collections.sort(peListRev);
         Collections.sort(peListRev, Collections.reverseOrder());
         for (PanelElement pe : peListRev) {
-            if (pe.getType() != PEType.TRACK) {
-                Pair<Boolean, Integer> result = pe.isTouched(new IntPoint(x, y));
+            if (!(pe.gpe instanceof Track)) {
+                Pair<Boolean, Integer> result = pe.gpe.isTouched(new IntPoint(x, y));
                 if (result.getKey()) {
                     return new Pair(pe, result.getValue());
                 }
@@ -957,8 +957,8 @@ public class SX4Draw extends Application {
     }  */
     private static PanelElement getRouteBtn(IntPoint p) {
         for (PanelElement pe : panelElements) {
-            if (pe.getType() == ROUTEBUTTON) {
-                Pair<Boolean, Integer> result = pe.isTouched(p);
+            if (pe.gpe instanceof RouteButton) {
+                Pair<Boolean, Integer> result = pe.gpe.isTouched(p);
                 if (result.getKey()) {
                     return pe;
                 }
@@ -972,7 +972,7 @@ public class SX4Draw extends Application {
         boolean found = false;
         for (PanelElement pe : panelElements) {
             if ((pe.getType() == type)
-                    && (Math.abs(poi.getX() - pe.getX()) <= 1) && (Math.abs(poi.getY() - pe.getY()) <= 1)) {
+                    && (Math.abs(poi.getX() - pe.gpe.getX()) <= 1) && (Math.abs(poi.getY() - pe.gpe.getY()) <= 1)) {
                 found = true;
             }
         }
@@ -1008,16 +1008,19 @@ public class SX4Draw extends Application {
         // all panel elements except tracks have an address
 
         if (pe != null) {
-            if (pe.getType() == ROUTEBUTTON) {
+            if (pe.gpe instanceof RouteButton) {
                 System.out.println("no address editing for route button");
                 return;
             }
             GenericAddress initA;
-            if (pe.getType() == SIGNAL) {
-                int orient = Utils.INSTANCE.signalDX2ToOrient(new IntPoint(pe.getX2() - pe.getX(), pe.getY2() - pe.getY()));
-                initA = new GenericAddress(pe.getAdr(), pe.getInv(), orient);
+            if (pe.gpe instanceof Turnout) {
+                initA = new GenericAddress(pe.gpe.getAddr(), ((Turnout)pe.gpe).getInv(), INVALID_INT);
+            } else if (pe.gpe instanceof Signal) {
+                int orient = Utils.INSTANCE.signalDX2ToOrient(new IntPoint(
+                        ((Signal) pe.gpe).getX2() - pe.gpe.getX(), ((Signal) pe.gpe).getY2() - pe.gpe.getY()));
+                initA = new GenericAddress(pe.gpe.getAddr(), 0, orient);
             } else {
-                initA = new GenericAddress(pe.getAdr(), pe.getInv(), INVALID_INT);
+                initA = new GenericAddress(pe.gpe.getAddr(), 0, 0);
             }
             GenericAddress res = AddressDialog.INSTANCE.open(pe, primStage, initA);
             if (res.getAddr() != -1) {
@@ -1027,25 +1030,27 @@ public class SX4Draw extends Application {
                     System.out.println("addressOK=false");
                     return; // do nothing
                 }
-                pe.setAdr(res.getAddr());
-                if (pe.getType() ==  SENSOR) {
-                    if ((pe.getAdr() > 300) && (pe.getAdr() < LBMIN)) {
-                        // set a virtual secondary SENSOR address
-                        pe.setAdr2(pe.getAdr() + 1000);
+                if (pe.gpe instanceof Sensor) {
+                    String aStr = "" + res.getAddr();
+                        if ((res.getAddr() > 300) && (res.getAddr() < LBMIN)) {
+                            // set a virtual secondary SENSOR address
+                            aStr += "," + (res.getAddr()+1000);
+                        }
+                    ((Sensor)pe.gpe).setAdrStr(aStr);
+                } else if (pe.gpe instanceof Turnout) {
+                    Turnout tu =(Turnout)pe.gpe;
+                    tu.setAdr(res.getAddr());
+                    if (tu.getInv() != res.getInv()) {
+                        // inv bit was changed, recreate shape
+                        tu.setInv(res.getInv());
+                        pe.recreateShape();
                     }
-                }
-
-                if (pe.getInv() != res.getInv()) {
-                    // inv bit was changed, recreate shape
-                    pe.setInv(res.getInv());
-                    pe.recreateShape();
-                }
-
-                if (pe.getType() == SIGNAL) {
+                } else if (pe.gpe instanceof Signal) {
+                    Signal si = (Signal)pe.gpe;
                     IntPoint d = Utils.INSTANCE.signalOrientToDXY2(res.getOrient());
                     System.out.println("or=" + res.getOrient() + " dx=" + d.getX() + " dy=" + d.getY());
-                    pe.setX2(pe.getX() + d.getX());
-                    pe.setY2(pe.getY() + d.getY());
+                    si.setX2(si.getX() + d.getX());
+                    si.setY2(si.getY() + d.getY());
                     pe.recreateShape();  // orientation might have changed, create new
                     lastPE = pe;
                     btnUndo.setDisable(false);
@@ -1068,8 +1073,8 @@ public class SX4Draw extends Application {
         PanelElement bt1 = PanelElement.Companion.getPeByAddress(btn1).get(0);
         PanelElement bt2 = PanelElement.Companion.getPeByAddress(btn2).get(0);
 
-        gc.strokeText("1", bt1.getX() - 4, bt1.getY() - YOFF + 4);
-        gc.strokeText("2", bt2.getX() - 4, bt2.getY() - YOFF + 4);
+        gc.strokeText("1", bt1.gpe.getX() - 4, bt1.gpe.getY() - YOFF + 4);
+        gc.strokeText("2", bt2.gpe.getX() - 4, bt2.gpe.getY() - YOFF + 4);
     }
 
     public void redrawPanelElements() {
@@ -1142,7 +1147,7 @@ public class SX4Draw extends Application {
             currentRoute = new Route(Route.Companion.getAutoAddress());
             System.out.println("init route with adr=" + currentRoute.getAdr());
             if (rtbtn != null) {  // first button
-                currentRoute.setBtn1(rtbtn.getAdr());
+                currentRoute.setBtn1(rtbtn.gpe.getAddr());
                 rtbtn.createShapeAndSetState(PEState.MARKED);
                 redrawPanelElements();
                 System.out.println("btn1 =" + currentRoute.getBtn1());
@@ -1162,7 +1167,7 @@ public class SX4Draw extends Application {
                 }
             } else {
                 // creation finished - a end route button has been selected
-                currentRoute.setBtn2(rtbtn.getAdr());
+                currentRoute.setBtn2(rtbtn.gpe.getAddr());
                 rtbtn.createShapeAndSetState(PEState.MARKED);
                 showRoute(currentRoute,0);
                 System.out.println("btn2 =" + currentRoute.getBtn2());
@@ -1272,8 +1277,8 @@ public class SX4Draw extends Application {
             dispAddresses.setSelected(false);
             rasterOn.setSelected(true);
             gc.clearRect(0, 0, RECT_X, INSTANCE.RECT_Y);  // clear addresses labels, if any
-            String result = ReadConfig.readXML(selectedFile.toString());
-            if (result.equals("OK")) {
+            layoutConfig = ReadConfig.readXML(selectedFile.toString());
+            if (layoutConfig != null) {
                 currentFileName = selectedFile.getName();
                 redrawPanelElements();
                 return selectedFile.getParent();
@@ -1281,7 +1286,7 @@ public class SX4Draw extends Application {
                 Alert alert = new Alert(AlertType.ERROR);
                 alert.setTitle("Error");
                 alert.setHeaderText("Konnte " + selectedFile.getName() + " nicht einlesen!");
-                alert.setContentText(result);
+                alert.setContentText("");
                 alert.showAndWait();
                 currentFileName = "";
                 return "";
