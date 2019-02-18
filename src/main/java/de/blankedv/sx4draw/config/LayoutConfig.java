@@ -41,7 +41,4 @@ public class LayoutConfig {
 
     }
 
-    public void clear() {
-        panelCfg = new ArrayList<>();
-    }
 }

@@ -23,6 +23,8 @@ import de.blankedv.sx4draw.Track;
 import de.blankedv.sx4draw.Turnout;
 import de.blankedv.sx4draw.model.GenericPE;
 
+import java.util.ArrayList;
+
 import static de.blankedv.sx4draw.views.SX4Draw.panelElements;
 import static de.blankedv.sx4draw.config.ReadConfig.YOFF;
 
@@ -33,16 +35,22 @@ public class Calc {
 
     public static void turnouts() {
         // check for intersection of track, if new, add a turnout with unknown SX address
-        for (int i = 0; i < panelElements.size(); i++) {
-            PanelElement p = panelElements.get(i);
-            GenericPE p1 = p.gpe;
-            if (!(p1 instanceof Track)) break;
-            for (int j = i + 1; j < panelElements.size(); j++) {
-                PanelElement q = panelElements.get(j);
-                GenericPE q1 = q.gpe;
-                if (!(q1 instanceof Track)) break;
+        ArrayList<Track> tracks = new ArrayList<>();
+        for (PanelElement pe : panelElements) {
+            switch (pe.getType()) {
+                case TRACK:
+                    tracks.add((Track) pe.gpe);
+                    break;
+                default:
+            }
+        }
+
+        for (int i = 0; i < tracks.size(); i++) {
+            Track p1 = tracks.get(i);
+            for (int j = i + 1; j < tracks.size(); j++) {
+                Track q1 = tracks.get(j);
                 //System.out.println("checkin tracks at "+p.x+","+p.y+ " and "+q.x+","+ q.y);
-                Turnout tu = LinearMath.trackIntersect((Track)p1, (Track)q1);
+                Turnout tu = LinearMath.trackIntersect(p1, q1);
 
                 if (tu != null) {
                     // there is an intersection => make new turnoout
@@ -73,10 +81,10 @@ public class Calc {
                         }
                     }
                     if (!known) {
-                        System.out.println("adding turnout at " + tu.getX() + "," + (tu.getY() - YOFF));
+                        System.out.println("adding turnout at " + tu.getX() + "," + tu.getY() );
                         panelElements.add(new PanelElement(tu));  // with unknown SX address
                     } else {
-                        // System.out.println("already known at " + turnout.x + "," + (turnout.y- YOFF));
+                        System.out.println("already known turnout at " + tu.getX() + "," + tu.getY());
                     }
                 }
             }

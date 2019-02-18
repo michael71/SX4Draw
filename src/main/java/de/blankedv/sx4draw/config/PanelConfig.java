@@ -88,6 +88,7 @@ public class PanelConfig {
                     turnouts.add((Turnout)pe.gpe);
                     break;
                 case SENSOR:
+                case SENSOR_US:
                     sensors.add((Sensor)pe.gpe);
                     break;
                 case SIGNAL:
@@ -96,9 +97,7 @@ public class PanelConfig {
                 case ROUTEBUTTON:
                     routebuttons.add((RouteButton)pe.gpe);
                     break;
-
             }
-
         }
     }
 
@@ -107,18 +106,4 @@ public class PanelConfig {
         comprts = comproutes;
     }
 
-    public void clear() {
-        name = "?";
-
-        tracks.clear();
-        turnouts.clear();
-        sensors.clear();
-        routebuttons.clear();
-        signals.clear();
-
-        rts.clear();
-        comprts.clear();
-        trips.clear();
-        timetables.clear();
-    }
 }

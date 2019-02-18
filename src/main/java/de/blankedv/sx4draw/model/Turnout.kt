@@ -45,7 +45,7 @@ class Turnout : GenericPE {
     var inv: Int? = null  // 0 or null == not inverted
 
     @get:XmlAttribute
-    var adr = 800
+    var adr = 801
 
     override val ord = 2
 
@@ -117,6 +117,15 @@ class Turnout : GenericPE {
         }
 
     }
+
+    public fun getInvValue() : Int {
+        if (inv != null) {
+            return inv!!
+        } else {
+            return 0
+        }
+    }
+
     /* private fun orderXY() {
         if (x == x2) {
             if (y2 < y) {

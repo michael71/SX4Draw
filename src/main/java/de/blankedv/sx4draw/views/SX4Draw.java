@@ -128,8 +128,8 @@ public class SX4Draw extends Application {
     private static final Button btnDelete = new Button();
     private static final ToggleGroup toggleGroup = new ToggleGroup();
 
-    private LayoutConfig layoutConfig = new LayoutConfig();
-    public static final PanelConfig panelConfig = new PanelConfig();
+    private static LayoutConfig layoutConfig = new LayoutConfig();
+    public static PanelConfig panelConfig = new PanelConfig();
 
     final CheckMenuItem dispAddresses = new CheckMenuItem("Adressen anzeigen");
     final CheckMenuItem rasterOn = new CheckMenuItem("Raster");
@@ -312,7 +312,7 @@ public class SX4Draw extends Application {
 
                 }
             } else if (me.getButton() == MouseButton.SECONDARY) {
-                System.out.println("secondary button");
+                System.out.println("secondary button, poi="+poi.getX()+","+poi.getY());
                 editPanelElement(poi, primaryStage);
             }
 
@@ -1014,7 +1014,7 @@ public class SX4Draw extends Application {
             }
             GenericAddress initA;
             if (pe.gpe instanceof Turnout) {
-                initA = new GenericAddress(pe.gpe.getAddr(), ((Turnout)pe.gpe).getInv(), INVALID_INT);
+                initA = new GenericAddress(((Turnout)pe.gpe).getAddr(), ((Turnout)pe.gpe).getInvValue(), INVALID_INT);
             } else if (pe.gpe instanceof Signal) {
                 int orient = Utils.INSTANCE.signalDX2ToOrient(new IntPoint(
                         ((Signal) pe.gpe).getX2() - pe.gpe.getX(), ((Signal) pe.gpe).getY2() - pe.gpe.getY()));
@@ -1251,12 +1251,15 @@ public class SX4Draw extends Application {
     }
 
     private void prepareLCAndWrite(String fn) {
-        panelConfig.clear();
+
+        layoutConfig = new LayoutConfig();
+        panelConfig = new PanelConfig();
+
         panelConfig.setPanelElements(panelElements);
         panelConfig.setRoutes(routes, compRoutes);
         panelConfig.setTrips(trips, timetables);
         panelConfig.setName(panelName);
-        layoutConfig.clear();
+
         layoutConfig.setPanelCfg(panelConfig);
         layoutConfig.setName(panelName);  //panelName
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");

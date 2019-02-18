@@ -91,10 +91,11 @@ object Dialogs {
     }
 
     fun checkAddress(oldValue: GenericAddress, newAddress: GenericAddress): Boolean {
-        println("check address = " + newAddress.addr)
-        if ((newAddress.addr in 0..SXMAX_USED &&
-                newAddress.addr % 10 != 0 && newAddress.addr % 10 != 9 ) || // =valid sx address
-                newAddress.addr in LBMIN..LBMAX) { // =valid lanbahn address
+        println("check new address = " + newAddress.addr)
+        if (( (newAddress.addr in 0..(SXMAX_USED*10+8) ) &&
+                        (newAddress.addr % 10 != 0) && (newAddress.addr % 10 != 9 ) )
+                || // =valid sx address
+                (newAddress.addr in LBMIN..LBMAX)) { // =valid lanbahn address
             // the address is valid
             var found = false
             var foundPE: PanelElement? = null

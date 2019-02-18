@@ -35,7 +35,7 @@ class Sensor : GenericPE {
     var y2 = INVALID_INT
 
     @get:XmlAttribute(name = "adr")
-    var adrStr = "900,1900"
+    var adrStr = "901,1901"
 
     override val ord = 1
 
