@@ -75,12 +75,11 @@ class Track : GenericPE {
     override fun scaleMinus() {
         x = x / 2
         y = y / 2
-            x2 = x2 / 2
-            y2 = y2 / 2
+        x2 = x2 / 2
+        y2 = y2 / 2
     }
 
     override fun isTouched(touch: IntPoint): Pair<Boolean, Int> {
-
         val ymin = Math.min(y, y2)
         val ymax = Math.max(y, y2)
         return if (touch.x >= x - PanelElement.TOUCH_RADIUS

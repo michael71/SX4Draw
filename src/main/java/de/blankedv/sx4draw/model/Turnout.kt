@@ -1,5 +1,6 @@
 package de.blankedv.sx4draw
 
+import de.blankedv.sx4draw.Constants.ADDR0_TURNOUT
 import de.blankedv.sx4draw.Constants.INVALID_INT
 import de.blankedv.sx4draw.model.GenericPE
 import de.blankedv.sx4draw.model.IntPoint
@@ -11,7 +12,6 @@ import javax.xml.bind.annotation.XmlType
 
 
 /**
- * generic panel element can be any of PEType types
  *
  * @author mblank
  */
@@ -22,7 +22,8 @@ class Turnout : GenericPE {
     @get:XmlAttribute
     override var name: String? = null
 
-    // if defined in GenericPE, the order in the XML output does not look nice ("x" would be at the end)
+    // if only defined in GenericPE, the order in the XML output does not look nice ("x" would be at the end)
+    // therefore this (in principle unnecessary) "override"
     @get:XmlAttribute
     override var x: Int = 0 // starting point
 
@@ -45,7 +46,7 @@ class Turnout : GenericPE {
     var inv: Int? = null  // 0 or null == not inverted
 
     @get:XmlAttribute
-    var adr = 801
+    var adr = ADDR0_TURNOUT
 
     override val ord = 2
 
@@ -58,23 +59,8 @@ class Turnout : GenericPE {
         y2 = closed.y
         xt = thrown.x
         yt = thrown.y
+        adr = ADDR0_TURNOUT
     }
-
-    /*constructor (pe : PanelElement) {
-        if (!pe.name.isBlank()) {
-            this.name = pe.name
-        }
-        this.x = pe.x
-        this.y = pe.y
-        this.x2 = pe.x2
-        this.y2 = pe.y2
-        this.xt = pe.xt
-        this.yt = pe.yt
-        this.adr = pe.adr
-        if (pe.inv != 0) {
-            this.inv = pe.inv
-        }
-    } */
 
     override fun scalePlus() {
         val dx = x
@@ -118,33 +104,13 @@ class Turnout : GenericPE {
 
     }
 
-    public fun getInvValue() : Int {
-        if (inv != null) {
-            return inv!!
-        } else {
-            return 0
-        }
+    override fun translate (d : IntPoint) {
+        x += d.x
+        x2 += d.x
+        xt += d.x
+        y += d.y
+        y2 += d.y
+        yt += d.y
     }
-
-    /* private fun orderXY() {
-        if (x == x2) {
-            if (y2 < y) {
-                val temp = y2
-                y2 = y
-                y = temp
-            }
-        } else if (x2 > x) {
-            // everything is fine ....
-        } else {
-            var temp = x2
-            x2 = x
-            x = temp
-            temp = y2
-            y2 = y
-            y = temp
-
-        }
-    } */
-
 
 }

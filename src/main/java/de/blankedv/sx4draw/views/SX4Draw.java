@@ -79,21 +79,12 @@ import static de.blankedv.sx4draw.views.SX4Draw.PEType.*;
 
 public class SX4Draw extends Application {
 
-    public static double vNumber = 0.40;
-    public static String vString = "15 Feb 2019";
+    public static double vNumber = 0.41;
+    public static String vString = "19 Feb 2019";
     public static String version = vNumber + " - " +vString;
 
-    // FIXED: weichengleichheit nicht auf den Pixel genau
-    // FIXED: UNDO funktioniert nicht nach Zeichnen eines Tracks
     // TODO UNDO für ca. mehrere Elemente
-    // FIXED: Signale/ Weichen etc mit virtuellen Adressen (>1200)
-    // FIXED: warnung bei doppelter Adresse (mit Anzeige)
-    // FIXED: suchfunktion - Adresse eingeben -> elemente anzeigen
-    // FIXED: Signale auch 45Grad, 135Grad, ....
-    // FIXED: für weichen INV funktion einbauen (in Fahrstrassenanzeige)
-    // FIXED: ScrollPane einführen für Drawing bereich
 
-    //public static ArrayList<PanelElement> panelElements = new ArrayList<>();
     public static ArrayList<PanelElement> panelElements = new ArrayList<>();
     public static PanelElement lastPE = null;
     public static String panelName = "";
@@ -379,7 +370,7 @@ public class SX4Draw extends Application {
                         case MOVE:    // MOVE ends
                             IntPoint d = IntPoint.Companion.delta(moveStart, poi, getRaster());
                             System.out.println("move END: final delta =" + d.getX() + "," + d.getY());
-                            PanelElement.Companion.translate(d);
+                            PanelElement.Companion.moveSelected(d);
                             draggedGroup.getChildren().clear();
                             resetPEStates();
                             redrawPanelElements();
@@ -945,16 +936,6 @@ public class SX4Draw extends Application {
         return null;
     }
 
-    /*
-    private static PanelElement selectedPENotTrack(IntPoint p) {
-        for (PanelElement pe : panelElements) {
-            if ((pe.getType() != PEType.TRACK)
-                    && (pe.isTouched(p))) {
-                return pe;
-            }
-        }
-        return null;
-    }  */
     private static PanelElement getRouteBtn(IntPoint p) {
         for (PanelElement pe : panelElements) {
             if (pe.gpe instanceof RouteButton) {
@@ -1013,8 +994,10 @@ public class SX4Draw extends Application {
                 return;
             }
             GenericAddress initA;
+            Integer inv = null;
             if (pe.gpe instanceof Turnout) {
-                initA = new GenericAddress(((Turnout)pe.gpe).getAddr(), ((Turnout)pe.gpe).getInvValue(), INVALID_INT);
+                inv = ((Turnout)pe.gpe).getInv();
+                initA = new GenericAddress(pe.gpe.getAddr(), inv , INVALID_INT);
             } else if (pe.gpe instanceof Signal) {
                 int orient = Utils.INSTANCE.signalDX2ToOrient(new IntPoint(
                         ((Signal) pe.gpe).getX2() - pe.gpe.getX(), ((Signal) pe.gpe).getY2() - pe.gpe.getY()));
@@ -1022,33 +1005,33 @@ public class SX4Draw extends Application {
             } else {
                 initA = new GenericAddress(pe.gpe.getAddr(), 0, 0);
             }
-            GenericAddress res = AddressDialog.INSTANCE.open(pe, primStage, initA);
-            if (res.getAddr() != -1) {
-                System.out.println("addr=" + res.getAddr() + " inv=" + res.getInv() + " orient=" + res.getOrient());
-                boolean addressOK = Dialogs.INSTANCE.checkAddress(initA, res);
+            GenericAddress result = AddressDialog.INSTANCE.open(pe, primStage, initA);
+            if (result.getAddr() != -1) {
+                System.out.println("addr=" + result.getAddr() + " inv=" + result.getInv() + " orient=" + result.getOrient());
+                boolean addressOK = Dialogs.INSTANCE.checkAddress(initA, result);
                 if (!addressOK) {
                     System.out.println("addressOK=false");
                     return; // do nothing
                 }
                 if (pe.gpe instanceof Sensor) {
-                    String aStr = "" + res.getAddr();
-                        if ((res.getAddr() > 300) && (res.getAddr() < LBMIN)) {
+                    String aStr = "" + result.getAddr();
+                        if ((result.getAddr() > 300) && (result.getAddr() < LBMIN)) {
                             // set a virtual secondary SENSOR address
-                            aStr += "," + (res.getAddr()+1000);
+                            aStr += "," + (result.getAddr()+1000);
                         }
                     ((Sensor)pe.gpe).setAdrStr(aStr);
                 } else if (pe.gpe instanceof Turnout) {
                     Turnout tu =(Turnout)pe.gpe;
-                    tu.setAdr(res.getAddr());
-                    if (tu.getInv() != res.getInv()) {
+                    tu.setAdr(result.getAddr());
+                    if (inv != result.getInv()) {
                         // inv bit was changed, recreate shape
-                        tu.setInv(res.getInv());
+                        tu.setInv(result.getInv());
                         pe.recreateShape();
                     }
                 } else if (pe.gpe instanceof Signal) {
                     Signal si = (Signal)pe.gpe;
-                    IntPoint d = Utils.INSTANCE.signalOrientToDXY2(res.getOrient());
-                    System.out.println("or=" + res.getOrient() + " dx=" + d.getX() + " dy=" + d.getY());
+                    IntPoint d = Utils.INSTANCE.signalOrientToDXY2(result.getOrient());
+                    System.out.println("or=" + result.getOrient() + " dx=" + d.getX() + " dy=" + d.getY());
                     si.setX2(si.getX() + d.getX());
                     si.setY2(si.getY() + d.getY());
                     pe.recreateShape();  // orientation might have changed, create new

@@ -454,6 +454,13 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
             }
         }
 
+        fun moveSelected(d: IntPoint) {
+            for (pe in panelElements.filter{ el -> el.state == PEState.SELECTED}) {
+                pe.gpe.translate(d)
+                pe.createShape()   // state will be reset to DEFAULT also
+            }
+        }
+
 
         fun scalePlus() {
             for (pe in panelElements) {

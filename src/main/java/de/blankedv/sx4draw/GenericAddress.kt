@@ -25,7 +25,7 @@ import de.blankedv.sx4draw.Constants.LBMIN
  */
 
 
-class GenericAddress (var addr :Int = 0, var inv : Int = 0, var orient : Int  = 0) {
+class GenericAddress (var addr :Int = 0, var inv : Int? = null, var orient : Int  = 0) {
 
     constructor(initVal: GenericAddress) : this() {
         addr = initVal.addr

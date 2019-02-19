@@ -78,9 +78,9 @@ object AddressDialog {
         // select inv (ONLY for TURNOUT)
         if (pe.gpe::class == Turnout::class) {
             genAddress.inv = initVal.inv
-            inv.isSelected = (initVal.inv != 0)
+            inv.isSelected = (initVal.inv != null)
           } else {
-            genAddress.inv = 0
+            genAddress.inv = null
             inv.isVisible = false
             lblInv.isVisible = false
         }
@@ -191,7 +191,7 @@ object AddressDialog {
         if (inv.isSelected) {
             genAddress.inv = 1
         } else {
-            genAddress.inv = 0
+            genAddress.inv = null
         }
     }
 

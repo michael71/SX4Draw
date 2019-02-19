@@ -40,6 +40,8 @@ object Constants {
     const val ADDR0_TRIP = 5000
     const val ADDR0_TIMETABLE = 5600
     const val ADDR0_SIGNAL = 4000
+    const val ADDR0_TURNOUT = 801
+
 
 
 }
