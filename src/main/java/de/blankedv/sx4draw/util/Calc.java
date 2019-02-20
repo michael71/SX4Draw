@@ -26,7 +26,6 @@ import de.blankedv.sx4draw.model.GenericPE;
 import java.util.ArrayList;
 
 import static de.blankedv.sx4draw.views.SX4Draw.panelElements;
-import static de.blankedv.sx4draw.config.ReadConfig.YOFF;
 
 /**
  * @author Michael Blank <mblank@bawue.de>
@@ -37,11 +36,9 @@ public class Calc {
         // check for intersection of track, if new, add a turnout with unknown SX address
         ArrayList<Track> tracks = new ArrayList<>();
         for (PanelElement pe : panelElements) {
-            switch (pe.getType()) {
-                case TRACK:
-                    tracks.add((Track) pe.gpe);
-                    break;
-                default:
+            if (pe.gpe instanceof Track) {
+                tracks.add((Track) pe.gpe);
+
             }
         }
 

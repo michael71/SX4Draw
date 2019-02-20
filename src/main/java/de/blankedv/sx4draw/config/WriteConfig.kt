@@ -1,14 +1,14 @@
-package de.blankedv.sx4draw.config;
+package de.blankedv.sx4draw.config
 
-import de.blankedv.sx4draw.config.LayoutConfig;
+import de.blankedv.sx4draw.config.LayoutConfig
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.StringWriter;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import javax.xml.bind.JAXBContext
+import javax.xml.bind.Marshaller
+import java.io.File
+import java.io.FileWriter
+import java.io.StringWriter
+import java.text.SimpleDateFormat
+import java.util.Date
 
 /**
  * WriteConfig - Utility turnout save Panel Config
@@ -16,16 +16,17 @@ import java.util.Date;
  * @author Michael Blank
  * @version 1.0
  */
-public class WriteConfig {
+object WriteConfig {
 
-    public static final String FILENAME_XML = "panel_test_new.xml";
+    val FILENAME_XML = "panel_test_new.xml"
 
-    static StringWriter writer;
-    private static String localPanelName = "";
+    internal var writer: StringWriter? = null
+    private val localPanelName = ""
 
     /**
      * writeConfigToXML
-     * <p>
+     *
+     *
      * saves all PanelElements to an XML file configFilename will have ".(date)"
      * appended, if no filename given
      *
@@ -33,47 +34,46 @@ public class WriteConfig {
      *
      * @return true, if succeeds - false, if not.
      */
-    public static boolean writeToXML(String fname, LayoutConfig lc) {
-
-
+    fun writeToXML(fname: String, lc: LayoutConfig): Boolean {
 
 
         try {
-            JAXBContext context = JAXBContext.newInstance(LayoutConfig.class);
-            Marshaller m = context.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+            val context = JAXBContext.newInstance(LayoutConfig::class.java)
+            val m = context.createMarshaller()
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, java.lang.Boolean.TRUE)
 
             // Write to System.out
-            m.marshal(lc, System.out);
+            m.marshal(lc, System.out)
 
             // Write to File
-            m.marshal(lc, new File(fname));
+            m.marshal(lc, File(fname))
 
-        } catch (Exception e) {
-            System.out.println("ERROR "+e.getMessage());
-            e.printStackTrace();
+        } catch (e: Exception) {
+            println("ERROR " + e.message)
+            e.printStackTrace()
         }
 
 
-        return true;
+        return true
     }
 
 
     /**
      * writeConfigToXML
-     * <p>
+     *
+     *
      * saves all PanelElements (including deducted elements) to an XML file (=
      * simple XMLSerializer for lanbahn panel elements and routes)
      *
      * @param
      * @return true, if succeeds - false, if not.
      */
-    private static String writeXml(LayoutConfig layoutConfig, String panelName, String fullFilename, String version) {
+    private fun writeXml(layoutConfig: LayoutConfig, panelName: String, fullFilename: String, version: String): String {
 
-// create JAXB context and instantiate marshaller
+        // create JAXB context and instantiate marshaller
 
 
-/*
+        /*
         // get variables from our xml file, created before
         System.out.println();
         System.out.println("Output from our XML File: ");
@@ -90,7 +90,7 @@ public class WriteConfig {
         //writer.write("<layout-config filename=\"" + filename + "\">\n");
         //writer.write("<locolist name=\"" + locolistName + "\" version=\"" + version+ "\">\n");
     */
-        return "OK";
+        return "OK"
 
     }
 

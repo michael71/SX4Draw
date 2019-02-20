@@ -2,13 +2,16 @@ package de.blankedv.sx4draw
 
 import de.blankedv.sx4draw.Constants.LBMIN
 import de.blankedv.sx4draw.Constants.INVALID_INT
+import de.blankedv.sx4draw.Constants.PEState
+
 import de.blankedv.sx4draw.config.ReadConfig.YOFF
 import de.blankedv.sx4draw.views.SX4Draw.*
 
-import de.blankedv.sx4draw.views.SX4Draw.PEType.*
+import de.blankedv.sx4draw.Constants.PEState.*
 import de.blankedv.sx4draw.model.GenericPE
 import de.blankedv.sx4draw.model.IntPoint
 import de.blankedv.sx4draw.model.Position
+import de.blankedv.sx4draw.util.Utils
 
 import java.util.ArrayList
 
@@ -34,24 +37,26 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
 
     protected var route = ""
 
-    var shape: Shape = Line(0.0, 0.0, 1.0, 1.0)   // default shape
-    var state = PEState.DEFAULT
+    lateinit var shape : Shape
+    lateinit var state : PEState
 
-    protected var defaultColor = Color.ALICEBLUE
+    lateinit var defaultColor : Color
 
 
-    enum class PEState {
+    /*enum class PEState {
         DEFAULT, MARKED, SELECTED, STATE_0, STATE_1
+    } */
+
+
+    constructor() {
+        gpe = Track(Line(0.0, 0.0, 1.0, 1.0))
+        state = DEFAULT
+        defaultColor = javafx.scene.paint.Color.ALICEBLUE
+        shape = Line(0.0, 0.0, 1.0, 1.0)   // default shape
     }
 
-    constructor() {}
 
-    constructor(pe: PanelElement) {  // copy
-        // TODO
-    }
-
-
-    constructor(type: PEType, l: Line) {
+   /* constructor(type: PEType, l: Line) {
         when (type) {
             TRACK -> {
                 this.gpe = Track(l)
@@ -65,110 +70,18 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
 
         //orderXY()
         createShapeAndSetState(PEState.DEFAULT)
-    }
+    } */
 
-    constructor(type: PEType, poi: IntPoint) {
-        when (type) {
-            SIGNAL -> {
-                this.gpe = Signal(poi)
-                createShapeAndSetState(PEState.DEFAULT)
-            }
-            ROUTEBUTTON -> {
-                this.gpe = RouteButton(poi)
-                createShapeAndSetState(PEState.DEFAULT)
-            }
-            SENSOR -> {  // US type
-                this.gpe = Sensor(poi)
-                createShapeAndSetState(PEState.DEFAULT)
-            }
-        }
-    }
-
-    constructor(tu: Turnout) {
+    constructor(tu: GenericPE) {
         this.gpe = tu
-        createShapeAndSetState(PEState.DEFAULT)
+        state = PEState.DEFAULT
+        val (s,c)  = Utils.createShape(tu, PEState.DEFAULT)
+        shape = s
+        defaultColor = c
     }
 
 
-    private fun createShape() {
-        val g = gpe
-        when (g) {
-            is Turnout -> {
-                defaultColor = Color.ORANGE
-                when (state) {
-                    PanelElement.PEState.STATE_0 -> {
-                        if (g.inv == 0) {   // not inverted
-                            shape = Line(g.x.toDouble(), g.y.toDouble(), g.x2.toDouble(), g.y2.toDouble())
-                            shape.strokeLineCap = StrokeLineCap.ROUND
-                            shape.strokeWidth = TRACKWIDTH
-                        } else {
-                            shape = Line(g.x.toDouble(), g.y.toDouble(), g.xt.toDouble(), g.yt.toDouble())
-                            shape.strokeLineCap = StrokeLineCap.ROUND
-                            shape.strokeWidth = TRACKWIDTH
-                        }
-                        shape.fill = Color.GREEN
-                        shape.stroke = Color.GREEN
-                    }
-                    PanelElement.PEState.STATE_1 -> {
-                        if (g.inv == 0) {   // not inverted
-                            shape = Line(g.x.toDouble(), g.y.toDouble(), g.xt.toDouble(), g.yt.toDouble())
-                            shape.strokeLineCap = StrokeLineCap.ROUND
-                            shape.strokeWidth = TRACKWIDTH
-                        } else {
-                            shape = Line(g.x.toDouble(), g.y.toDouble(), g.x2.toDouble(), g.y2.toDouble())
-                            shape.strokeLineCap = StrokeLineCap.ROUND
-                            shape.strokeWidth = TRACKWIDTH
-                        }
-                        shape.fill = Color.RED
-                        shape.stroke = Color.RED
-                    }
-                    else -> {
-                        val l1 = Line(g.x.toDouble(), g.y.toDouble(), g.x2.toDouble(), g.y2.toDouble())
-                        l1.strokeLineCap = StrokeLineCap.ROUND
-                        l1.strokeWidth = TRACKWIDTH
-                        val l2 = Line(g.x.toDouble(), g.y.toDouble(), g.xt.toDouble(), g.yt.toDouble())
-                        l2.strokeLineCap = StrokeLineCap.ROUND
-                        l2.strokeWidth = TRACKWIDTH
-                        shape = Shape.union(l1, l2)
-                        shape.fill = defaultColor
-                        shape.stroke = defaultColor
-                    }
-                }
-            }
-            is Track -> {
-                defaultColor = Color.BLACK
-                shape = Line(g.x.toDouble(), g.y.toDouble(), g.x2.toDouble(), g.y2.toDouble())
-                shape.strokeWidth = TRACKWIDTH
-                shape.strokeLineCap = StrokeLineCap.ROUND
-            }
-            is RouteButton -> {
-                shape = Circle(g.x.toDouble(), g.y.toDouble(), 9.5, Color.DARKGREY)
-                defaultColor = Color.DARKGREY
-            }
-            is Sensor -> {
-                if (g.x2 != INVALID_INT) {//DE type of sensor
-                    shape = Line(g.x.toDouble(), g.y.toDouble(), g.x2.toDouble(), g.y2.toDouble())
-                    shape.strokeWidth = SENSORWIDTH
-                    shape.strokeDashArray.addAll(15.0, 10.0)
-                    shape.strokeLineCap = StrokeLineCap.ROUND
-                    defaultColor = Color.YELLOW
-                } else {  //US Type SENSOR
-                    shape = Circle(g.x.toDouble(), g.y.toDouble(), 8.0, Color.ORANGE)
-                    defaultColor = Color.ORANGE
-                }
-            }
 
-            is Signal -> {
-                defaultColor = Color.BLACK
-                val ls = Line(g.x.toDouble(), g.y.toDouble(), g.x2.toDouble(), g.y2.toDouble())
-                val c = Circle(g.x.toDouble(), g.y.toDouble(), 5.0)
-                ls.strokeWidth = 1.5
-                ls.strokeLineCap = StrokeLineCap.ROUND
-                shape = Shape.union(ls, c)
-            }
-        }
-
-    }
 
     fun recreateShape() {
         // create shape but don't change state
@@ -178,47 +91,34 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
 
     fun createShapeAndSetState(st: PEState) {
         state = st
-        createShape()
+        val (s,c)  = Utils.createShape(gpe, state)
+        shape = s
+        setColorFromState()
+    }
+
+    private fun setColorFromState() {
         when (state) {
-            PanelElement.PEState.DEFAULT -> {
+            DEFAULT -> {
                 shape.fill = defaultColor
                 shape.stroke = defaultColor
             }
-            PanelElement.PEState.SELECTED -> {
+            SELECTED -> {
                 shape.fill = Color.RED
                 shape.stroke = Color.RED
             }
-            PanelElement.PEState.MARKED -> {
+            MARKED -> {
                 shape.fill = Color.AQUA
                 shape.stroke = Color.AQUA
             }
-            PanelElement.PEState.STATE_0 -> {
+            STATE_0 -> {
                 shape.fill = Color.RED
                 shape.stroke = Color.RED
             }
-            PanelElement.PEState.STATE_1 -> {
+            STATE_1 -> {
                 shape.fill = Color.GREEN
                 shape.stroke = Color.GREEN
             }
         }
-    }
-
-    fun getType(): PEType {
-        val g = gpe
-        when (g) {
-            is Track -> return TRACK
-            is Sensor -> {
-                if (g.x2 != INVALID_INT) {
-                    return SENSOR
-                } else {
-                    return SENSOR_US
-                }
-            }
-            is Signal -> return SIGNAL
-            is RouteButton -> return ROUTEBUTTON
-            is Turnout -> return TURNOUT
-        }
-        return TRACK
     }
 
     fun toggleShapeSelected() {
@@ -270,6 +170,8 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
         const val TRACKWIDTH = 5.0
         const val SENSORWIDTH = 4.0
 
+
+
         /**
          * search for a panel element(or elements) when only the address is known
          *
@@ -288,7 +190,7 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
 
         fun resetState() {
             for (pe in panelElements) {
-                pe.createShapeAndSetState(PEState.DEFAULT)
+                pe.createShapeAndSetState(pe.state)
             }
         }
 
@@ -450,14 +352,15 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
         fun translate(d: IntPoint) {
             for (pe in panelElements) {
                 pe.gpe.translate(d)
-                pe.createShape()   // state will be reset to DEFAULT also
+                pe.createShapeAndSetState(pe.state)
+                 // state will be reset to DEFAULT also
             }
         }
 
         fun moveSelected(d: IntPoint) {
             for (pe in panelElements.filter{ el -> el.state == PEState.SELECTED}) {
                 pe.gpe.translate(d)
-                pe.createShape()   // state will be reset to DEFAULT also
+                pe.createShapeAndSetState(PEState.DEFAULT)
             }
         }
 

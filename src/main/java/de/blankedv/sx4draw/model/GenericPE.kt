@@ -49,4 +49,8 @@ abstract class GenericPE() : Comparator<GenericPE>, Comparable<GenericPE> {
     override fun compareTo(other: GenericPE): Int {
         return x - other.x
     }
+
+    fun onSamePoint(p2 : IntPoint) : Boolean {
+        return ((x == p2.x) and (y == p2.y))
+    }
 }

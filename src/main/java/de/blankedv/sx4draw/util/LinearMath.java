@@ -18,14 +18,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 package de.blankedv.sx4draw.util;
 
-import de.blankedv.sx4draw.PanelElement;
 import de.blankedv.sx4draw.Track;
 import de.blankedv.sx4draw.Turnout;
-import de.blankedv.sx4draw.views.SX4Draw.PEType;
 import de.blankedv.sx4draw.model.IntPoint;
 
-import static de.blankedv.sx4draw.config.ReadConfig.YOFF;
-//import java.awt.Point;
+
 
 public class LinearMath {
 
@@ -119,8 +116,8 @@ public class LinearMath {
                 // =========== this is a turnout !! ======================
                 // find closed and thrown positions (x2>x) both for e and f !!
                 // 1. check, turnout which lines' endpoint (xi,yi) belongs
-                String es = "E x,y=(" + e.getX() + "," + (e.getY() - YOFF) + ") x2,y2=(" + e.getX2() + "," + (e.getY2() - YOFF) + ")";
-                String fs = "F x,y=(" + f.getX() + "," + (f.getY() - YOFF) + ") x2,y2=(" + f.getX2() + "," + (f.getY2() - YOFF) + ")";
+                String es = "E x,y=(" + e.getX() + "," + e.getY()  + ") x2,y2=(" + e.getX2() + "," + e.getY2()  + ")";
+                String fs = "F x,y=(" + f.getX() + "," + f.getY()  + ") x2,y2=(" + f.getX2() + "," + f.getY2()  + ")";
                 if (DEBUG_MATH) System.out.println(es);
                 if (DEBUG_MATH) System.out.println(fs);
                 xc1 = xt = xi;
