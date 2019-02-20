@@ -5,7 +5,7 @@ import de.blankedv.sx4draw.Constants.INVALID_INT
 import de.blankedv.sx4draw.model.GenericPE
 import de.blankedv.sx4draw.model.IntPoint
 import de.blankedv.sx4draw.views.SX4Draw
-import de.blankedv.sx4draw.views.SX4Draw.panelElements
+import de.blankedv.sx4draw.views.SX4Draw.Companion.panelElements
 
 import javax.xml.bind.annotation.XmlAttribute
 import javax.xml.bind.annotation.XmlRootElement

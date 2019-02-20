@@ -3,15 +3,12 @@ package de.blankedv.sx4draw
 import de.blankedv.sx4draw.Constants.LBMIN
 import de.blankedv.sx4draw.Constants.INVALID_INT
 import de.blankedv.sx4draw.Constants.PEState
-
-import de.blankedv.sx4draw.config.ReadConfig.YOFF
-import de.blankedv.sx4draw.views.SX4Draw.*
-
 import de.blankedv.sx4draw.Constants.PEState.*
 import de.blankedv.sx4draw.model.GenericPE
 import de.blankedv.sx4draw.model.IntPoint
 import de.blankedv.sx4draw.model.Position
 import de.blankedv.sx4draw.util.Utils
+import de.blankedv.sx4draw.views.SX4Draw.Companion.panelElements
 
 import java.util.ArrayList
 
@@ -31,16 +28,16 @@ import javafx.scene.shape.StrokeLineCap
 
 class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
 
-    lateinit var gpe: GenericPE
+    var gpe: GenericPE
 
     // elements for graphics
 
     protected var route = ""
 
-    lateinit var shape : Shape
-    lateinit var state : PEState
+    var shape : Shape
+    var state : PEState
 
-    lateinit var defaultColor : Color
+    var defaultColor : Color
 
 
     /*enum class PEState {
@@ -80,6 +77,13 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
         defaultColor = c
     }
 
+    /*constructor(tu: Turnout) {
+        this.gpe = tu
+        state = PEState.DEFAULT
+        val (s,c)  = Utils.createShape(tu, PEState.DEFAULT)
+        shape = s
+        defaultColor = c
+    } */
 
 
 
@@ -144,8 +148,8 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
             sAddr = "" + addr
         }
 
-        gc.fillRect(gpe.x.toDouble(), (gpe.y - YOFF).toDouble(), (8 * sAddr.length).toDouble(), 12.0)
-        gc.strokeText(sAddr, gpe.x.toDouble(), (gpe.y - YOFF + 10).toDouble())
+        gc.fillRect(gpe.x.toDouble(), gpe.y.toDouble() - 11.0, (8 * sAddr.length).toDouble(), 12.0)
+        gc.strokeText(sAddr, gpe.x.toDouble(), gpe.y.toDouble())
     }
 
     override fun compare(o1: PanelElement, o2: PanelElement): Int {

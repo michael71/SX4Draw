@@ -6,6 +6,7 @@ import de.blankedv.sx4draw.views.SX4Draw.*
 import de.blankedv.sx4draw.model.GenericPE
 import de.blankedv.sx4draw.model.IntPoint
 import de.blankedv.sx4draw.util.Utils
+import de.blankedv.sx4draw.views.SX4Draw.Companion.panelElements
 import java.lang.NumberFormatException
 
 import javax.xml.bind.annotation.XmlAttribute

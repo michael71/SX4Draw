@@ -24,7 +24,6 @@ import de.blankedv.sx4draw.GenericAddress
 import de.blankedv.sx4draw.PanelElement
 import de.blankedv.sx4draw.Signal
 import de.blankedv.sx4draw.Turnout
-import de.blankedv.sx4draw.config.ReadConfig.YOFF
 
 import javafx.beans.value.ChangeListener
 import javafx.collections.FXCollections
@@ -55,11 +54,11 @@ object AddressDialog {
 
     fun open(pe: PanelElement, primaryStage: Stage, initVal: GenericAddress): GenericAddress {
 
-        genAddress = GenericAddress(initVal)
-
+        genAddress = initVal
+        println("genAddress.addr =" + genAddress.toString())
 
         val title = ("Adresse " + pe.gpe::class.simpleName
-                 + " Pos.= " + pe.gpe.x + "," + (pe.gpe.y - YOFF))
+                 + " Pos.= " + pe.gpe.x + "," + pe.gpe.y)
         val in1000 = initVal.addr / 1000
         val in100 = (initVal.addr - in1000 * 1000) / 100
         val in10 = (initVal.addr - in1000 * 1000 - in100 * 100) / 10
@@ -70,7 +69,7 @@ object AddressDialog {
         spinner1.valueFactory.value = in1
         genAddress.addr = initVal.addr
 
-        updateAddress()
+        // updateAddress()
         println("init address =" + initVal.addr)
 
         val lblInv = Label(" invertiert")

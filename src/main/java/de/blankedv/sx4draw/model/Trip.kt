@@ -6,7 +6,7 @@ package de.blankedv.sxdraw
 
 import de.blankedv.sx4draw.Constants.ADDR0_TRIP
 import de.blankedv.sx4draw.Constants.INVALID_INT
-import de.blankedv.sx4draw.views.SX4Draw.trips
+import de.blankedv.sx4draw.views.SX4Draw.Companion.trips
 import java.util.Comparator
 
 import org.w3c.dom.Node

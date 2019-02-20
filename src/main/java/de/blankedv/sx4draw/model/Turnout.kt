@@ -77,6 +77,10 @@ class Turnout : GenericPE {
 
     }
 
+    override fun getAddr(): Int {
+        return adr
+    }
+
 
     override fun isTouched(touch: IntPoint): Pair<Boolean, Int> {
         // check first for (x2,y2) touch (state 0)

@@ -31,24 +31,13 @@ object ReadConfig {
 
     //TODO read/write locolist (see SX4)
 
-    val YOFF = 0   // y values start at 60, this value get added when reading a config
-    // and substracted when storing.
-
-    private val CFG_DEBUG = true
-    private val rtValues = Arrays.asList(*RT.values())
-
-    // code template taken from lanbahnPanel
     fun readXML(fname: String): LayoutConfig? {
 
         try {
             val context = JAXBContext.newInstance(LayoutConfig::class.java)
             val um = context.createUnmarshaller()
-            return um.unmarshal(FileReader(
-                    FILENAME_XML)) as LayoutConfig
-            /* TODO ArrayList<Track> tracks = lc.get();
-         for (Track tr : tracks) {
-            System.out.println("track x=" +tr.getX());
-        } */
+            return um.unmarshal(FileReader(fname)) as LayoutConfig
+
         } catch (e: Exception) {
             println("ERROR " + e.message)
             e.printStackTrace()

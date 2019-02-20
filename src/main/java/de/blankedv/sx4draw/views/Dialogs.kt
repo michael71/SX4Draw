@@ -21,7 +21,7 @@ import de.blankedv.sx4draw.Constants.LBMIN
 import de.blankedv.sx4draw.Constants.SXMAX_USED
 import de.blankedv.sx4draw.GenericAddress
 import de.blankedv.sx4draw.PanelElement
-import de.blankedv.sx4draw.views.SX4Draw.panelElements
+import de.blankedv.sx4draw.views.SX4Draw.Companion.panelElements
 
 
 import javafx.application.Application

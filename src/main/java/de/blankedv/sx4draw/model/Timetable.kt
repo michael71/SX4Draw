@@ -7,7 +7,7 @@ package de.blankedv.sx4draw.model
 import de.blankedv.sx4draw.Constants
 import de.blankedv.sx4draw.Constants.INVALID_INT
 import de.blankedv.sx4draw.views.SX4Draw
-import de.blankedv.sx4draw.views.SX4Draw.timetables
+import de.blankedv.sx4draw.views.SX4Draw.Companion.timetables
 import java.util.Comparator
 
 import org.w3c.dom.Node

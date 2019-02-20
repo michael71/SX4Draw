@@ -9,28 +9,34 @@ import de.blankedv.sx4draw.config.WriteConfig.FILENAME_XML
 //This statement means that class "LayoutConfig.java" is the root-element
 @XmlRootElement(name = "layout-config")
 class LayoutConfig {
-    // XmLElementWrapper generates a wrapper element around XML representation
+    // see https://blog.scottlogic.com/2016/04/04/practical-kotlin.html
 
-    @XmlAttribute
-    var name = "noName"
+    @get:XmlAttribute
+    var fileName = ""
 
-    @XmlAttribute
-    var fileName = "panel_test.xml"
-
-    @XmlAttribute
+    @get:XmlAttribute
     var version = "0001"
 
     @XmlElementWrapper(name = "panels")
-    @XmlElement(name = "panel")
-    val panelCfgs  = ArrayList<PanelConfig>()
+    @get:XmlElement(name = "panel")
+    private val panel  = ArrayList<PanelConfig>()
 
+    constructor()
 
-    /*fun setName(name: String) {
-        this.name2 = name
-    } */
-
-    fun addPanelCfg(pc: PanelConfig) {
-        panelCfgs.add(pc)
+    constructor(fn : String, pc: PanelConfig, ve: String) {
+        this.fileName = fn
+        panel.add(pc)
+        this.version = ve
     }
+
+    fun getPC0() : PanelConfig? {
+        if (panel.size >= 1) {
+            return panel.get(0)
+        } else {
+            return null
+        }
+    }
+
+
 
 }
