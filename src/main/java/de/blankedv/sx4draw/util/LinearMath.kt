@@ -18,8 +18,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 package de.blankedv.sx4draw.util
 
-import de.blankedv.sx4draw.Track
-import de.blankedv.sx4draw.Turnout
+import de.blankedv.sx4draw.model.Track
+import de.blankedv.sx4draw.model.Turnout
 import de.blankedv.sx4draw.model.IntPoint
 
 

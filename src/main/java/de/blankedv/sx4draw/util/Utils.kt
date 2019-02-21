@@ -1,7 +1,19 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+SX4Draw
+Copyright (C) 2019 Michael Blank
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package de.blankedv.sx4draw.util
 
@@ -9,6 +21,11 @@ import de.blankedv.sx4draw.*
 import de.blankedv.sx4draw.Constants.INVALID_INT
 import de.blankedv.sx4draw.model.GenericPE
 import de.blankedv.sx4draw.model.IntPoint
+import de.blankedv.sx4draw.model.RouteButton
+import de.blankedv.sx4draw.model.Turnout
+import de.blankedv.sx4draw.model.Track
+import de.blankedv.sx4draw.model.Signal
+import de.blankedv.sx4draw.model.Sensor
 import java.util.concurrent.atomic.AtomicLong
 
 import javafx.scene.control.TableView
@@ -30,10 +47,14 @@ object Utils {
 
     // see https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line
     fun calcDistanceFromLine(l1: IntPoint, l2: IntPoint, p: IntPoint): Double {
-        val d1 = Math.abs((l2.y - l1.y) * p.x - (l2.x - l1.x) * p.y + l2.x * l1.y - l2.y * l1.x)
-        val d2 = Math.sqrt(((l2.y - l1.y) * (l2.y - l1.y) + (l2.x - l1.x) * (l2.x - l1.x)).toDouble())
-
-        return d1.toDouble() / d2
+        // check first if l1 and l2 are different
+        if ((l1.x == l2.x) and (l1.y == l2.y)) {
+            return Math.sqrt(((p.x -l1.x)*(p.x -l1.x) + (p.y - l1.y)*(p.y - l1.y)).toDouble())
+        } else {
+            val d1 = Math.abs((l2.y - l1.y) * p.x - (l2.x - l1.x) * p.y + l2.x * l1.y - l2.y * l1.x)
+            val d2 = Math.sqrt(((l2.y - l1.y) * (l2.y - l1.y) + (l2.x - l1.x) * (l2.x - l1.x)).toDouble())
+            return d1.toDouble() / d2
+        }
     }
 
     fun calcDistance(p: IntPoint, q: IntPoint): Double {
@@ -68,33 +89,27 @@ object Utils {
                 dx = -SIGLEN2
                 dy = +SIGLEN2
             }
-            2   // 90
-            -> {
+            2 -> {   // 90
                 dx = 0
                 dy = +SIGLEN
             }
-            3   // 135
-            -> {
+            3 -> {  // 135
                 dx = +SIGLEN2
                 dy = +SIGLEN2
             }
-            4   // 180
-            -> {
+            4 -> {  // 180
                 dx = +SIGLEN
                 dy = 0
             }
-            5   // 225
-            -> {
+            5 -> {  // 225
                 dx = +SIGLEN2
                 dy = -SIGLEN2
             }
-            6   // 270
-            -> {
+            6 -> {  // 270
                 dx = 0
                 dy = -SIGLEN
             }
-            7   // 315
-            -> {
+            7 -> {  // 315
                 dx = -SIGLEN2
                 dy = -SIGLEN2
             }
@@ -129,11 +144,11 @@ object Utils {
                         if (g.inv == 0) {   // not inverted
                             shape = Line(g.x.toDouble(), g.y.toDouble(), g.x2.toDouble(), g.y2.toDouble())
                             shape.strokeLineCap = StrokeLineCap.ROUND
-                            shape.strokeWidth = PanelElement.TRACKWIDTH
+                            shape.strokeWidth = PanelElement.TRACK_WIDTH
                         } else {
                             shape = Line(g.x.toDouble(), g.y.toDouble(), g.xt.toDouble(), g.yt.toDouble())
                             shape.strokeLineCap = StrokeLineCap.ROUND
-                            shape.strokeWidth = PanelElement.TRACKWIDTH
+                            shape.strokeWidth = PanelElement.TRACK_WIDTH
                         }
                         shape.fill = Color.GREEN
                         shape.stroke = Color.GREEN
@@ -142,11 +157,11 @@ object Utils {
                         if (g.inv == 0) {   // not inverted
                             shape = Line(g.x.toDouble(), g.y.toDouble(), g.xt.toDouble(), g.yt.toDouble())
                             shape.strokeLineCap = StrokeLineCap.ROUND
-                            shape.strokeWidth = PanelElement.TRACKWIDTH
+                            shape.strokeWidth = PanelElement.TRACK_WIDTH
                         } else {
                             shape = Line(g.x.toDouble(), g.y.toDouble(), g.x2.toDouble(), g.y2.toDouble())
                             shape.strokeLineCap = StrokeLineCap.ROUND
-                            shape.strokeWidth = PanelElement.TRACKWIDTH
+                            shape.strokeWidth = PanelElement.TRACK_WIDTH
                         }
                         shape.fill = Color.RED
                         shape.stroke = Color.RED
@@ -154,10 +169,10 @@ object Utils {
                     else -> {
                         val l1 = Line(g.x.toDouble(), g.y.toDouble(), g.x2.toDouble(), g.y2.toDouble())
                         l1.strokeLineCap = StrokeLineCap.ROUND
-                        l1.strokeWidth = PanelElement.TRACKWIDTH
+                        l1.strokeWidth = PanelElement.TRACK_WIDTH
                         val l2 = Line(g.x.toDouble(), g.y.toDouble(), g.xt.toDouble(), g.yt.toDouble())
                         l2.strokeLineCap = StrokeLineCap.ROUND
-                        l2.strokeWidth = PanelElement.TRACKWIDTH
+                        l2.strokeWidth = PanelElement.TRACK_WIDTH
                         shape = Shape.union(l1, l2)
                         shape.fill = defaultColor
                         shape.stroke = defaultColor
@@ -167,7 +182,7 @@ object Utils {
             is Track -> {
                 defaultColor = Color.BLACK
                 shape = Line(g.x.toDouble(), g.y.toDouble(), g.x2.toDouble(), g.y2.toDouble())
-                shape.strokeWidth = PanelElement.TRACKWIDTH
+                shape.strokeWidth = PanelElement.TRACK_WIDTH
                 shape.strokeLineCap = StrokeLineCap.ROUND
             }
             is RouteButton -> {
@@ -175,12 +190,12 @@ object Utils {
                 defaultColor = Color.DARKGREY
             }
             is Sensor -> {
-                if (g.x2 != INVALID_INT) {//DE type of sensor
-                    shape = Line(g.x.toDouble(), g.y.toDouble(), g.x2.toDouble(), g.y2.toDouble())
-                    shape.strokeWidth = PanelElement.SENSORWIDTH
+                defaultColor = Color.YELLOW
+                if (g.x2 != null) {//DE type of sensor
+                    shape = Line(g.x.toDouble(), g.y.toDouble(), g.x2!!.toDouble(), g.y2!!.toDouble())
+                    shape.strokeWidth = PanelElement.SENSOR_WIDTH
                     shape.strokeDashArray.addAll(15.0, 10.0)
                     shape.strokeLineCap = StrokeLineCap.ROUND
-                    defaultColor = Color.YELLOW
                 } else {  //US Type SENSOR
                     shape = Circle(g.x.toDouble(), g.y.toDouble(), 8.0, Color.ORANGE)
                     defaultColor = Color.ORANGE
@@ -197,11 +212,6 @@ object Utils {
             }
         }
 
-
-
-
         return Pair(shape, defaultColor)
-
     }
-
 }

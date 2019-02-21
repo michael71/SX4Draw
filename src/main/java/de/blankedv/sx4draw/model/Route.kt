@@ -1,15 +1,28 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+SX4Draw
+Copyright (C) 2019 Michael Blank
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package de.blankedv.sx4draw
+package de.blankedv.sx4draw.model
 
 import de.blankedv.sx4draw.Constants.INVALID_INT
 import de.blankedv.sx4draw.views.SX4Draw.Companion.routes
 
 import de.blankedv.sx4draw.Constants.PEState
-import de.blankedv.sx4draw.views.SX4Draw
+import de.blankedv.sx4draw.PanelElement
+import de.blankedv.sx4draw.model.*
 
 import java.util.ArrayList
 import java.util.Comparator
@@ -103,13 +116,13 @@ class Route : Comparator<Route>, Comparable<Route> {
      * @param pe
      */
     fun addElement(pe: PanelElement) {
-        when (pe.gpe::class) {
-            Sensor::class -> if (sensors.isEmpty()) {
+        when (pe.gpe) {
+            is Sensor -> if (sensors.isEmpty()) {
                 sensors = "" + pe.gpe.getAddr()
             } else {
                 sensors = sensors + "," + pe.gpe.getAddr()
             }
-            Turnout::class -> if (route.isEmpty()) {
+            is Turnout -> if (route.isEmpty()) {
                 route = "" + pe.gpe.getAddr() + ",0"
             } else {
                 route = route + ";" + pe.gpe.getAddr() + ",0"
@@ -124,18 +137,18 @@ class Route : Comparator<Route>, Comparable<Route> {
      * @param peSt
      */
     fun addElement(peSt: Pair<PanelElement, Int>) {
-        when (peSt.key.gpe::class) {
-            Sensor::class -> if (sensors.isEmpty()) {
+        when (peSt.key.gpe) {
+            is Sensor -> if (sensors.isEmpty()) {
                 sensors = "" + peSt.key.gpe.getAddr()
             } else {
                 sensors = sensors + "," + peSt.key.gpe.getAddr()
             }
-            Turnout::class -> if (route.isEmpty()) {
+            is Turnout -> if (route.isEmpty()) {
                 route = "" + peSt.key.gpe.getAddr() + "," + peSt.value
             } else {
                 route = route + ";" + peSt.key.gpe.getAddr() + "," + peSt.value
             }
-            Signal::class -> if (route.isEmpty()) {
+            is Signal -> if (route.isEmpty()) {
                 route = "" + peSt.key.gpe.getAddr() + ",0"
             } else {
                 route = route + ";" + peSt.key.gpe.getAddr() + ",0"

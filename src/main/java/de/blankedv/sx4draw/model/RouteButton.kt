@@ -1,10 +1,25 @@
-package de.blankedv.sx4draw
+/*
+SX4Draw
+Copyright (C) 2019 Michael Blank
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package de.blankedv.sx4draw.model
 
 import de.blankedv.sx4draw.Constants.ADDR0_ROUTEBUTTON
 import de.blankedv.sx4draw.Constants.INVALID_INT
-import de.blankedv.sx4draw.model.GenericPE
-import de.blankedv.sx4draw.model.IntPoint
-import de.blankedv.sx4draw.views.SX4Draw
 import de.blankedv.sx4draw.views.SX4Draw.Companion.panelElements
 
 import javax.xml.bind.annotation.XmlAttribute
@@ -35,19 +50,6 @@ class RouteButton : GenericPE {
 
     constructor() {}
 
-    /*constructor (pe : PanelElement) {
-        if (!pe.name.isBlank()) {
-            this.name = pe.name
-        }
-        this.x = pe.x
-        this.y = pe.y
-        if (pe.adr == INVALID_INT) {
-            autoAddress()
-        } else {
-            this.adr = pe.adr
-        }
-    } */
-
     constructor (poi : IntPoint) {
         x = poi.x
         y = poi.y
@@ -56,6 +58,10 @@ class RouteButton : GenericPE {
 
     override fun getAddr() : Int {
         return adr
+    }
+
+    override fun getAddr2() : Int {
+        return INVALID_INT
     }
 
     private fun autoAddress() {

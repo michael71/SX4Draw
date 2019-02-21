@@ -1,10 +1,24 @@
-package de.blankedv.sx4draw
+/*
+SX4Draw
+Copyright (C) 2019 Michael Blank
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+package de.blankedv.sx4draw.model
 
 import de.blankedv.sx4draw.Constants.ADDR0_SIGNAL
 import de.blankedv.sx4draw.Constants.INVALID_INT
-import de.blankedv.sx4draw.views.SX4Draw.*
-import de.blankedv.sx4draw.model.GenericPE
-import de.blankedv.sx4draw.model.IntPoint
 import de.blankedv.sx4draw.util.Utils
 import de.blankedv.sx4draw.views.SX4Draw.Companion.panelElements
 import java.lang.NumberFormatException
@@ -114,7 +128,9 @@ class Signal : GenericPE {
         val aArry = adrStr.split(",")
         var a = INVALID_INT
         try {
-            a = aArry[0].toInt()
+            if (aArry.isNotEmpty()) {
+                a = aArry[0].toInt()
+            }
         } catch (e: NumberFormatException) {
 
         }
@@ -125,7 +141,9 @@ class Signal : GenericPE {
         val aArry = adrStr.split(",")
         var a = INVALID_INT
         try {
-            a = aArry[1].toInt()
+            if (aArry.size >= 2) {
+                a = aArry[1].toInt()
+            }
         } catch (e: NumberFormatException) {
 
         }

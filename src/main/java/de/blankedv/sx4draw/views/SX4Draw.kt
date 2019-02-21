@@ -20,13 +20,8 @@ package de.blankedv.sx4draw.views
 
 import de.blankedv.sx4draw.*
 import de.blankedv.sx4draw.config.*
-import de.blankedv.sx4draw.model.CompRoute
-import de.blankedv.sx4draw.model.IntPoint
-import de.blankedv.sx4draw.model.Loco
-import de.blankedv.sx4draw.model.Timetable
-import de.blankedv.sx4draw.util.Calc
-import de.blankedv.sx4draw.util.Utils
-import de.blankedv.sxdraw.Trip
+import de.blankedv.sx4draw.util.*
+
 import javafx.animation.KeyFrame
 import javafx.animation.Timeline
 import javafx.application.Application
@@ -67,7 +62,6 @@ import java.util.Collections
 import java.util.Date
 import java.util.prefs.Preferences
 
-import de.blankedv.sx4draw.Constants.LBMIN
 import de.blankedv.sx4draw.Constants.INVALID_INT
 import de.blankedv.sx4draw.Constants.DEBUG
 import de.blankedv.sx4draw.Constants.RASTER
@@ -75,10 +69,11 @@ import de.blankedv.sx4draw.Constants.RECT_X
 import de.blankedv.sx4draw.Constants.RECT_Y
 import de.blankedv.sx4draw.Constants.PEState
 
-import de.blankedv.sx4draw.PanelElement.Companion.SENSORWIDTH
-import de.blankedv.sx4draw.PanelElement.Companion.TRACKWIDTH
+import de.blankedv.sx4draw.PanelElement.Companion.SENSOR_WIDTH
+import de.blankedv.sx4draw.PanelElement.Companion.TRACK_WIDTH
+import de.blankedv.sx4draw.model.*
+import de.blankedv.sx4draw.util.Calc
 import java.lang.NullPointerException
-import kotlin.Exception
 
 class SX4Draw : Application() {
 
@@ -100,7 +95,7 @@ class SX4Draw : Application() {
     internal val showMousePos = CheckMenuItem("Mauspos. anzeigen")
     internal val mousePositionToolTip = Tooltip("")
     internal val anchorPane = AnchorPane()
-    internal val status = Label("status")
+    // internal val status = Label("status")
 
 
     private var currentGUIState = GUIState.SELECT
@@ -109,14 +104,6 @@ class SX4Draw : Application() {
 
     enum class GUIState {
         ADD_TRACK, ADD_SENSOR, ADD_SENSOR_US, ADD_SIGNAL, ADD_ROUTEBTN, ADD_ROUTE, SELECT, MOVE
-    }
-
-    enum class PEType {
-        TRACK, SENSOR, SENSOR_US, SIGNAL, TURNOUT, ROUTEBUTTON
-    }
-
-    enum class RT {
-        ROUTE, COMPROUTE, TRIP, TIMETABLE
     }
 
     override fun start(primaryStage: Stage) {
@@ -204,7 +191,7 @@ class SX4Draw : Application() {
                 println("primary button")
                 val poiRast = IntPoint.toRaster(poi, getRaster())
                 when (currentGUIState) {
-                    SX4Draw.GUIState.ADD_TRACK -> line = startNewLine(start, TRACKWIDTH)
+                    SX4Draw.GUIState.ADD_TRACK -> line = startNewLine(start, TRACK_WIDTH)
                     SX4Draw.GUIState.ADD_SIGNAL -> {
                         val sig = Signal(poiRast)
                         if (!isPETypeOn(poiRast)) {
@@ -233,11 +220,12 @@ class SX4Draw : Application() {
                             panelElements.add(pe)
                             lastPE = pe
                             btnUndo.isDisable = false
+
                         }
                     }
                     SX4Draw.GUIState.ADD_ROUTE -> createRoute(poi)
                     SX4Draw.GUIState.ADD_SENSOR -> {
-                        line = startNewLine(start, SENSORWIDTH)
+                        line = startNewLine(start, SENSOR_WIDTH)
                         line!!.strokeDashArray.addAll(15.0, 10.0)
                         line!!.stroke = Color.YELLOW
                     }
@@ -287,33 +275,28 @@ class SX4Draw : Application() {
                 val end = IntPoint.correctAngle(start, poi, getRaster())
                 println("end x=" + end.x + " y=" + end.y)
                 when (currentGUIState) {
-                    SX4Draw.GUIState.ADD_TRACK -> {
-                        line!!.endX = end.x.toDouble()
-                        line!!.endY = end.y.toDouble()
-                        lineGroup!!.children.remove(line)  // will be re-added from within PE
-                        if (Math.abs(line!!.endX - line!!.startX) > 5 || Math.abs(line!!.endY - line!!.startY) > 5) {
-                            val tr = Track(line!!)
-                            val pe = PanelElement(tr)
-                            lastPE = pe
-                            panelElements.add(pe)
-                            lineGroup!!.children.add(lastPE!!.shape)
-                            btnUndo.isDisable = false
-                        }
-                    }
-
+                    SX4Draw.GUIState.ADD_TRACK,
                     SX4Draw.GUIState.ADD_SENSOR -> {
                         line!!.endX = end.x.toDouble()
                         line!!.endY = end.y.toDouble()
                         lineGroup!!.children.remove(line)  // will be re-added from within PE
                         if (Math.abs(line!!.endX - line!!.startX) > 5 || Math.abs(line!!.endY - line!!.startY) > 5) {
-                            val se = Sensor(line!!)
-                            val pe = PanelElement(se)
-                            lastPE = pe
-                            lineGroup!!.children.add(pe!!.shape)
-                            panelElements.add(pe)
+                            if (currentGUIState == GUIState.ADD_TRACK) {
+                                val pe = PanelElement(Track(line!!))
+                                lastPE = pe
+                                panelElements.add(pe)
+                            } else {
+                                val pe = PanelElement(Sensor(line!!))
+                                lastPE = pe
+                                panelElements.add(pe)
+                            }
+
+                            lineGroup!!.children.add(lastPE!!.shape)
                             btnUndo.isDisable = false
+                            redrawPanelElements()
                         }
                     }
+
                     SX4Draw.GUIState.ADD_SENSOR_US, SX4Draw.GUIState.ADD_SIGNAL, SX4Draw.GUIState.ADD_ROUTEBTN, SX4Draw.GUIState.ADD_ROUTE -> {
                     }
                     SX4Draw.GUIState.MOVE    // MOVE ends
@@ -419,7 +402,7 @@ class SX4Draw : Application() {
 
         primaryStage.show()
 
-        primaryStage.setOnCloseRequest { e: WindowEvent ->
+        primaryStage.setOnCloseRequest { _: WindowEvent ->
             saveOnExit(prefs, primaryStage)
             System.exit(0)
         }
@@ -469,7 +452,7 @@ class SX4Draw : Application() {
 
         btnUnSelect.text = "Unselect"
         //btnUnSelect.setGraphic(selIcon);
-        btnUnSelect.setOnAction { event: ActionEvent ->
+        btnUnSelect.setOnAction {
             println("unselect")
             unselectAll()
             redrawPanelElements()
@@ -481,7 +464,7 @@ class SX4Draw : Application() {
         btnSelect.isSelected = false
         btnMove.text = "Move"
         btnMove.graphic = moveIcon
-        btnMove.setOnAction { event: ActionEvent ->
+        btnMove.setOnAction {
             currentGUIState = GUIState.MOVE
             canvas!!.cursor = Cursor.CLOSED_HAND
         }
@@ -489,7 +472,7 @@ class SX4Draw : Application() {
         btnAddTrack.toggleGroup = toggleGroup
         btnAddTrack.text = "Track"
         btnAddTrack.graphic = plusIcon1
-        btnAddTrack.setOnAction { event: ActionEvent ->
+        btnAddTrack.setOnAction {
             currentGUIState = GUIState.ADD_TRACK
             canvas!!.cursor = Cursor.CROSSHAIR
             //resetLines();
@@ -498,7 +481,7 @@ class SX4Draw : Application() {
         btnAddSensor.toggleGroup = toggleGroup
         btnAddSensor.text = "Sensor"
         btnAddSensor.graphic = plusIcon2
-        btnAddSensor.setOnAction { event: ActionEvent ->
+        btnAddSensor.setOnAction {
             currentGUIState = GUIState.ADD_SENSOR
             canvas!!.cursor = Cursor.CROSSHAIR
             //resetLines();
@@ -507,7 +490,7 @@ class SX4Draw : Application() {
         btnAddSensorUS.toggleGroup = toggleGroup
         btnAddSensorUS.text = "Sensor-US"
         btnAddSensorUS.graphic = plusIcon4
-        btnAddSensorUS.setOnAction { event: ActionEvent ->
+        btnAddSensorUS.setOnAction {
             currentGUIState = GUIState.ADD_SENSOR_US
             canvas!!.cursor = Cursor.CROSSHAIR
             //resetLines();
@@ -516,7 +499,7 @@ class SX4Draw : Application() {
         btnAddSignal.toggleGroup = toggleGroup
         btnAddSignal.text = "Signal"
         btnAddSignal.graphic = plusIcon
-        btnAddSignal.setOnAction { event: ActionEvent ->
+        btnAddSignal.setOnAction {
             currentGUIState = GUIState.ADD_SIGNAL
             canvas!!.cursor = Cursor.CROSSHAIR
             //resetLines();
@@ -525,7 +508,7 @@ class SX4Draw : Application() {
         btnRouteBtn.toggleGroup = toggleGroup
         btnRouteBtn.text = "RT-Button"
         btnRouteBtn.graphic = plusIcon3
-        btnRouteBtn.setOnAction { event: ActionEvent ->
+        btnRouteBtn.setOnAction {
             currentGUIState = GUIState.ADD_ROUTEBTN
             canvas!!.cursor = Cursor.CROSSHAIR
             //resetLines();
@@ -534,7 +517,7 @@ class SX4Draw : Application() {
         btnAddRoute.toggleGroup = toggleGroup
         btnAddRoute.text = "Fahrstr."
         btnAddRoute.graphic = plusIcon5
-        btnAddRoute.setOnAction { event: ActionEvent ->
+        btnAddRoute.setOnAction {
             if (PanelElement.addressesAvail()) {
                 currentGUIState = GUIState.ADD_ROUTE
                 canvas!!.cursor = Cursor.CLOSED_HAND
@@ -552,8 +535,7 @@ class SX4Draw : Application() {
         btnUndo.text = "Undo"
         btnUndo.isDisable = true
         btnUndo.graphic = undoIcon
-        btnUndo.setOnAction { event: ActionEvent ->
-            //resetLines();
+        btnUndo.setOnAction {
             val pe = lastPE
             if (pe != null) {
                 lineGroup!!.children.remove(pe!!.shape)
@@ -569,7 +551,7 @@ class SX4Draw : Application() {
         btnDelete.isDisable = true
 
         btnDelete.graphic = delIcon
-        btnDelete.setOnAction { event: ActionEvent ->
+        btnDelete.setOnAction {
             btnUndo.isDisable = true
             lastPE = null
             var toDelete = INVALID_INT
@@ -858,70 +840,98 @@ class SX4Draw : Application() {
         return l
     }
 
+    private fun editTurnout(pe: PanelElement, primStage: Stage) {
+        val tu = (pe.gpe as Turnout)
+        println("IN: addr=" + tu.getAddr() + " inv=" + tu.inv )
+        val initA = GenericAddress(tu.getAddr(), INVALID_INT, tu.inv)
+        val result = AddressDialog.open(pe, primStage, initA)
+        if (result.addr != -1) {
+            println("OUT: addr=" + result.addr + " addr2=" + result.addr2 + " inv=" + result.inv + " orient=" + result.orient)
+            val addressOK = Dialogs.checkAddress(initA, result)
+            if (!addressOK) {
+                println("addressOK=false")
+                return  // do nothing
+            }
+            tu.adr = result.addr
+            tu.inv = result.inv
+            println("tu addr=" + tu.adr + " tu.inv=" + tu.inv)
+            pe.recreateShape()
+            redrawPanelElements()
+        } else {
+            println("no address selected")
+        }
+    }
+
+    private fun editSignal(pe: PanelElement, primStage: Stage) {
+        val si = (pe.gpe as Signal)
+        val orientation = Utils.signalDX2ToOrient(IntPoint(
+                (pe.gpe as Signal).x2 - pe.gpe.x, (pe.gpe as Signal).y2 - pe.gpe.y))
+        val initA = GenericAddress(si.getAddr(), si.getAddr2(), 0, orient = orientation)
+        val result = AddressDialog.open(pe, primStage, initA)
+        if (result.addr != -1) {
+            println("OUT: addr=" + result.addr + " addr2=" + result.addr2 + " inv=" + result.inv + " orient=" + result.orient)
+            val addressOK = Dialogs.checkAddress(initA, result)
+            if (!addressOK) {
+                println("addressOK=false")
+                return  // do nothing
+            }
+            if (result.addr2 != INVALID_INT) {
+                si.adrStr = "" + result.addr + "," + (result.addr + 1)
+            } else {
+                si.adrStr = "" + result.addr
+            }
+            val d = Utils.signalOrientToDXY2(result.orient)
+            println("or=" + result.orient + " dx=" + d.x + " dy=" + d.y)
+            si.x2 = si.x + d.x
+            si.y2 = si.y + d.y
+            pe.recreateShape()  // orientation might have changed, create new
+            lastPE = pe
+            btnUndo.isDisable = false
+            redrawPanelElements()
+
+        } else {
+            println("no address selected")
+        }
+
+    }
+
+    private fun editSensor(pe: PanelElement, primStage: Stage) {
+        val se = (pe.gpe as Sensor)
+        val initA = GenericAddress(se.getAddr(), se.getAddr2())
+        val result = AddressDialog.open(pe, primStage, initA)
+        if (result.addr != -1) {
+            println("OUT: addr=" + result.addr + " addr2=" + result.addr2 + " inv=" + result.inv + " orient=" + result.orient)
+            val addressOK = Dialogs.checkAddress(initA, result)
+            if (!addressOK) {
+                println("addressOK=false")
+                return  // do nothing
+            }
+            if (result.addr2 != INVALID_INT) {
+                se.adrStr = "" + result.addr + "," + result.addr2
+            } else {
+                se.adrStr = "" + result.addr
+            }
+
+            redrawPanelElements()
+        } else {
+            println("no address selected")
+        }
+
+    }
+
     private fun editPanelElement(poi: IntPoint, primStage: Stage) {
         val pe = selectedPENotTrack(poi.x.toDouble(), poi.y.toDouble())
         // all panel elements except tracks have an address
         println("editing pe =" + pe.toString())
         if (pe != null) {
-            if (pe.gpe is RouteButton) {
-                println("no address editing for route button")
-                return
-            }
-            var initA = GenericAddress(pe.gpe.getAddr(), 0, 0)
-            println("1. initA =" + initA.toString())
-            var inv: Int? = null
-            if (pe.gpe is Turnout) {
-                inv = (pe.gpe as Turnout).inv
-                initA = GenericAddress(pe.gpe.getAddr(), inv, INVALID_INT)
-                println("2. turnout initA =" + initA.toString())
-            } else if (pe.gpe is Signal) {
-                val orient = Utils.signalDX2ToOrient(IntPoint(
-                        (pe.gpe as Signal).x2 - pe.gpe.x, (pe.gpe as Signal).y2 - pe.gpe.y))
-                initA = GenericAddress(pe.gpe.getAddr(), 0, orient)
-            }
-            println("3. initA =" + initA.toString())
-            val result = AddressDialog.open(pe, primStage, initA)
-            if (result.addr != -1) {
-                println("addr=" + result.addr + " inv=" + result.inv + " orient=" + result.orient)
-                val addressOK = Dialogs.checkAddress(initA, result)
-                if (!addressOK) {
-                    println("addressOK=false")
-                    return  // do nothing
+            when (pe.gpe) {
+                is RouteButton -> {
+                    println("no address editing for route button")
+                    return
                 }
-                val g = pe.gpe
-                if (pe.gpe is Sensor) {
-                    var aStr = "" + result.addr
-                    if (result.addr > 300 && result.addr < LBMIN) {
-                        // set a virtual secondary SENSOR address
-                        aStr += "," + (result.addr + 1000)
-                    }
-                    (pe.gpe as Sensor).adrStr = aStr
-                } else if (pe.gpe is Turnout) {
-                    (pe.gpe as Turnout).adr = result.addr
-                    println("tu addr=" + (pe.gpe as Turnout).adr)
-                    if (inv !== result.inv) {
-                        // inv bit was changed, recreate shape
-                        (pe.gpe as Turnout).inv = result.inv
-                        pe.recreateShape()
-                    }
-                } else if (pe.gpe is Signal) {
-                    val si = pe.gpe as Signal
-                    val d = Utils.signalOrientToDXY2(result.orient)
-                    println("or=" + result.orient + " dx=" + d.x + " dy=" + d.y)
-                    si.x2 = si.x + d.x
-                    si.y2 = si.y + d.y
-                    pe.recreateShape()  // orientation might have changed, create new
-                    lastPE = pe
-                    btnUndo.isDisable = false
-                    redrawPanelElements()  // including addresses
-                } else {
-                    // redraw address
-                    if (dispAddresses.isSelected) {
-                        pe.drawAddress(gc!!)
-                    }
-                }
-            } else {
-                println("no address selected")
+                is Turnout -> editTurnout(pe, primStage)
+                is Signal -> editSignal(pe, primStage)
+                is Sensor -> editSensor(pe, primStage)
             }
         } else {
             println("no panel element found at " + poi.x + "/" + poi.y)
@@ -1056,7 +1066,7 @@ class SX4Draw : Application() {
             }
 
             prepareLCAndWrite(fn)
-            //WriteConfig.writeToXML(fn, panelName);  // OLD
+            //WriteConfig.toXML(fn, panelName);  // OLD
             currentFileName = selectedFile.name
             return selectedFile.parent
         } else {
@@ -1074,7 +1084,7 @@ class SX4Draw : Application() {
         val shortFN = File(fn).name
         val layoutConfig = LayoutConfig(shortFN, panelConfig, version)
 
-        WriteConfig.writeToXML(fn, layoutConfig!!)
+        WriteConfig.toXML(fn, layoutConfig!!)
     }
 
 
@@ -1099,7 +1109,7 @@ class SX4Draw : Application() {
             dispAddresses.isSelected = false
             rasterOn.isSelected = true
             gc!!.clearRect(0.0, 0.0, RECT_X.toDouble(), RECT_Y.toDouble())  // clear addresses labels, if any
-            val layoutConfig = ReadConfig.readXML(selectedFile.toString())
+            val layoutConfig = ReadConfig.fromXML(selectedFile.toString())
             if (layoutConfig != null) {
                 currentFileName = selectedFile.name
                 version = layoutConfig.version
@@ -1108,14 +1118,14 @@ class SX4Draw : Application() {
                 try {
                     panelElements = panelConfig!!.getAllPanelElements()
                     panelName = panelConfig!!.name
-                    routes = FXCollections.observableArrayList(panelConfig!!.getRoutes())
-                    compRoutes = FXCollections.observableArrayList(panelConfig!!.getCompoundRoutes())
+                    routes = FXCollections.observableArrayList(panelConfig!!.getAllRoutes())
+                    compRoutes = FXCollections.observableArrayList(panelConfig!!.getAllCompRoutes())
                     trips = panelConfig!!.getAllTrips()
                     timetables = panelConfig!!.getAllTimetables()
-                } catch (e : NullPointerException) {
+                } catch (e: NullPointerException) {
                     System.out.println("ERROR in reading panelConfig")
                     System.out.println("ERROR: ${e.message}")
-                 }
+                }
                 // from write...
                 //val panelConfig = PanelConfig(panelName, panelElements, ArrayList(routes), ArrayList(compRoutes), trips, timetables)
                 //val shortFN = File(fn).name
@@ -1181,7 +1191,6 @@ class SX4Draw : Application() {
         var panelName = ""
 
         var allLocos = ArrayList<Loco>()
-        var locolistName = ""
 
         var start = IntPoint(0, 0)
         private val btnUndo = Button()
@@ -1196,7 +1205,6 @@ class SX4Draw : Application() {
         private val btnMove = ToggleButton()
         private val btnDelete = Button()
         private val toggleGroup = ToggleGroup()
-
 
 
         /**
@@ -1282,7 +1290,6 @@ class SX4Draw : Application() {
                 btnMove.isDisable = true
             }
         }
-
 
         private fun drawAddresses(gc: GraphicsContext) {
             gc.clearRect(0.0, 0.0, RECT_X.toDouble(), RECT_Y.toDouble())

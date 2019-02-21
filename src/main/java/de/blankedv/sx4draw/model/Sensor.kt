@@ -1,6 +1,24 @@
-package de.blankedv.sx4draw
+/*
+SX4Draw
+Copyright (C) 2019 Michael Blank
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+package de.blankedv.sx4draw.model
 
 import de.blankedv.sx4draw.Constants.INVALID_INT
+import de.blankedv.sx4draw.PanelElement
 import de.blankedv.sx4draw.model.GenericPE
 import de.blankedv.sx4draw.model.IntPoint
 import de.blankedv.sx4draw.util.Utils
@@ -29,13 +47,19 @@ class Sensor : GenericPE {
     override var y: Int = 0
 
     @get:XmlAttribute
-    var x2 = INVALID_INT // endpoint - x2 always >x
+    var x2: Int? = null
 
     @get:XmlAttribute
-    var y2 = INVALID_INT
+    var y2: Int? = null
 
     @get:XmlAttribute(name = "adr")
-    var adrStr = "901,1901"
+    var adrStr = ""
+
+    @get:XmlAttribute
+    var sxadr: Int? = null
+
+    @get:XmlAttribute
+    var sxbit: Int? = null
 
     override val ord = 1
 
@@ -51,39 +75,27 @@ class Sensor : GenericPE {
 
     constructor(poi: IntPoint) {
         this.x = poi.x
-        this.x2 = INVALID_INT
+        this.x2 = null
         this.y = poi.y
-        this.y2 = INVALID_INT
+        this.y2 = null
     }
-
-    /*constructor (pe : PanelElementNew) {
-        if (!pe.name.isBlank()) {
-            this.name = pe.name
-        }
-        this.x = pe.x
-        this.y = pe.y
-        this.x2 = pe.x2
-        this.y2 = pe.y2
-        this.adrStr = "" + pe.adr
-        if (pe.adr2 != INVALID_INT) {
-            this.adrStr += "," + pe.adr2
-        }
-    } */
 
     override fun translate(d: IntPoint) {
         x += d.x
         y += d.y
-        if (x2 != INVALID_INT)
-            x2 += d.x
-        if (y2 != INVALID_INT)
-            y2 += d.y
+        if (x2 != null)
+            x2 = x2!! + d.x
+        if (y2 != null)
+            y2 = y2!! + d.y
     }
 
     override fun getAddr(): Int {
         val aArry = adrStr.split(",")
         var a = INVALID_INT
         try {
-            a = aArry[0].toInt()
+            if (aArry.isNotEmpty()) {
+                a = aArry[0].toInt()
+            }
         } catch (e: NumberFormatException) {
 
         }
@@ -94,7 +106,9 @@ class Sensor : GenericPE {
         val aArry = adrStr.split(",")
         var a = INVALID_INT
         try {
-            a = aArry[1].toInt()
+            if (aArry.size >= 2) {
+                a = aArry[1].toInt()
+            }
         } catch (e: NumberFormatException) {
 
         }
@@ -104,54 +118,69 @@ class Sensor : GenericPE {
     override fun scalePlus() {
         x = 2 * x
         y = 2 * y
-        if (x2 != INVALID_INT) {
-            x2 = 2 * x2
+        if (x2 != null) {
+            x2 = 2 * x2!!
         }
-        if (y2 != INVALID_INT) {
-            y2 = 2 * y2
+        if (y2 != null) {
+            y2 = 2 * y2!!
         }
     }
 
     override fun scaleMinus() {
         x = x / 2
         y = y / 2
-        if (x2 != INVALID_INT) {
-            x2 = x2 / 2
+        if (x2 != null) {
+            x2 = x2!! / 2
         }
-        if (y2 != INVALID_INT) {
-            y2 = y2 / 2
+        if (y2 != null) {
+            y2 = y2!! / 2
+        }
+    }
+
+    // conv sxadr/sxbit -> adr
+    fun evalOldAddress() {
+        if ((sxadr != null) && (sxbit != null)) {
+            val a = sxadr!!
+            val b = sxbit!!
+            adrStr = "" + (a * 10 + b)
+            sxadr = null  // only once do "evalOldAddress()"
+            sxbit = null
         }
     }
 
     private fun orderX() {
+
         if (x == x2) {
-            if (y2 < y) {
+            if (y2!! < y) {
                 val temp = y2
                 y2 = y
-                y = temp
+                y = temp!!
             }
-        } else if (x2 > x) {
+        } else if (x2!! > x) {
             // everything is fine ....
         } else {
             var temp = x2
             x2 = x
-            x = temp
+            x = temp!!
             temp = y2
             y2 = y
-            y = temp
+            y = temp!!
 
         }
+
     }
 
     override fun isTouched(touch: IntPoint): Pair<Boolean, Int> {
+        val xx2 = x2 ?: x    // map "null" to a useful value for US Type sensor
+        val yy2 = y2 ?: y
+        val ymin = Math.min(y, yy2)
+        val ymax = Math.max(y, yy2)
 
-        val ymin = Math.min(y, y2)
-        val ymax = Math.max(y, y2)
         return if (touch.x >= x - PanelElement.TOUCH_RADIUS
-                && touch.x <= x2 + PanelElement.TOUCH_RADIUS
+                && touch.x <= xx2 + PanelElement.TOUCH_RADIUS
                 && touch.y >= ymin - PanelElement.TOUCH_RADIUS
                 && touch.y <= ymax + PanelElement.TOUCH_RADIUS) {
-            if (Utils.calcDistanceFromLine(IntPoint(x, y), IntPoint(x2, y2), touch) < PanelElement.TOUCH_RADIUS) {
+            if (Utils.calcDistanceFromLine(IntPoint(x, y), IntPoint(xx2, yy2), touch) < PanelElement.TOUCH_RADIUS) {
                 Pair(true, 0)
             } else {
                 Pair(false, 0)
@@ -159,5 +188,6 @@ class Sensor : GenericPE {
         } else {
             Pair(false, 0)
         }
+
     }
 }

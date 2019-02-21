@@ -1,6 +1,22 @@
-package de.blankedv.sx4draw.model;
+/*
+SX4Draw
+Copyright (C) 2019 Michael Blank
 
-import de.blankedv.sx4draw.Constants.INVALID_INT
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+package de.blankedv.sx4draw.model
+
 import de.blankedv.sx4draw.PanelElement
 import javafx.util.Pair
 import java.util.Comparator
@@ -16,9 +32,9 @@ abstract class GenericPE() : Comparator<GenericPE>, Comparable<GenericPE> {
     // order for graphics Z axis
     open val ord: Int = 0
 
-    open fun getAddr() = INVALID_INT
+    abstract fun getAddr() : Int
 
-    open fun getAddr2() = INVALID_INT
+    abstract fun getAddr2() : Int
 
     open fun translate(d: IntPoint) {
         x += d.x

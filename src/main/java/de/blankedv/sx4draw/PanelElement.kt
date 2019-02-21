@@ -1,3 +1,20 @@
+/*
+SX4Draw
+Copyright (C) 2019 Michael Blank
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package de.blankedv.sx4draw
 
 import de.blankedv.sx4draw.Constants.LBMIN
@@ -6,7 +23,8 @@ import de.blankedv.sx4draw.Constants.PEState
 import de.blankedv.sx4draw.Constants.PEState.*
 import de.blankedv.sx4draw.model.GenericPE
 import de.blankedv.sx4draw.model.IntPoint
-import de.blankedv.sx4draw.model.Position
+import de.blankedv.sx4draw.model.RouteButton
+import de.blankedv.sx4draw.model.Track
 import de.blankedv.sx4draw.util.Utils
 import de.blankedv.sx4draw.views.SX4Draw.Companion.panelElements
 
@@ -14,89 +32,44 @@ import java.util.ArrayList
 
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
-import javafx.scene.shape.Circle
 import javafx.scene.shape.Line
 import javafx.scene.shape.Shape
-import javafx.scene.shape.StrokeLineCap
-
 
 /**
- * generic panel element can be any of PEType types
+ * generic panel element - contains data model (Track, Sensor, ...) plus
+ * state plus graphical representation (Shape)
  *
  * @author mblank
  */
 
 class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
 
-    var gpe: GenericPE
+    var gpe: GenericPE =Track(Line(0.0, 0.0, 1.0, 1.0))
 
     // elements for graphics
 
-    protected var route = ""
+    var shape : Shape = Line(0.0, 0.0, 1.0, 1.0)
+    var state : PEState = DEFAULT
 
-    var shape : Shape
-    var state : PEState
+    var defaultColor : Color = javafx.scene.paint.Color.ALICEBLUE
 
-    var defaultColor : Color
-
-
-    /*enum class PEState {
-        DEFAULT, MARKED, SELECTED, STATE_0, STATE_1
-    } */
-
-
-    constructor() {
-        gpe = Track(Line(0.0, 0.0, 1.0, 1.0))
-        state = DEFAULT
-        defaultColor = javafx.scene.paint.Color.ALICEBLUE
-        shape = Line(0.0, 0.0, 1.0, 1.0)   // default shape
-    }
-
-
-   /* constructor(type: PEType, l: Line) {
-        when (type) {
-            TRACK -> {
-                this.gpe = Track(l)
-                createShapeAndSetState(PEState.DEFAULT)
-            }
-            SENSOR -> {
-                this.gpe = Sensor(l)
-                createShapeAndSetState(PEState.DEFAULT)
-            }
-        }
-
-        //orderXY()
-        createShapeAndSetState(PEState.DEFAULT)
-    } */
+    constructor()
 
     constructor(tu: GenericPE) {
         this.gpe = tu
-        state = PEState.DEFAULT
-        val (s,c)  = Utils.createShape(tu, PEState.DEFAULT)
-        shape = s
-        defaultColor = c
+        createShapeAndSetState(PEState.DEFAULT)
     }
-
-    /*constructor(tu: Turnout) {
-        this.gpe = tu
-        state = PEState.DEFAULT
-        val (s,c)  = Utils.createShape(tu, PEState.DEFAULT)
-        shape = s
-        defaultColor = c
-    } */
-
-
 
     fun recreateShape() {
         // create shape but don't change state
         createShapeAndSetState(state)
     }
 
-
     fun createShapeAndSetState(st: PEState) {
         state = st
         val (s,c)  = Utils.createShape(gpe, state)
         shape = s
+        defaultColor = c
         setColorFromState()
     }
 
@@ -171,10 +144,8 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
     companion object {
 
         const val TOUCH_RADIUS = 7
-        const val TRACKWIDTH = 5.0
-        const val SENSORWIDTH = 4.0
-
-
+        const val TRACK_WIDTH = 5.0
+        const val SENSOR_WIDTH = 4.0
 
         /**
          * search for a panel element(or elements) when only the address is known

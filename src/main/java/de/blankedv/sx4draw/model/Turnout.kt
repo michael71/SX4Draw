@@ -1,7 +1,25 @@
-package de.blankedv.sx4draw
+/*
+SX4Draw
+Copyright (C) 2019 Michael Blank
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+package de.blankedv.sx4draw.model
 
 import de.blankedv.sx4draw.Constants.ADDR0_TURNOUT
 import de.blankedv.sx4draw.Constants.INVALID_INT
+import de.blankedv.sx4draw.PanelElement
 import de.blankedv.sx4draw.model.GenericPE
 import de.blankedv.sx4draw.model.IntPoint
 
@@ -43,10 +61,16 @@ class Turnout : GenericPE {
     var yt = INVALID_INT
 
     @get:XmlAttribute
-    var inv: Int? = null  // 0 or null == not inverted
+    var inv: Int = 0
 
     @get:XmlAttribute
     var adr = ADDR0_TURNOUT
+
+    @get:XmlAttribute
+    var sxadr: Int? = null
+
+    @get:XmlAttribute
+    var sxbit: Int? = null
 
     override val ord = 2
 
@@ -79,6 +103,11 @@ class Turnout : GenericPE {
 
     override fun getAddr(): Int {
         return adr
+    }
+
+
+    override fun getAddr2(): Int {
+        return INVALID_INT
     }
 
 
@@ -115,6 +144,17 @@ class Turnout : GenericPE {
         y += d.y
         y2 += d.y
         yt += d.y
+    }
+
+    // conv sxadr/sxbit -> adr
+    fun evalOldAddress() {
+        if ((sxadr != null) && (sxbit != null)) {
+            val a = sxadr!!
+            val b = sxbit!!
+            adr = (a * 10 + b)
+            sxadr = null  // only once do "evalOldAddress()"
+            sxbit = null
+        }
     }
 
 }

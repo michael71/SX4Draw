@@ -19,9 +19,8 @@ package de.blankedv.sx4draw.util
 
 
 import de.blankedv.sx4draw.PanelElement
-import de.blankedv.sx4draw.Track
-import de.blankedv.sx4draw.Turnout
-import de.blankedv.sx4draw.model.GenericPE
+import de.blankedv.sx4draw.model.Track
+import de.blankedv.sx4draw.model.Turnout
 
 import java.util.ArrayList
 
@@ -60,10 +59,9 @@ object Calc {
                     // check whether this turnout is already known
                     var known = false
                     for (e in panelElements) {
-                        val g = e.gpe
-                        if (g is Turnout) {
-                            val t2 = g as Turnout
-                            if (t2.x == tu.x && t2.y == tu.y
+                        val t2 = e.gpe
+                        if (t2 is Turnout) {
+                               if (t2.x == tu.x && t2.y == tu.y
                                     // at the approximately the same position => match
                                     && (Math.abs(t2.x2 - tu.x2) <= 5 && Math.abs(t2.y2 - tu.y2) <= 5 &&
                                             Math.abs(t2.xt - tu.xt) <= 5 && Math.abs(t2.yt - tu.yt) <= 5

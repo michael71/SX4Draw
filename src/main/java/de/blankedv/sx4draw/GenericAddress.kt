@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 package de.blankedv.sx4draw
 
+import de.blankedv.sx4draw.Constants.INVALID_INT
 import de.blankedv.sx4draw.Constants.LBMIN
 
 /**
@@ -25,21 +26,13 @@ import de.blankedv.sx4draw.Constants.LBMIN
  */
 
 
-class GenericAddress (var addr :Int = 0, var inv : Int? = null, var orient : Int  = 0) {
-
-    constructor(initVal: GenericAddress) : this() {
-        addr = initVal.addr
-        inv = initVal.inv
-        orient = initVal.orient
-    }
-
-// orient = orientation of signals (0 = 0 grad, 1 = 45 grad, ... etc)
+data class GenericAddress (var addr :Int, var addr2 :Int = INVALID_INT, var inv : Int = 0, var orient : Int  = INVALID_INT) {
 
     override fun toString(): String {
         return if (addr < LBMIN) {
-            (addr / 10).toString() + "." + addr % 10
+            (addr / 10).toString() + "." + addr % 10 + " inv="+inv
         } else {
-            "" + addr
+            "" + addr  + " inv="+inv
         }
     }
 
