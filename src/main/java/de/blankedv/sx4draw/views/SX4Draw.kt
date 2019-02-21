@@ -1114,6 +1114,7 @@ class SX4Draw : Application() {
                 currentFileName = selectedFile.name
                 version = layoutConfig.version
                 System.out.println("filename=${currentFileName} version=$version")
+                locos = layoutConfig.getAllLocos()
                 val panelConfig = layoutConfig.getPC0()   // first PanelConfig
                 try {
                     panelElements = panelConfig!!.getAllPanelElements()
@@ -1174,23 +1175,22 @@ class SX4Draw : Application() {
 
     companion object {
 
-        var vNumber = 0.41
-        var vString = "19 Feb 2019"
+        var vNumber = 0.42
+        var vString = "21 Feb 2019"
         var version = "$vNumber - $vString"
 
         // TODO UNDO für ca. mehrere Elemente
-
+        var locos = ArrayList<Loco>()
         var panelElements = ArrayList<PanelElement>()
         var routes = FXCollections.observableArrayList<Route>()
         var compRoutes = FXCollections.observableArrayList<CompRoute>()
         //public static final ObservableList<Trip> trips = FXCollections.observableArrayList();
         var trips = ArrayList<Trip>()
+
         var timetables = ArrayList<Timetable>()
 
         var lastPE: PanelElement? = null
         var panelName = ""
-
-        var allLocos = ArrayList<Loco>()
 
         var start = IntPoint(0, 0)
         private val btnUndo = Button()

@@ -60,6 +60,10 @@ class LayoutConfig {
         }
     }
 
+    fun getAllLocos() : ArrayList<Loco> {
+       return loco
+    }
+
 
 
 }

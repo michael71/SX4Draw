@@ -9,14 +9,15 @@
   <resources>
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
     <jar href="annotations-13.0.jar" size="17536" download="eager" />
+    <jar href="kotlin-reflect-1.3.20.jar" size="2667787" download="eager" />
     <jar href="kotlin-stdlib-1.3.20.jar" size="1185426" download="eager" />
     <jar href="kotlin-stdlib-common-1.3.20.jar" size="153220" download="eager" />
     <jar href="kotlin-stdlib-jdk7-1.3.20.jar" size="3119" download="eager" />
     <jar href="kotlin-stdlib-jdk8-1.3.20.jar" size="13751" download="eager" />
     <jar href="kotlin-test-1.3.20.jar" size="29074" download="eager" />
     <jar href="kotlin-test-common-1.3.20.jar" size="4452" download="eager" />
-    <jar href="sx4draw.jar" size="277887" download="eager" />
+    <jar href="sx4draw.jar" size="470598" download="eager" />
   </resources>
-  <jfx:javafx-desc  width="600" height="400" main-class="de.blankedv.sx4draw.SX4Draw"  name="sx4draw" />
+  <jfx:javafx-desc  width="600" height="400" main-class="de.blankedv.sx4draw.views.SX4Draw"  name="sx4draw" />
   <update check="background"/>
 </jnlp>

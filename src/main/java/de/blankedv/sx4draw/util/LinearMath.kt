@@ -30,17 +30,16 @@ object LinearMath {
     private const val TURNOUT_LENGTH_LONG = 14
 
     /**
-     * Computes the intersection between two lines. The calculated point is
+     * Computes the intersection between two lines (=tracks). The calculated point is
      * approximate, since integers are used. If you need a more precise result,
      * use doubles everywhere. (c) 2007 Alexander Hristov. Use Freely (LGPL
      * license). http://www.ahristov.com (c) 2012 Michael Blank, for lines with
      * endpoints
      */
-    fun trackIntersect(e: Track, f: Track): Turnout? {
-        var e = e
-        var f = f
+    fun trackIntersect( e1: Track, f1: Track): Turnout? {
 
-        // only look for crossing track elements
+        var e = e1
+        var f = f1   // => var because they might be swapped below
 
         val x1: Int = e.x
         val y1: Int = e.y
@@ -105,7 +104,7 @@ object LinearMath {
                 var temp = e
                 e = f
                 f = temp
-                if (DEBUG_MATH) println("swap e/f")
+                if (DEBUG_MATH) println("swapped e/f")
             } // else start/endpoint of f
             else if (xi == f.x && yi == f.y || xi == f.x2 && yi == f.y2) {
                 doubleslip = false

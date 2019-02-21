@@ -104,7 +104,7 @@ object Dialogs {
                 if (newAddress.addr != oldValue.addr && newAddress.addr == pe.gpe.getAddr()) {
                     found = true
                     foundPE = pe
-                    foundPE!!.toggleShapeSelected()
+                    foundPE.toggleShapeSelected()
                     break
                 }
             }
