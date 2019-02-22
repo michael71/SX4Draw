@@ -18,6 +18,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 package de.blankedv.sx4draw.model
 
+import kotlin.math.roundToInt
+
 /**
  * @author mblank
  */
@@ -37,8 +39,8 @@ class IntPoint {
     }
 
     internal constructor(x: Double, y: Double) {
-        this.x = x.toInt()
-        this.y = y.toInt()
+        this.x = x.roundToInt()
+        this.y = y.roundToInt()
     }
 
     override fun toString(): String {

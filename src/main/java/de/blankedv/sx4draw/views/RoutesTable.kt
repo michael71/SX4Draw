@@ -24,18 +24,15 @@ import de.blankedv.sx4draw.views.SX4Draw.Companion.routes
 import javafx.event.EventHandler
 import javafx.scene.Scene
 import javafx.scene.control.TableColumn
-import javafx.scene.control.TableColumn.CellEditEvent
 import javafx.scene.control.TableView
 import javafx.scene.control.cell.PropertyValueFactory
 import javafx.scene.control.cell.TextFieldTableCell
 import javafx.scene.layout.BorderPane
 import javafx.stage.Stage
 import javafx.beans.binding.Bindings
-import javafx.event.ActionEvent
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.MenuItem
 import javafx.scene.control.TableRow
-import javafx.util.Callback
 import javafx.util.StringConverter
 
 /**
@@ -98,6 +95,8 @@ class RoutesTable internal constructor(primaryStage: Stage, private val app: SX4
         val routeCol = TableColumn<Route, String>("Fahrstraße")
         val sensorsCol = TableColumn<Route, String>("Sensoren")
 
+
+
         /* final TextFormatter<String> formatter = new TextFormatter<String>(change -> {
             change.setText(change.getText().replaceAll("[^0-9.,]", ""));
             return change;
@@ -146,24 +145,21 @@ class RoutesTable internal constructor(primaryStage: Stage, private val app: SX4
             val row = TableRow<Route>()
             val contextMenu = ContextMenu()
             val removeMenuItem = MenuItem("Fahrstraße löschen")
-            removeMenuItem.onAction = EventHandler { tableView.items.remove(row.item) }
+            removeMenuItem.onAction = EventHandler {
+                app.hideAllRoutes()
+                tableView.items.remove(row.item)
+            }
             val showMenuItem = MenuItem("Fahrstraße anzeigen")
             showMenuItem.onAction = EventHandler {
+                app.hideAllRoutes()
                 val rtShown = row.item
-                app.showRoute(rtShown, 6)
-                /*rtShown.setRouteStates();
-                        app.redrawPanelElements();
-                        app.drawRTButtons(rtShown.getBtn1(), rtShown.getBtn2());
-                        Timeline timeline = new Timeline(new KeyFrame(
-                                Duration.millis(6000),
-                                ae -> {
-                                    rtShown.setMarked(false);
-                                    app.redrawPanelElements();
-                                }));
-
-                        timeline.play(); */
+                app.showRoute(rtShown)
             }
-            contextMenu.items.addAll(showMenuItem, removeMenuItem)
+            val hideMenuItem = MenuItem("Fahrstraßen nicht mehr anzeigen")
+            hideMenuItem.onAction = EventHandler {
+                app.hideAllRoutes()
+            }
+            contextMenu.items.addAll(showMenuItem, hideMenuItem, removeMenuItem)
             // Set context menu on row, but use a binding to make it only show for non-empty rows:
             row.contextMenuProperty().bind(
                     Bindings.`when`(row.emptyProperty())
@@ -194,13 +190,13 @@ class RoutesTable internal constructor(primaryStage: Stage, private val app: SX4
                 }
             }); */
 
-        idCol.setCellValueFactory(PropertyValueFactory("adr"))
-        btn1Col.setCellValueFactory(PropertyValueFactory("btn1"))
-        btn2Col.setCellValueFactory(PropertyValueFactory("btn2"))
-        routeCol.setCellValueFactory(PropertyValueFactory("route"))
-        sensorsCol.setCellValueFactory(PropertyValueFactory("sensors"))
+        idCol.cellValueFactory = PropertyValueFactory("adr")
+        btn1Col.cellValueFactory = PropertyValueFactory("btn1")
+        btn2Col.cellValueFactory = PropertyValueFactory("btn2")
+        routeCol.cellValueFactory = PropertyValueFactory("route")
+        sensorsCol.cellValueFactory = PropertyValueFactory("sensors")
 
-        tableView.setItems(routes)
+        tableView.items = routes
 
         // textField.setTextFormatter(formatter);
         Utils.customResize(tableView)

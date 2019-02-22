@@ -89,7 +89,9 @@ class SX4Draw : Application() {
     private var currentRoute: Route? = null
 
     private var line: Line? = null
+    private val scPane = ScrollPane()
 
+    internal val showScrollBars = CheckMenuItem("ScrollBars")
     internal val dispAddresses = CheckMenuItem("Adressen anzeigen")
     internal val rasterOn = CheckMenuItem("Raster")
     internal val showMousePos = CheckMenuItem("Mauspos. anzeigen")
@@ -151,6 +153,7 @@ class SX4Draw : Application() {
                         println("moveStart")
                         addToDraggedGroup()
                     }
+                    else -> { /* do nothing */ }
                 }//}
             } else if (me.button == MouseButton.SECONDARY) {
                 println("sec btn")
@@ -308,6 +311,7 @@ class SX4Draw : Application() {
                         resetPEStates()
                         redrawPanelElements()
                     }
+                    else -> { /*do nothing */}
                 }
             }
         }
@@ -336,51 +340,31 @@ class SX4Draw : Application() {
                         draggedGroup.translateX = d.x.toDouble()
                         draggedGroup.translateY = d.y.toDouble()
                     }
-                }// do nothing
+                    else -> {
+                        // do nothing
+                    }
+                }
             }
 
-            if (showMousePos.isSelected) {
-                val msg = "(" + me.x.toInt() + ", " + me.y.toInt() + ")"
-                mousePositionToolTip.text = msg
-                val node = me.source as Node
-                mousePositionToolTip.show(node, (me.x.toInt() + 30).toDouble(), (me.y.toInt() + 20).toDouble())
-            }
         }
 
-        //vb.setLayoutX(0);
-        //vb.setLayoutY(0);
-        //vb.getChildren().addAll(menuBar, buttons);
 
-        /*BorderPane bp = new BorderPane();
-        bp.setMaxSize(10000,6000);
-        bp.minHeight(100);
-        bp.minWidth(400);
-        //bp.setPrefSize(2000,1200);
-        bp.setPickOnBounds(true); */
-
-
-        //StackPane stackPane = new StackPane();
-
-
-        val scPane = ScrollPane()
         vb!!.children.addAll(menuBar, buttons, scPane)    //, status);
-        //scPane.setFitToHeight(true);
-        //scPane.setFitToWidth(true);
+        scPane.isFitToHeight = true;
+        scPane.isFitToWidth = true;
         scPane.maxWidth = RECT_X.toDouble()
         scPane.maxHeight = RECT_Y.toDouble()
         vb!!.maxWidth = RECT_X.toDouble()
         vb!!.maxHeight = (RECT_Y + 40).toDouble()
         scPane.setPrefSize(RECT_X.toDouble(), RECT_Y.toDouble())
-        scPane.isFitToWidth = true
-        //BorderPane.setAlignment(scPane, Pos.CENTER);
+
+        // scPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED)   // DOES NOT WORK AS EXPECTED (because raster is always large)
+        // scPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED)
         VBox.setVgrow(scPane, Priority.ALWAYS)
         HBox.setHgrow(scPane, Priority.ALWAYS)
 
-        //anchorPane.setPrefSize(1100,540);
-        //scPane.setContent(stackPane);
         scPane.content = anchorPane
-        //bp.setCenter(scPane);
-        //bp.setTop(vb);
+
 
         var i = 0
         while (i <= RECT_X + 100) {
@@ -391,9 +375,9 @@ class SX4Draw : Application() {
                 if (canvas!!.boundsInParent.contains(i.toDouble(), j.toDouble())) {
                     raster!!.children.add(cir)
                 }
-                j = j + RASTER * 2
+                j += RASTER * 2
             }
-            i = i + RASTER * 2
+            i += RASTER * 2
         }
 
         anchorPane.children.addAll(lineGroup, raster, canvas, draggedGroup)
@@ -448,7 +432,7 @@ class SX4Draw : Application() {
         btnMove.isSelected = false
         btnSelect.text = "Select"
         btnSelect.graphic = selIcon
-        btnSelect.setOnAction { event: ActionEvent -> enterSelectState() }
+        btnSelect.setOnAction { _ -> enterSelectState() }
 
         btnUnSelect.text = "Unselect"
         //btnUnSelect.setGraphic(selIcon);
@@ -538,7 +522,7 @@ class SX4Draw : Application() {
         btnUndo.setOnAction {
             val pe = lastPE
             if (pe != null) {
-                lineGroup!!.children.remove(pe!!.shape)
+                lineGroup!!.children.remove(pe.shape)
                 panelElements.remove(pe)
                 line = null
                 lastPE = null
@@ -610,12 +594,15 @@ class SX4Draw : Application() {
         val ivInfo = ImageView(Image("info.png"))
         val ivSX4generic = ImageView(Image("sx4_draw_ico32.png"))
         val menu1 = Menu("File")
+        val menuWindows = Menu("Fenster")
+        val openRoutingTable = MenuItem("Fahrstr. anzeigen")
+
         val menuOptions = Menu("Optionen")
         val setName = MenuItem("Set Panel-Name")
 
         val scale200 = MenuItem("Scale 200%")
         val scale50 = MenuItem("Scale 50%")
-        val openRoutingTable = MenuItem("Fahrstr. anzeigen")
+
 
         val menuCalc = Menu("Berechnen")
         val cTurnouts = MenuItem("Weichen berechnen")
@@ -626,20 +613,25 @@ class SX4Draw : Application() {
         val saveItem = MenuItem("Panel abspeichern")
         val openItem = MenuItem("Panel öffnen")
         val exitItem = MenuItem("Programm-Ende/Exit")
+
         menu1.items.addAll(openItem, saveItem, exitItem)
-        menuOptions.items.addAll(setName, dispAddresses, rasterOn, showMousePos, openRoutingTable)
+        menuWindows.items.addAll(openRoutingTable)
+        menuOptions.items.addAll(setName, dispAddresses, rasterOn) //, showMousePos) //, showScrollBars)
         menuCalc.items.addAll(cTurnouts, cNormPositions, scale200, scale50)
         menuExtra.items.addAll(cSearch)
-        rasterOn.isSelected = true
-        showMousePos.isSelected = false
 
-        exitItem.setOnAction { event ->
+        rasterOn.isSelected = true
+        dispAddresses.isSelected = false
+
+        //showMousePos.isSelected = false
+
+        exitItem.setOnAction {
             saveOnExit(prefs, stage)
             System.exit(0)
 
         }
 
-        saveItem.setOnAction { event ->
+        saveItem.setOnAction {
             //PanelElement.normPositions();
             redrawPanelElements()
             val path = prefs.get("directory", System.getProperty("user.home"))
@@ -650,7 +642,7 @@ class SX4Draw : Application() {
             stage.title = "Create Panel Description (Name: $panelName) File: $currentFileName"
         }
 
-        openItem.setOnAction { event ->
+        openItem.setOnAction {
             val path = prefs.get("directory", System.getProperty("user.home"))
             val lastPath = openFile(stage, path)
             if (lastPath != null && !lastPath.isEmpty()) {
@@ -659,7 +651,7 @@ class SX4Draw : Application() {
             stage.title = "Create Panel Description (Name: $panelName) File: $currentFileName"
         }
 
-        setName.setOnAction { event ->
+        setName.setOnAction {
             println("set panelName")
             val getName = TextInputDialog(panelName)
             getName.title = "Neuer Panel-Name"
@@ -673,7 +665,17 @@ class SX4Draw : Application() {
 
         }
 
-        rasterOn.setOnAction { event ->
+        /* showScrollBars.setOnAction { event ->
+            println("scrollbars toggle")
+            if (showScrollBars.isSelected) {
+                // scPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED)
+            } else {
+                // sp.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER); = (showScrollBars.isSelected)
+            }
+
+        } */
+
+        rasterOn.setOnAction {
             println("raster toggle")
             if (rasterOn.isSelected) {
                 if (!anchorPane.children.contains(raster)) {
@@ -684,29 +686,29 @@ class SX4Draw : Application() {
             }
         }
 
-        showMousePos.setOnAction { event ->
+        /* showMousePos.setOnAction { event ->
             println("mousepos toggle")
             if (showMousePos.isSelected) {
                 //mousePositionToolTip.setText(null);
             } else {
                 //mousePositionToolTip.remo
             }
-        }
+        } */
 
-        scale200.setOnAction { event ->
+        scale200.setOnAction {
             println("scale 200%")
             PanelElement.scalePlus()
             redrawPanelElements()
         }
 
-        scale50.setOnAction { event ->
+        scale50.setOnAction {
 
             println("scale 50%")
             PanelElement.scaleMinus()
             redrawPanelElements()
         }
 
-        dispAddresses.setOnAction { event ->
+        dispAddresses.setOnAction {
             println("display addresses = " + dispAddresses.isSelected)
             if (dispAddresses.isSelected) {
                 drawAddresses(gc!!)
@@ -716,19 +718,19 @@ class SX4Draw : Application() {
 
         }
 
-        cTurnouts.setOnAction { event ->
+        cTurnouts.setOnAction {
             println("calc. turnouts")
             Calc.turnouts()
             redrawPanelElements()
         }
-        cNormPositions.setOnAction { event ->
+        cNormPositions.setOnAction {
             println("norm positions")
 
             PanelElement.normPositions()
             redrawPanelElements()
         }
 
-        cSearch.setOnAction { event ->
+        cSearch.setOnAction {
             println("search")
             val dialog = TextInputDialog("Suche")
             dialog.title = "PanelElement suchen"
@@ -813,7 +815,7 @@ class SX4Draw : Application() {
             }
         }
 
-        menuBar.menus.addAll(menu1, menuOptions, menuCalc, menuExtra, menuInfo)
+        menuBar.menus.addAll(menu1, menuOptions, menuCalc, menuExtra, menuWindows,  menuInfo)
     }
 
     private fun toggleSelectionPE(p: IntPoint) {
@@ -842,8 +844,9 @@ class SX4Draw : Application() {
 
     private fun editTurnout(pe: PanelElement, primStage: Stage) {
         val tu = (pe.gpe as Turnout)
-        println("IN: addr=" + tu.getAddr() + " inv=" + tu.inv )
-        val initA = GenericAddress(tu.getAddr(), INVALID_INT, tu.inv)
+        val invert = tu.inv ?: 0
+        println("IN: addr=" + tu.getAddr() + " inv=" + invert )
+        val initA = GenericAddress(tu.getAddr(), INVALID_INT, invert)
         val result = AddressDialog.open(pe, primStage, initA)
         if (result.addr != -1) {
             println("OUT: addr=" + result.addr + " addr2=" + result.addr2 + " inv=" + result.inv + " orient=" + result.orient)
@@ -853,7 +856,11 @@ class SX4Draw : Application() {
                 return  // do nothing
             }
             tu.adr = result.addr
-            tu.inv = result.inv
+            if (result.inv == 0) {
+                tu.inv = null
+            } else {
+                tu.inv = 1
+            }
             println("tu addr=" + tu.adr + " tu.inv=" + tu.inv)
             pe.recreateShape()
             redrawPanelElements()
@@ -938,7 +945,7 @@ class SX4Draw : Application() {
         }
     }
 
-    fun drawRTButtons(btn1: Int, btn2: Int) {
+    private fun drawRTButtons(btn1: Int, btn2: Int) {
         val bt1 = PanelElement.getPeByAddress(btn1)[0]
         val bt2 = PanelElement.getPeByAddress(btn2)[0]
 
@@ -956,7 +963,7 @@ class SX4Draw : Application() {
         }
 
         lineGroup!!.children.clear()
-        Collections.sort(panelElements)   // route buttons on top of sensors, sensors on top of track, etc ...
+        panelElements.sort()   // route buttons on top of sensors, sensors on top of track, etc ...
         for (pe in panelElements) {
             lineGroup!!.children.add(pe.shape)
             //System.out.println("drawing PE at " + pe.getX() + "," + pe.getY() + " type=" + pe.getType()
@@ -1017,9 +1024,11 @@ class SX4Draw : Application() {
                 currentRoute!!.btn2 = rtbtn.gpe.getAddr()
                 rtbtn.createShapeAndSetState(PEState.MARKED)
                 val crt = currentRoute
-                showRoute(crt!!, 0)
+                showRoute(crt!!)
                 println("btn2 =" + currentRoute!!.btn2)
                 routes.add(Route(currentRoute!!))  // add a new route from btn1 to btn2
+                val revRoute = (currentRoute!!).reverseRoute()
+                routes.add(revRoute)
 
                 val alert = Alert(AlertType.INFORMATION)
                 alert.title = "Fahrstraße " + currentRoute!!.adr + " abgeschlossen."
@@ -1035,8 +1044,6 @@ class SX4Draw : Application() {
     }
 
     private fun writeFile(stage: Stage, path: String): String? {
-        var path = path
-
 
         //System.out.println("path=" + path);
         val fileChooser = FileChooser()
@@ -1058,13 +1065,11 @@ class SX4Draw : Application() {
                 ExtensionFilter("Panel Files", "panel*.xml*"))
         val selectedFile = fileChooser.showSaveDialog(stage)
         if (selectedFile != null) {
-            path = selectedFile.parent
-            //System.out.println("path=" + path);
+
             var fn = selectedFile.toString()
             if (!fn.endsWith(".xml")) {
                 fn = "$fn.xml"
             }
-
             prepareLCAndWrite(fn)
             //WriteConfig.toXML(fn, panelName);  // OLD
             currentFileName = selectedFile.name
@@ -1084,7 +1089,7 @@ class SX4Draw : Application() {
         val shortFN = File(fn).name
         val layoutConfig = LayoutConfig(shortFN, panelConfig, version)
 
-        WriteConfig.toXML(fn, layoutConfig!!)
+        WriteConfig.toXML(fn, layoutConfig)
     }
 
 
@@ -1159,18 +1164,18 @@ class SX4Draw : Application() {
     }
 
 
-    fun showRoute(rt: Route, seconds: Int) {
-        rt.setRouteStates()
-        redrawPanelElements()
-        drawRTButtons(rt.btn1, rt.btn2)
-        if (seconds != 0) {
-            val timeline = Timeline(KeyFrame(Duration.seconds(seconds.toDouble()),
-                    EventHandler<ActionEvent> {
-                        rt.setMarked(false)
-                        redrawPanelElements()
-                    }))
-            timeline.play()
+    fun showRoute(rt: Route?) {
+        if (rt != null) {
+            println("showRoute rt=${rt.adr}")
+            rt.setRouteStates()
+            redrawPanelElements()
+            drawRTButtons(rt.btn1, rt.btn2)
         }
+    }
+
+    fun hideAllRoutes() {
+        PanelElement.resetState()
+        redrawPanelElements()
     }
 
     companion object {
@@ -1217,7 +1222,6 @@ class SX4Draw : Application() {
         private fun selectedPE(x: Double, y: Double): PanelElement? {
             // do the search from top element (SensorUS, RouteButton) to bottom (track)
             val peListRev = ArrayList(panelElements)
-            Collections.sort(peListRev)
             Collections.sort(peListRev, Collections.reverseOrder())
             for (pe in peListRev) {
                 val result = pe.gpe.isTouched(IntPoint(x, y))

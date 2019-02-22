@@ -106,10 +106,12 @@ class Track : GenericPE {
     }
 
     override fun isTouched(touch: IntPoint): Pair<Boolean, Int> {
+        val xmin = Math.min(x, x2)
+        val xmax = Math.max(x, x2)
         val ymin = Math.min(y, y2)
         val ymax = Math.max(y, y2)
-        return if (touch.x >= x - PanelElement.TOUCH_RADIUS
-                && touch.x <= x2 + PanelElement.TOUCH_RADIUS
+        return if (touch.x >= xmin - PanelElement.TOUCH_RADIUS
+                && touch.x <= xmax + PanelElement.TOUCH_RADIUS
                 && touch.y >= ymin - PanelElement.TOUCH_RADIUS
                 && touch.y <= ymax + PanelElement.TOUCH_RADIUS) {
             if (Utils.calcDistanceFromLine(IntPoint(x, y), IntPoint(x2, y2), touch) < PanelElement.TOUCH_RADIUS) {

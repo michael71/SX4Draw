@@ -29,6 +29,7 @@ import java.util.Comparator
 
 import javafx.util.Pair
 import org.w3c.dom.Node
+import java.lang.NumberFormatException
 import javax.xml.bind.annotation.XmlAttribute
 import javax.xml.bind.annotation.XmlRootElement
 import javax.xml.bind.annotation.XmlType
@@ -71,8 +72,10 @@ class Route : Comparator<Route>, Comparable<Route> {
                 val elementAndState = rt.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
                 try {
                     val a = Integer.parseInt(elementAndState[0])
-                    val peList = PanelElement.getPeByAddress(a)
-                    pes.addAll(peList)
+                    if (a != INVALID_INT) {
+                        val peList = PanelElement.getPeByAddress(a)
+                        pes.addAll(peList)
+                    }
                 } catch (e: Exception) {
                 }
 
@@ -82,8 +85,10 @@ class Route : Comparator<Route>, Comparable<Route> {
                 println("sensor $s")
                 try {
                     val a = Integer.parseInt(s)
-                    val peList = PanelElement.getPeByAddress(a)
-                    pes.addAll(peList)
+                    if (a != INVALID_INT) {
+                        val peList = PanelElement.getPeByAddress(a)
+                        pes.addAll(peList)
+                    }
                 } catch (e: Exception) {
                 }
 
@@ -110,6 +115,14 @@ class Route : Comparator<Route>, Comparable<Route> {
         this.sensors = r.sensors
     }
 
+    internal constructor (a : Int, b1 : Int, b2 : Int, rt : String, sens : String) {
+        adr = a
+        btn1 = b1
+        btn2 = b2
+        route = rt
+        sensors = sens
+    }
+
     /**
      * add a turnout, signal or sensor to a route
      *
@@ -129,6 +142,18 @@ class Route : Comparator<Route>, Comparable<Route> {
             }
             else -> {}
         }
+    }
+
+    fun reverseRoute() : Route {
+        val allsens = sensors.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        var revSens = ""
+        // order sensors in string in reverse order of original route
+        for (i in (allsens.size -1) downTo 0) {
+            val s = allsens[i]
+              if (revSens.isNotEmpty()) revSens += ","
+            revSens += s
+        }
+        return Route(adr+1, btn2, btn1, route, revSens)
     }
 
     /**
@@ -164,6 +189,7 @@ class Route : Comparator<Route>, Comparable<Route> {
      */
     fun setMarked(mark: Boolean) {
         val pes = pES  // implicit setRouteState
+        println("setMarked, n=${pes.size}")
         if (mark) {
             for (pe : PanelElement in pes) {
                 pe.createShapeAndSetState(PEState.MARKED)
@@ -176,8 +202,8 @@ class Route : Comparator<Route>, Comparable<Route> {
     }
 
     fun setRouteStates() {
-
-        PanelElement.resetState()
+        println("setRouteStates")
+        // PanelElement.resetState() TODO
         // route buttons
         PanelElement.getPeByAddress(btn1)[0].createShapeAndSetState(PEState.MARKED)
         PanelElement.getPeByAddress(btn2)[0].createShapeAndSetState(PEState.MARKED)
@@ -191,16 +217,18 @@ class Route : Comparator<Route>, Comparable<Route> {
             val elementAndState = rt.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
             try {
                 val a = Integer.parseInt(elementAndState[0])
-                val rst = Integer.parseInt(elementAndState[1])
-                val peList = PanelElement.getPeByAddress(a)
-                for (pe in peList) {
-                    if (rst == 0) {
-                        pe.createShapeAndSetState(PEState.STATE_0)
-                    } else {
-                        pe.createShapeAndSetState(PEState.STATE_1)
-                        // TODO distinguish between 1 and 2 (=yellow)
+                if (a != INVALID_INT) {
+                    val rst = Integer.parseInt(elementAndState[1])
+                    val peList = PanelElement.getPeByAddress(a)
+                    for (pe in peList) {
+                        if (rst == 0) {
+                            pe.createShapeAndSetState(PEState.STATE_0)
+                        } else {
+                            pe.createShapeAndSetState(PEState.STATE_1)
+                            // TODO distinguish between 1 and 2 (=yellow)
+                        }
+                        println("set pe.adr=" + pe.gpe.getAddr() + " rst=" + rst)
                     }
-                    println("set pe.adr=" + pe.gpe.getAddr() + " rst=" + rst)
                 }
             } catch (e: Exception) {
                 // do nothing
@@ -214,9 +242,11 @@ class Route : Comparator<Route>, Comparable<Route> {
             println("sensor $s")
             try {
                 val a = Integer.parseInt(s)
-                val sensList = PanelElement.getPeByAddress(a)
-                for (pe in sensList) {
-                    pe.createShapeAndSetState(PEState.MARKED)
+                if (a != INVALID_INT) {
+                    val sensList = PanelElement.getPeByAddress(a)
+                    for (pe in sensList) {
+                        pe.createShapeAndSetState(PEState.MARKED)
+                    }
                 }
             } catch (e: Exception) {
                 // do nothing

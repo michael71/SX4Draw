@@ -31,8 +31,8 @@ object Constants {
     const val DEBUG = true
 
     const val RASTER = 10
-    const val RECT_X = 1600
-    const val RECT_Y = 1000
+    const val RECT_X = 2000
+    const val RECT_Y = 1200
 
     const val ADDR0_ROUTEBUTTON = 3000
     const val ADDR0_ROUTE = 3200

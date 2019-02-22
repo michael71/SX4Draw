@@ -48,6 +48,8 @@ class RouteButton : GenericPE {
     @get:XmlAttribute
     override var y: Int = 0
 
+    override val ord = 2
+
     constructor() {}
 
     constructor (poi : IntPoint) {

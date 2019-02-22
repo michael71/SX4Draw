@@ -25,7 +25,7 @@ import java.util.ArrayList
 
 
 @XmlRootElement(name = "panel")
-@XmlType(propOrder = ["track", "turnout", "sensor", "signal", "routebutton", "route", "comproute", "trip", "timetable"])
+//@XmlType(propOrder = ["track", "turnout", "sensor", "signal", "routebutton", "route", "comproute", "trip", "timetable"])
 class PanelConfig {
 
     @get:XmlAttribute

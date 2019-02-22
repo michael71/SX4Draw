@@ -61,7 +61,7 @@ class Turnout : GenericPE {
     var yt = INVALID_INT
 
     @get:XmlAttribute
-    var inv: Int = 0
+    var inv: Int? = null
 
     @get:XmlAttribute
     var adr = ADDR0_TURNOUT

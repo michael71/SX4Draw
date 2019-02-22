@@ -17,14 +17,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package de.blankedv.sx4draw
 
+import de.blankedv.sx4draw.Constants.DEBUG
 import de.blankedv.sx4draw.Constants.LBMIN
 import de.blankedv.sx4draw.Constants.INVALID_INT
 import de.blankedv.sx4draw.Constants.PEState
 import de.blankedv.sx4draw.Constants.PEState.*
-import de.blankedv.sx4draw.model.GenericPE
-import de.blankedv.sx4draw.model.IntPoint
-import de.blankedv.sx4draw.model.RouteButton
-import de.blankedv.sx4draw.model.Track
+import de.blankedv.sx4draw.model.*
 import de.blankedv.sx4draw.util.Utils
 import de.blankedv.sx4draw.views.SX4Draw.Companion.panelElements
 
@@ -44,14 +42,14 @@ import javafx.scene.shape.Shape
 
 class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
 
-    var gpe: GenericPE =Track(Line(0.0, 0.0, 1.0, 1.0))
+    var gpe: GenericPE = Track(Line(0.0, 0.0, 1.0, 1.0))
 
     // elements for graphics
 
-    var shape : Shape = Line(0.0, 0.0, 1.0, 1.0)
-    var state : PEState = DEFAULT
+    var shape: Shape = Line(0.0, 0.0, 1.0, 1.0)
+    var state: PEState = DEFAULT
 
-    var defaultColor : Color = javafx.scene.paint.Color.ALICEBLUE
+    var defaultColor: Color = javafx.scene.paint.Color.ALICEBLUE
 
     constructor()
 
@@ -67,7 +65,7 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
 
     fun createShapeAndSetState(st: PEState) {
         state = st
-        val (s,c)  = Utils.createShape(gpe, state)
+        val (s, c) = Utils.createShape(gpe, state)
         shape = s
         defaultColor = c
         setColorFromState()
@@ -165,7 +163,7 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
 
         fun resetState() {
             for (pe in panelElements) {
-                pe.createShapeAndSetState(pe.state)
+                pe.createShapeAndSetState(DEFAULT)
             }
         }
 
@@ -200,120 +198,93 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
         /**
          * better fit on display (20,20) smallest (x,y) and for possible upside down" display
          * (=view from other side of the layout) currently
+         * in WriteConfig the NEW values are written !!
          */
         fun normPositions() {
 
-            // in WriteConfig the NEW values are written !!
-            /*  TODO
+
+
             var xmin = INVALID_INT
             var xmax = INVALID_INT
             var ymin = INVALID_INT
             var ymax = INVALID_INT
             var first = true
-            for (pe in panelElementsNew) {
+            for (pe in panelElements) {
+                val g = pe.gpe
                 if (first) {
-                    xmax = pe.gpe.x
+                    xmax = g.x
                     xmin = xmax
-                    ymax = pe.gpe.y
+                    ymax = g.y
                     ymin = ymax
                     first = false
                 }
 
-                if (pe.gpe.x != INVALID_INT && pe.gpe.x < xmin) {
-                    xmin = pe.gpe.x
+                if (g.x != INVALID_INT && g.x < xmin) {
+                    xmin = g.x
                 }
-                if (pe.gpe.x != INVALID_INT && pe.gpe.x > xmax) {
-                    xmax = pe.gpe.x
+                if (g.x != INVALID_INT && g.x > xmax) {
+                    xmax = g.x
                 }
-                if (pe.gpe.x2 != INVALID_INT && pe.gpe.x2 < xmin) {
-                    xmin = pe.gpe.x2
+                if (g.y != INVALID_INT && g.y < ymin) {
+                    ymin = g.y
                 }
-                if (pe.gpe.x2 != INVALID_INT && pe.gpe.x2 > xmax) {
-                    xmax = pe.gpe.x2
-                }
-                if (pe.gpe.xt != INVALID_INT && pe.gpe.xt < xmin) {
-                    xmin = pe.gpe.xt
-                }
-                if (pe.gpe.xt != INVALID_INT && pe.gpe.xt > xmax) {
-                    xmax = pe.gpe.xt
+                if (g.y != INVALID_INT && g.y > ymax) {
+                    ymax = g.y
                 }
 
-                if (pe.gpe.y != INVALID_INT && pe.gpe.y < ymin) {
-                    ymin = pe.gpe.y
-                }
-                if (pe.gpe.y != INVALID_INT && pe.gpe.y > ymax) {
-                    ymax = pe.gpe.y
-                }
-                if (pe.gpe.y2 != INVALID_INT && pe.gpe.y2 < ymin) {
-                    ymin = pe.gpe.y2
-                }
-                if (pe.gpe.y2 != INVALID_INT && pe.gpe.y2 > ymax) {
-                    ymax = pe.gpe.y2
-                }
-                if (pe.gpe.yt != INVALID_INT && pe.gpe.yt < ymin) {
-                    ymin = pe.gpe.yt
-                }
-                if (pe.gpe.yt != INVALID_INT && pe.gpe.yt > ymax) {
-                    ymax = pe.gpe.yt
-                }
+                when (g) {
+                    is Track -> {
+                        if (g.x2 != INVALID_INT && g.x2 < xmin) {
+                            xmin = g.x2
+                        }
+                        if (g.x2 != INVALID_INT && g.x2 > xmax) {
+                            xmax = g.x2
+                        }
+                    }
+                    is Turnout -> {
+                        if (g.x2 != INVALID_INT && g.x2 < xmin) {
+                            xmin = g.x2
+                        }
+                        if (g.x2 != INVALID_INT && g.x2 > xmax) {
+                            xmax = g.x2
+                        }
+                        if (g.xt != INVALID_INT && g.xt < xmin) {
+                            xmin = g.xt
+                        }
+                        if (g.xt != INVALID_INT && g.xt > xmax) {
+                            xmax = g.xt
+                        }
+                        if (g.y2 != INVALID_INT && g.y2 < ymin) {
+                            ymin = g.y2
+                        }
+                        if (g.y2 != INVALID_INT && g.y2 > ymax) {
+                            ymax = g.y2
+                        }
+                        if (g.yt != INVALID_INT && g.yt < ymin) {
+                            ymin = g.yt
+                        }
+                        if (g.yt != INVALID_INT && g.yt > ymax) {
+                            ymax = g.yt
+                        }
+                    }
 
-            }
-
-            val flipUpsideDown = false
-            // now move origin to (20,20+YOFF)
-            for (pe in panelElementsNew) {
-                if (!flipUpsideDown) {
-                    if (pe.gpe.x != INVALID_INT) {
-                        pe.gpe.x = 20 + (pe.gpe.x - xmin)
-                    }
-                    if (pe.gpe.x2 != INVALID_INT) {
-                        pe.gpe.x2 = 20 + (pe.gpe.x2 - xmin)
-                    }
-                    if (pe.gpe.xt != INVALID_INT) {
-                        pe.gpe.xt = 20 + (pe.gpe.xt - xmin)
-                    }
-                    if (pe.gpe.y != INVALID_INT) {
-                        pe.gpe.y = YOFF + 20 + (pe.gpe.y - ymin)
-                    }
-                    if (pe.gpe.y2 != INVALID_INT) {
-                        pe.gpe.y2 = YOFF + 20 + (pe.gpe.y2 - ymin)
-                    }
-                    if (pe.gpe.yt != INVALID_INT) {
-                        pe.gpe.yt = YOFF + 20 + (pe.gpe.yt - ymin)
-                    }
-                } else {
-                    if (pe.gpe.x != INVALID_INT) {
-                        pe.gpe.x = 20 + (xmax - pe.gpe.x)
-                    }
-                    if (pe.gpe.x2 != INVALID_INT) {
-                        pe.gpe.x2 = 20 + (xmax - pe.gpe.x2)
-                    }
-                    if (pe.gpe.xt != INVALID_INT) {
-                        pe.gpe.xt = 20 + (xmax - pe.gpe.xt)
-                    }
-                    if (pe.gpe.y != INVALID_INT) {
-                        pe.gpe.y = YOFF + 20 + (ymax - pe.gpe.y)
-                    }
-                    if (pe.gpe.y2 != INVALID_INT) {
-                        pe.gpe.y2 = YOFF + 20 + (ymax - pe.gpe.y2)
-                    }
-                    if (pe.gpe.yt != INVALID_INT) {
-                        pe.gpe.yt = YOFF + 20 + (ymax - pe.yt)
-                    }
                 }
-                pe.createShapeAndSetState(PEState.DEFAULT)
-
             }
 
             if (DEBUG) {
-                println(" xmin=" + xmin + " xmax=" + xmax + " ymin=" + ymin
-                        + " ymax=" + ymax)
+                println("translate dx=" + (20 -xmin) + " dy=" + (20 -ymin))
+            }
+            // now move origin to (20,20+YOFF)
+            for (pe in panelElements) {
+                pe.gpe.translate(IntPoint(20 - xmin, 20 - ymin))
+                pe.createShapeAndSetState(PEState.DEFAULT)
             }
 
-            //configHasChanged = true;   ==> will not saved in xml file
-            */
+            if (DEBUG) {
+                println("(OLD) xmin=" + xmin + " xmax=" + xmax + " ymin=" + ymin
+                        + " ymax=" + ymax)
+            }
         }
-
 
         fun atLeastOneSelected(): Boolean {
             for (pe in panelElements) {
@@ -328,12 +299,12 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
             for (pe in panelElements) {
                 pe.gpe.translate(d)
                 pe.createShapeAndSetState(pe.state)
-                 // state will be reset to DEFAULT also
+                // state will be reset to DEFAULT also
             }
         }
 
         fun moveSelected(d: IntPoint) {
-            for (pe in panelElements.filter{ el -> el.state == PEState.SELECTED}) {
+            for (pe in panelElements.filter { el -> el.state == PEState.SELECTED }) {
                 pe.gpe.translate(d)
                 pe.createShapeAndSetState(PEState.DEFAULT)
             }
