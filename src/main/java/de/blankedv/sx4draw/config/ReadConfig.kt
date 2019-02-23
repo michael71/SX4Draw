@@ -38,8 +38,6 @@ import java.io.FileReader
  */
 object ReadConfig {
 
-    //TODO read/write locolist (see SX4)
-
     fun fromXML(fname: String): LayoutConfig? {
 
         try {

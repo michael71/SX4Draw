@@ -46,6 +46,12 @@ class Loco {
 
     constructor()
 
+    constructor(a : Int, n : String, m : Int, v : Int) {
+        adr = a
+        name = n
+        mass = m
+        vmax = v
+    }
 
     override fun toString() : String {
         return "Loco: adr="+adr+" name="+name+" mass=" + mass +" vmax=" +vmax

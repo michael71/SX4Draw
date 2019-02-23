@@ -87,6 +87,7 @@ class SX4Draw : Application() {
 
     private var routingTable: RoutesTable? = null
     private var currentRoute: Route? = null
+    private var locosTable: LocosTable? = null
 
     private var line: Line? = null
     private val scPane = ScrollPane()
@@ -596,6 +597,7 @@ class SX4Draw : Application() {
         val menu1 = Menu("File")
         val menuWindows = Menu("Fenster")
         val openRoutingTable = MenuItem("Fahrstr. anzeigen")
+        val openLocoTable = MenuItem("Loks anzeigen")
 
         val menuOptions = Menu("Optionen")
         val setName = MenuItem("Set Panel-Name")
@@ -615,7 +617,7 @@ class SX4Draw : Application() {
         val exitItem = MenuItem("Programm-Ende/Exit")
 
         menu1.items.addAll(openItem, saveItem, exitItem)
-        menuWindows.items.addAll(openRoutingTable)
+        menuWindows.items.addAll(openRoutingTable, openLocoTable)
         menuOptions.items.addAll(setName, dispAddresses, rasterOn) //, showMousePos) //, showScrollBars)
         menuCalc.items.addAll(cTurnouts, cNormPositions, scale200, scale50)
         menuExtra.items.addAll(cSearch)
@@ -781,6 +783,15 @@ class SX4Draw : Application() {
                 routingTable = RoutesTable(stage, this)
             } else {
                 routingTable!!.show()
+            }
+        }
+
+        openLocoTable.setOnAction { event ->
+            println("open locos table")
+            if (locosTable == null) {
+                locosTable = LocosTable(stage, this)
+            } else {
+                locosTable!!.show()
             }
         }
 
@@ -1085,7 +1096,7 @@ class SX4Draw : Application() {
         val df = SimpleDateFormat("yyyyMMdd_HHmmss")
         val version = df.format(Date())
         System.out.println("creating Config, filename=$fn panelName=$panelName")
-        val panelConfig = PanelConfig(panelName, locos, panelElements, ArrayList(routes), ArrayList(compRoutes), trips, timetables)
+        val panelConfig = PanelConfig(panelName, ArrayList(locos), panelElements, ArrayList(routes), ArrayList(compRoutes), trips, timetables)
         val shortFN = File(fn).name
         val layoutConfig = LayoutConfig(shortFN, version, panelConfig)
 
@@ -1123,7 +1134,7 @@ class SX4Draw : Application() {
                 try {
                     panelElements = panelConfig!!.getAllPanelElements()
                     panelName = panelConfig!!.name
-                    locos = panelConfig!!.getAllLocos()
+                    locos = FXCollections.observableArrayList(panelConfig!!.getAllLocos())
                     for (l in locos) println(l.toString())
                     routes = FXCollections.observableArrayList(panelConfig!!.getAllRoutes())
                     compRoutes = FXCollections.observableArrayList(panelConfig!!.getAllCompRoutes())
@@ -1188,7 +1199,7 @@ class SX4Draw : Application() {
 
         // TODO UNDO für ca. mehrere Panel Elemente
 
-        var locos = ArrayList<Loco>()
+        var locos = FXCollections.observableArrayList<Loco>()
         var panelElements = ArrayList<PanelElement>()
         var routes = FXCollections.observableArrayList<Route>()
         var compRoutes = FXCollections.observableArrayList<CompRoute>()

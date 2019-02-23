@@ -62,14 +62,14 @@ class RoutesTable internal constructor(primaryStage: Stage, private val app: SX4
         routingWindow = Stage()
         /* btnClose.setOnAction((e) -> {
             //sxAddress.addr = -1;
-            routingWindow.close();
+            locosWindow.close();
         }); */
 
         routingWindow.title = "Fahrstraßen Tabelle " + panelName
         routingWindow.scene = routingTableScene
 
         // Specifies the modality for new window.
-        //routingWindow.initModality(Modality.WINDOW_MODAL);
+        //locosWindow.initModality(Modality.WINDOW_MODAL);
         // Specifies the owner Window (parent) for new window
         routingWindow.initOwner(primaryStage)
 
