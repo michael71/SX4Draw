@@ -1085,9 +1085,9 @@ class SX4Draw : Application() {
         val df = SimpleDateFormat("yyyyMMdd_HHmmss")
         val version = df.format(Date())
         System.out.println("creating Config, filename=$fn panelName=$panelName")
-        val panelConfig = PanelConfig(panelName, panelElements, ArrayList(routes), ArrayList(compRoutes), trips, timetables)
+        val panelConfig = PanelConfig(panelName, locos, panelElements, ArrayList(routes), ArrayList(compRoutes), trips, timetables)
         val shortFN = File(fn).name
-        val layoutConfig = LayoutConfig(shortFN, panelConfig, version)
+        val layoutConfig = LayoutConfig(shortFN, version, panelConfig)
 
         WriteConfig.toXML(fn, layoutConfig)
     }
@@ -1119,14 +1119,16 @@ class SX4Draw : Application() {
                 currentFileName = selectedFile.name
                 version = layoutConfig.version
                 System.out.println("filename=${currentFileName} version=$version")
-                locos = layoutConfig.getAllLocos()
                 val panelConfig = layoutConfig.getPC0()   // first PanelConfig
                 try {
                     panelElements = panelConfig!!.getAllPanelElements()
                     panelName = panelConfig!!.name
+                    locos = panelConfig!!.getAllLocos()
+                    for (l in locos) println(l.toString())
                     routes = FXCollections.observableArrayList(panelConfig!!.getAllRoutes())
                     compRoutes = FXCollections.observableArrayList(panelConfig!!.getAllCompRoutes())
                     trips = panelConfig!!.getAllTrips()
+                    for (t in trips) println(t.toString())
                     timetables = panelConfig!!.getAllTimetables()
                 } catch (e: NullPointerException) {
                     System.out.println("ERROR in reading panelConfig")
@@ -1180,18 +1182,18 @@ class SX4Draw : Application() {
 
     companion object {
 
-        var vNumber = 0.42
-        var vString = "21 Feb 2019"
+        var vNumber = 0.43
+        var vString = "22 Feb 2019"
         var version = "$vNumber - $vString"
 
-        // TODO UNDO für ca. mehrere Elemente
+        // TODO UNDO für ca. mehrere Panel Elemente
+
         var locos = ArrayList<Loco>()
         var panelElements = ArrayList<PanelElement>()
         var routes = FXCollections.observableArrayList<Route>()
         var compRoutes = FXCollections.observableArrayList<CompRoute>()
         //public static final ObservableList<Trip> trips = FXCollections.observableArrayList();
         var trips = ArrayList<Trip>()
-
         var timetables = ArrayList<Timetable>()
 
         var lastPE: PanelElement? = null

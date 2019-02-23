@@ -26,7 +26,6 @@ import javax.xml.bind.annotation.*
 
 //This statement means that class "LayoutConfig.java" is the root-element
 @XmlRootElement(name = "layout-config")
-@XmlType(propOrder = ["loco","panel"])
 class LayoutConfig {
     // see https://blog.scottlogic.com/2016/04/04/practical-kotlin.html
 
@@ -36,20 +35,17 @@ class LayoutConfig {
     @get:XmlAttribute
     var version = "0001"
 
-    @XmlElementWrapper(name = "locos")
-    @get:XmlElement(name = "loco")
-    private val loco = ArrayList<Loco>()
-
     @XmlElementWrapper(name = "panels")
     @get:XmlElement(name = "panel")
     private val panel  = ArrayList<PanelConfig>()
 
     constructor()
 
-    constructor(fn : String, pc: PanelConfig, ve: String) {
+    constructor(fn : String,  ve: String, pc: PanelConfig) {
         this.fileName = fn
         panel.add(pc)
-        this.version = ve
+
+          this.version = ve
     }
 
     fun getPC0() : PanelConfig? {
@@ -60,10 +56,4 @@ class LayoutConfig {
         }
     }
 
-    fun getAllLocos() : ArrayList<Loco> {
-       return loco
-    }
-
-
-
-}
+   }

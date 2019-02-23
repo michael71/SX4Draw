@@ -27,12 +27,12 @@ import javax.xml.bind.annotation.*
 
 /**
  *
- * <trip adr="3100" routeid="2300" sens1="924" sens2="902" loco="29,1,126" stopdelay="1500" />
+ * <trip adr="3100" route="2300" sens1="924" sens2="902" loco="29,1,126" stopdelay="1500" />
  *
  * @author mblank
  */
 @XmlRootElement(name = "trip")
-@XmlType() //TODO Does not work: propOrder = {"adr", "routeid", "sens1", "sens2", "loco", "stopdelay"})
+//@XmlType() //TODO Does not work: propOrder = {"adr", "route", "sens1", "sens2", "loco", "stopdelay"})
 
 class Trip : Comparator<Trip>, Comparable<Trip> {
 
@@ -40,7 +40,7 @@ class Trip : Comparator<Trip>, Comparable<Trip> {
     var adr = INVALID_INT
 
     @get:XmlAttribute
-    var routeid = INVALID_INT
+    var route = INVALID_INT
 
     @get:XmlAttribute
     var sens1 = INVALID_INT
@@ -78,6 +78,10 @@ class Trip : Comparator<Trip>, Comparable<Trip> {
         return adr - other.adr
     }
 
+    override fun toString() : String {
+        return "Trip: adr=" + adr + " route=" + route + " sens1="+sens1 + " sens2=" +sens2
+    }
+
     companion object {
 
         fun add(a: Node) {
@@ -93,8 +97,8 @@ class Trip : Comparator<Trip>, Comparable<Trip> {
                     trip.sens1 = Integer.parseInt(theAttribute.nodeValue)
                 } else if (theAttribute.nodeName == "sens2") {
                     trip.sens2 = Integer.parseInt(theAttribute.nodeValue)
-                } else if (theAttribute.nodeName == "routeid" || theAttribute.nodeName == "route") {  // old def.
-                    trip.routeid = Integer.parseInt(theAttribute.nodeValue)
+                } else if (theAttribute.nodeName == "route" || theAttribute.nodeName == "route") {  // old def.
+                    trip.route = Integer.parseInt(theAttribute.nodeValue)
                 } else if (theAttribute.nodeName == "stopdelay") {
                     trip.stopdelay = Integer.parseInt(theAttribute.nodeValue)
                 } else if (theAttribute.nodeName == "loco") {

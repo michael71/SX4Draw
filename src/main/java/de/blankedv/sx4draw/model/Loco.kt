@@ -18,28 +18,39 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 package de.blankedv.sx4draw.model
 
+import javax.xml.bind.annotation.XmlAttribute
+import javax.xml.bind.annotation.XmlRootElement
+
 /** Loco class used for storing loco info from Config file
  *
  *
  * @author mblank
  */
 
+@XmlRootElement(name = "loco")
 class Loco {
     // example from xml file
     //<loco adr="97" name="SchoenBB" mass="2" vmax="120" />
-    var addr = 1
+    // "adr" NOT:addr
+    @get:XmlAttribute
+    var adr = 1
+
+    @get:XmlAttribute
     var name = ""
-    private var mass = 3
-    private var vmax = 160
+
+    @get:XmlAttribute
+    var mass = 3
+
+    @get:XmlAttribute
+    var vmax = 160
 
     constructor()
 
 
-    fun getMass(): Int {
-        return mass
+    override fun toString() : String {
+        return "Loco: adr="+adr+" name="+name+" mass=" + mass +" vmax=" +vmax
     }
-
-    fun setMass(mass: Int) {
+  /*  fun setMass(mass: Int) {
         if (mass in 1..5) {
             this.mass = mass
         } else {
@@ -58,6 +69,6 @@ class Loco {
             this.vmax = 160
         }
     }
-
+ */
 
 }

@@ -31,6 +31,10 @@ class PanelConfig {
     @get:XmlAttribute
     var name: String = ""
 
+    @XmlElementWrapper(name = "locos")
+    @get:XmlElement(name = "loco")
+    private var loco = ArrayList<Loco>()
+
     @XmlElementWrapper(name = "tracks")
     @get:XmlElement(name = "track")
     private val track = ArrayList<Track>()
@@ -70,12 +74,14 @@ class PanelConfig {
     constructor()
 
     constructor (name: String,
+                 ls: ArrayList<Loco>,
                  pes: ArrayList<PanelElement>,
                  routes: ArrayList<Route>,
                  compRoutes: ArrayList<CompRoute>,
                  trips: ArrayList<Trip>,
                  timetables: ArrayList<Timetable>) {
         this.name = name
+        this.loco = ls
         setPanelElements(pes)
         this.route = routes
         this.comproute = compRoutes
@@ -131,6 +137,10 @@ class PanelConfig {
 
     fun getAllTimetables() : ArrayList<Timetable> {
         return timetable
+    }
+
+    fun getAllLocos() : ArrayList<Loco> {
+        return loco
     }
 
 }
