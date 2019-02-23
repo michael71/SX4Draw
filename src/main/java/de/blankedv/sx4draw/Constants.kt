@@ -42,6 +42,8 @@ object Constants {
     const val ADDR0_SIGNAL = 4000
     const val ADDR0_TURNOUT = 801
 
+    const val EMPTY_LOCO_NAME = "leer"
+
     enum class PEState {
         DEFAULT, MARKED, SELECTED, STATE_0, STATE_1
     }

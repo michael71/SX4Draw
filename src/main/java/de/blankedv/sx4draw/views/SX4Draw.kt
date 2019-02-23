@@ -64,6 +64,7 @@ import java.util.prefs.Preferences
 
 import de.blankedv.sx4draw.Constants.INVALID_INT
 import de.blankedv.sx4draw.Constants.DEBUG
+import de.blankedv.sx4draw.Constants.EMPTY_LOCO_NAME
 import de.blankedv.sx4draw.Constants.RASTER
 import de.blankedv.sx4draw.Constants.RECT_X
 import de.blankedv.sx4draw.Constants.RECT_Y
@@ -88,6 +89,7 @@ class SX4Draw : Application() {
     private var routingTable: RoutesTable? = null
     private var currentRoute: Route? = null
     private var locosTable: LocosTable? = null
+    private var compRoutesTable : CompRoutesTable? = null
 
     private var line: Line? = null
     private val scPane = ScrollPane()
@@ -598,6 +600,7 @@ class SX4Draw : Application() {
         val menuWindows = Menu("Fenster")
         val openRoutingTable = MenuItem("Fahrstr. anzeigen")
         val openLocoTable = MenuItem("Loks anzeigen")
+        val openCompRoutesTable = MenuItem("Zusammenges. Fahrstraßen anzeigen")
 
         val menuOptions = Menu("Optionen")
         val setName = MenuItem("Set Panel-Name")
@@ -617,7 +620,7 @@ class SX4Draw : Application() {
         val exitItem = MenuItem("Programm-Ende/Exit")
 
         menu1.items.addAll(openItem, saveItem, exitItem)
-        menuWindows.items.addAll(openRoutingTable, openLocoTable)
+        menuWindows.items.addAll(openRoutingTable, openCompRoutesTable, openLocoTable)
         menuOptions.items.addAll(setName, dispAddresses, rasterOn) //, showMousePos) //, showScrollBars)
         menuCalc.items.addAll(cTurnouts, cNormPositions, scale200, scale50)
         menuExtra.items.addAll(cSearch)
@@ -789,11 +792,30 @@ class SX4Draw : Application() {
         openLocoTable.setOnAction { event ->
             println("open locos table")
             if (locosTable == null) {
+                if (locos.size == 0) {
+                    // create a dummy entry (will NOT be written to XML file)
+                    locos.add(Loco(1,EMPTY_LOCO_NAME,3,120))
+                }
                 locosTable = LocosTable(stage, this)
             } else {
                 locosTable!!.show()
             }
         }
+
+        openCompRoutesTable.setOnAction { event ->
+            println("open compRoutes table")
+            if (compRoutesTable == null) {
+                if (compRoutes.size == 0) {
+                    // create a dummy entry (will NOT be written to XML file)
+                    compRoutes.add(CompRoute(9999,9999,9999,"2200,2201"))
+                }
+                compRoutesTable = CompRoutesTable(stage, this)
+            } else {
+                compRoutesTable!!.show()
+            }
+        }
+
+
 
         val infoItem = MenuItem("Info")
         val updateItem = MenuItem("Sind Updates verfügbar?")
@@ -1096,7 +1118,10 @@ class SX4Draw : Application() {
         val df = SimpleDateFormat("yyyyMMdd_HHmmss")
         val version = df.format(Date())
         System.out.println("creating Config, filename=$fn panelName=$panelName")
-        val panelConfig = PanelConfig(panelName, ArrayList(locos), panelElements, ArrayList(routes), ArrayList(compRoutes), trips, timetables)
+
+        val panelConfig = PanelConfig(panelName, ArrayList(locos.filter{it -> !it.name.equals(EMPTY_LOCO_NAME)}),
+                panelElements, ArrayList(routes),
+                ArrayList(compRoutes.filter{it -> !(it.adr != 9999)}), trips, timetables)
         val shortFN = File(fn).name
         val layoutConfig = LayoutConfig(shortFN, version, panelConfig)
 
@@ -1184,6 +1209,27 @@ class SX4Draw : Application() {
             redrawPanelElements()
             drawRTButtons(rt.btn1, rt.btn2)
         }
+    }
+
+    fun showCompRoute(compRt: CompRoute?) {
+        val allRoutes = compRt!!.routes.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        var btn1 = 0
+        var btn2 = 0
+        if (allRoutes.size != 0) {
+            for (i in 0..(allRoutes.size-1)) {
+                val rtStr = allRoutes[i]
+                try {
+                    val rtID = Integer.parseInt(rtStr)
+                    val route = Route.getByAddress(rtID)
+                    if (i == 0) btn1 = route!!.btn1
+                    if (i == (allRoutes.size -1))  btn2 = route!!.btn2
+                    showRoute(route)
+                } catch (e : java.lang.NumberFormatException) {
+                }
+            }
+        }
+        redrawPanelElements()
+        drawRTButtons(btn1, btn2)
     }
 
     fun hideAllRoutes() {

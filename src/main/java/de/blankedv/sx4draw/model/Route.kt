@@ -213,7 +213,6 @@ class Route : Comparator<Route>, Comparable<Route> {
         // all have a state "rst" which is different from INVALID_ID
         var routeInfo = route.split(";".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         for (rt in routeInfo) {
-            println("routeInfo $rt")
             val elementAndState = rt.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
             try {
                 val a = Integer.parseInt(elementAndState[0])
@@ -239,13 +238,13 @@ class Route : Comparator<Route>, Comparable<Route> {
         // now sensors
         routeInfo = sensors.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         for (s in routeInfo) {
-            println("sensor $s")
             try {
                 val a = Integer.parseInt(s)
                 if (a != INVALID_INT) {
                     val sensList = PanelElement.getPeByAddress(a)
                     for (pe in sensList) {
                         pe.createShapeAndSetState(PEState.MARKED)
+                        println("sensor="+(pe.gpe  as Sensor).getAddr())
                     }
                 }
             } catch (e: Exception) {
@@ -300,6 +299,13 @@ class Route : Comparator<Route>, Comparable<Route> {
                 }
             }
             return newID + 1
+        }
+
+        fun getByAddress(a : Int): Route? {
+            for (rt in routes) {
+                if (rt.adr == a) return rt
+            }
+            return null
         }
     }
 }
