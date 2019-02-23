@@ -88,6 +88,7 @@ class SX4Draw : Application() {
 
     private var routingTable: RoutesTable? = null
     private var currentRoute: Route? = null
+    private var currentCompRoute : CompRoute? = null
     private var locosTable: LocosTable? = null
     private var compRoutesTable : CompRoutesTable? = null
 
@@ -108,7 +109,7 @@ class SX4Draw : Application() {
     private var currentFileName = ""
 
     enum class GUIState {
-        ADD_TRACK, ADD_SENSOR, ADD_SENSOR_US, ADD_SIGNAL, ADD_ROUTEBTN, ADD_ROUTE, SELECT, MOVE
+        ADD_TRACK, ADD_SENSOR, ADD_SENSOR_US, ADD_SIGNAL, ADD_ROUTEBTN, ADD_ROUTE, ADD_COMPROUTE, SELECT, MOVE
     }
 
     override fun start(primaryStage: Stage) {
@@ -137,7 +138,8 @@ class SX4Draw : Application() {
             if (me.button == MouseButton.PRIMARY) {
                 println("prim btn")
                 when (currentGUIState) {
-                    SX4Draw.GUIState.ADD_TRACK, SX4Draw.GUIState.ADD_SIGNAL, SX4Draw.GUIState.ADD_SENSOR, SX4Draw.GUIState.ADD_SENSOR_US, SX4Draw.GUIState.ADD_ROUTEBTN ->
+                    SX4Draw.GUIState.ADD_TRACK, SX4Draw.GUIState.ADD_SIGNAL, SX4Draw.GUIState.ADD_SENSOR,
+                    SX4Draw.GUIState.ADD_SENSOR_US, SX4Draw.GUIState.ADD_ROUTEBTN, GUIState.ADD_COMPROUTE ->
                         // this does not work ....
                         //MyPoint start = IntPoint.toRaster(poi);
                         //line = startNewLine(start);
@@ -174,13 +176,14 @@ class SX4Draw : Application() {
         anchorPane.addEventHandler(KeyEvent.KEY_PRESSED) { t ->
             if (t.code == KeyCode.ESCAPE) {
                 println("click on escape")
-                if (currentGUIState == GUIState.ADD_ROUTE) {
+                if ((currentGUIState == GUIState.ADD_ROUTE) or (currentGUIState == GUIState.ADD_COMPROUTE)){
                     // abbruch
                     for (sel in panelElements) {
                         sel.createShapeAndSetState(Constants.PEState.DEFAULT)
                     }
                     //redrawPanelElements();
                     currentRoute = null // reset
+                    currentCompRoute = null
                 }
             }
         }
@@ -230,6 +233,7 @@ class SX4Draw : Application() {
                         }
                     }
                     SX4Draw.GUIState.ADD_ROUTE -> createRoute(poi)
+                    SX4Draw.GUIState.ADD_COMPROUTE -> createCompRoute(poi)
                     SX4Draw.GUIState.ADD_SENSOR -> {
                         line = startNewLine(start, SENSOR_WIDTH)
                         line!!.strokeDashArray.addAll(15.0, 10.0)
@@ -420,6 +424,7 @@ class SX4Draw : Application() {
         val plusIcon3 = ImageView(Image("plus.png"))
         val plusIcon4 = ImageView(Image("plus.png"))
         val plusIcon5 = ImageView(Image("plus.png"))
+        val plusIcon6 = ImageView(Image("plus.png"))
         val delIcon = ImageView(Image("delete.png"))
         val moveIcon = ImageView(Image("move.png"))
         val undoIcon = ImageView(Image("undo.png"))
@@ -428,7 +433,8 @@ class SX4Draw : Application() {
         val sep2 = Separator(Orientation.VERTICAL)
 
         val btns = HBox(3.0)
-        btns.children.addAll(btnSelect, btnUnSelect, sep1, btnAddTrack, btnAddSensor, btnAddSensorUS, btnAddSignal, btnRouteBtn, btnAddRoute, sep2, btnUndo, btnDelete, btnMove)
+        btns.children.addAll(btnSelect, btnUnSelect, sep1, btnAddTrack, btnAddSensor, btnAddSensorUS,
+                btnAddSignal, btnRouteBtn, btnAddRoute, btnAddCompRoute, sep2, btnUndo, btnDelete, btnMove)
 
         btnSelect.toggleGroup = toggleGroup
         btnSelect.isSelected = true
@@ -507,6 +513,24 @@ class SX4Draw : Application() {
         btnAddRoute.setOnAction {
             if (PanelElement.addressesAvail()) {
                 currentGUIState = GUIState.ADD_ROUTE
+                canvas!!.cursor = Cursor.CLOSED_HAND
+            } else {
+
+                val alert = Alert(AlertType.WARNING)
+                alert.title = "Warnung"
+                alert.headerText = "Es sind keine oder nur wenige Adressen eingegeben"
+                alert.contentText = "Bitte Adressen definieren vor der Fahrstraßeneingabe!"
+                alert.showAndWait()
+                enterSelectState()
+            }
+        }
+
+        btnAddCompRoute.toggleGroup = toggleGroup
+        btnAddCompRoute.text = "Zus. Fahrstr."
+        btnAddCompRoute.graphic = plusIcon6
+        btnAddCompRoute.setOnAction {
+            if (PanelElement.addressesAvail()) {
+                currentGUIState = GUIState.ADD_COMPROUTE
                 canvas!!.cursor = Cursor.CLOSED_HAND
             } else {
 
@@ -807,7 +831,7 @@ class SX4Draw : Application() {
             if (compRoutesTable == null) {
                 if (compRoutes.size == 0) {
                     // create a dummy entry (will NOT be written to XML file)
-                    compRoutes.add(CompRoute(9999,9999,9999,"2200,2201"))
+                    compRoutes.add(CompRoute())
                 }
                 compRoutesTable = CompRoutesTable(stage, this)
             } else {
@@ -979,8 +1003,8 @@ class SX4Draw : Application() {
     }
 
     private fun drawRTButtons(btn1: Int, btn2: Int) {
-        val bt1 = PanelElement.getPeByAddress(btn1)[0]
-        val bt2 = PanelElement.getPeByAddress(btn2)[0]
+        val bt1 = PanelElement.getPeByAddress(btn1)!![0]
+        val bt2 = PanelElement.getPeByAddress(btn2)!![0]
 
         gc!!.strokeText("1", (bt1.gpe.x - 4).toDouble(), (bt1.gpe.y + 4).toDouble())
         gc!!.strokeText("2", (bt2.gpe.x - 4).toDouble(), (bt2.gpe.y + 4).toDouble())
@@ -1076,6 +1100,59 @@ class SX4Draw : Application() {
         }
     }
 
+    private fun createCompRoute(poi: IntPoint) {
+        val rtbtn = getRouteBtn(poi)
+        if (currentCompRoute == null) {
+            // initialize new route
+            currentCompRoute = CompRoute(CompRoute.getAutoAddress())
+            println("init route with adr=" + currentCompRoute!!.adr)
+            if (rtbtn != null) {  // first button
+                currentCompRoute!!.btn1 = rtbtn.gpe.getAddr()
+                rtbtn.createShapeAndSetState(PEState.MARKED)
+                redrawPanelElements()
+                println("btn1 =" + currentCompRoute!!.btn1)
+                //gc.strokeText("1", rtbtn.x - 4, rtbtn.y - YOFF + 4);
+            } else {
+                currentCompRoute = null // no routebtn at this point
+            }
+        } else {
+            if (rtbtn != null)  {
+                // creation finished - an end route button has been selected
+                currentCompRoute!!.btn2 = rtbtn.gpe.getAddr()
+                println("btn2 =" + currentCompRoute!!.btn2)
+                // check if there is such a compound route
+                val foundRoutes : String? = CompRoute.findCompRoute(currentCompRoute!!.btn1, currentCompRoute!!.btn2)
+                if (foundRoutes == null) {
+                   // no such compound Route
+                    val alert = Alert(AlertType.INFORMATION)
+                    alert.title = "Zusammenges. Fahrstraße " + currentCompRoute!!.adr + " ?"
+                    alert.headerText = null
+                    alert.contentText = "keine passende Fahrstraßenkombination vorhanden"
+                    alert.showAndWait()
+                } else {
+                    currentCompRoute!!.routes = foundRoutes
+                    rtbtn.createShapeAndSetState(PEState.MARKED)
+                    val compRt = currentCompRoute
+                    showCompRoute(compRt!!)
+
+                    compRoutes.add(CompRoute(currentCompRoute!!))  // add a new route from btn1 to btn2
+                    val revCompRoute = (currentCompRoute!!).reverseCompRoute()
+                    compRoutes.add(revCompRoute)
+
+                    val alert = Alert(AlertType.INFORMATION)
+                    alert.title = "Zusammenges. Fahrstraße " + currentCompRoute!!.adr
+                    alert.headerText = null
+                    alert.contentText = " erstellt! - Routen: " + currentCompRoute!!.routes
+                    alert.showAndWait()
+                }
+                resetPEStates()
+                redrawPanelElements()
+                currentCompRoute = null // reset
+            }
+        }
+    }
+
+
     private fun writeFile(stage: Stage, path: String): String? {
 
         //System.out.println("path=" + path);
@@ -1119,9 +1196,13 @@ class SX4Draw : Application() {
         val version = df.format(Date())
         System.out.println("creating Config, filename=$fn panelName=$panelName")
 
-        val panelConfig = PanelConfig(panelName, ArrayList(locos.filter{it -> !it.name.equals(EMPTY_LOCO_NAME)}),
+        val panelConfig = PanelConfig(panelName,
+                // filter "dummy loco" out
+                ArrayList(locos.filter{it -> !it.name.equals(EMPTY_LOCO_NAME)}),
                 panelElements, ArrayList(routes),
-                ArrayList(compRoutes.filter{it -> !(it.adr != 9999)}), trips, timetables)
+                // filter "dummy compRoute" out
+                ArrayList(compRoutes.filter{it -> (it.btn1 != 0) and (it.btn2 != 0)}),
+                trips, timetables)
         val shortFN = File(fn).name
         val layoutConfig = LayoutConfig(shortFN, version, panelConfig)
 
@@ -1229,7 +1310,11 @@ class SX4Draw : Application() {
             }
         }
         redrawPanelElements()
-        drawRTButtons(btn1, btn2)
+        if ((btn1 != 0) and (btn2 != 0)) {
+            drawRTButtons(btn1, btn2)
+        } else {
+            println("ERROR: compRoute: check btn1, btn2")
+        }
     }
 
     fun hideAllRoutes() {
@@ -1264,6 +1349,7 @@ class SX4Draw : Application() {
         private val btnAddSignal = ToggleButton()
         private val btnRouteBtn = ToggleButton()
         private val btnAddRoute = ToggleButton()
+        private val btnAddCompRoute = ToggleButton()
         private val btnSelect = ToggleButton()
         private val btnUnSelect = Button()
         private val btnMove = ToggleButton()

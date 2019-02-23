@@ -17,7 +17,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package de.blankedv.sx4draw.model
 
+import de.blankedv.sx4draw.Constants
 import de.blankedv.sx4draw.Constants.INVALID_INT
+import de.blankedv.sx4draw.views.SX4Draw
 import de.blankedv.sx4draw.views.SX4Draw.Companion.compRoutes
 import java.util.Comparator
 
@@ -34,7 +36,7 @@ import javax.xml.bind.annotation.XmlType
 @XmlType
 data class CompRoute (
         @get:XmlAttribute
-        var adr: Int = 0,
+        var adr: Int = getAutoAddress(),
 
         @get:XmlAttribute
         var btn1: Int = 0,   // TODO remove btn1 and btn2 from comproute vars (already implicit in route#)
@@ -44,8 +46,22 @@ data class CompRoute (
 
         @get:XmlAttribute
         var routes: String = "")
-                                     : Comparator<CompRoute>, Comparable<CompRoute> {
+         : Comparator<CompRoute>, Comparable<CompRoute> {
 
+
+    constructor(cr: CompRoute) : this (cr.adr, cr.btn1, cr.btn2, cr.routes)
+
+    fun reverseCompRoute() : CompRoute {
+        val allsens = routes.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        var revRoutes = ""
+        // order sensors in string in reverse order of original route
+        for (i in (allsens.size -1) downTo 0) {
+            val s = allsens[i]
+            if (revRoutes.isNotEmpty()) revRoutes += ","
+            revRoutes += s
+        }
+        return CompRoute(adr+1, btn2, btn1, revRoutes)
+    }
 
     override fun compare(o1: CompRoute, o2: CompRoute): Int {
         return o1.adr - o2.adr
@@ -78,6 +94,22 @@ data class CompRoute (
             if (crt.adr != INVALID_INT) {
                 compRoutes.add(crt)
             }
+        }
+
+        fun getAutoAddress(): Int {
+            var newID = Constants.ADDR0_COMPROUTE
+            for (crt in SX4Draw.compRoutes) {
+                if (crt.adr > newID) {
+                    newID = crt.adr
+                }
+            }
+            return newID + 1
+        }
+
+        // find a compRoute from a start routeBtn to an end routeBtn
+        fun findCompRoute(from : Int, to : Int) : String? {
+            return null
+            // TODO : Algorithm for compound route detection
         }
     }
 }

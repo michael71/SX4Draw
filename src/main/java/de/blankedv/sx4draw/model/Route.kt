@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package de.blankedv.sx4draw.model
 
+import de.blankedv.sx4draw.Constants.ADDR0_ROUTE
 import de.blankedv.sx4draw.Constants.INVALID_INT
 import de.blankedv.sx4draw.views.SX4Draw.Companion.routes
 
@@ -292,7 +293,7 @@ class Route : Comparator<Route>, Comparable<Route> {
         }
 
         fun getAutoAddress(): Int {
-            var newID = 2200  // start with 2200
+            var newID = ADDR0_ROUTE  // start with 2200
             for (rt in routes) {
                 if (rt.adr > newID) {
                     newID = rt.adr
