@@ -74,6 +74,7 @@ import de.blankedv.sx4draw.PanelElement.Companion.SENSOR_WIDTH
 import de.blankedv.sx4draw.PanelElement.Companion.TRACK_WIDTH
 import de.blankedv.sx4draw.model.*
 import de.blankedv.sx4draw.util.Calc
+import javafx.collections.ObservableList
 import java.lang.NullPointerException
 
 class SX4Draw : Application() {
@@ -91,6 +92,7 @@ class SX4Draw : Application() {
     private var currentCompRoute : CompRoute? = null
     private var locosTable: LocosTable? = null
     private var compRoutesTable : CompRoutesTable? = null
+    private var tripsTable : TripsTable? = null
 
     private var line: Line? = null
     private val scPane = ScrollPane()
@@ -624,6 +626,7 @@ class SX4Draw : Application() {
         val openRoutingTable = MenuItem("Fahrstr. anzeigen")
         val openLocoTable = MenuItem("Loks anzeigen")
         val openCompRoutesTable = MenuItem("Zusammenges. Fahrstraßen anzeigen")
+        val openTripsTable = MenuItem("Fahrten anzeigen")
 
         val menuOptions = Menu("Optionen")
         val setName = MenuItem("Set Panel-Name")
@@ -643,7 +646,7 @@ class SX4Draw : Application() {
         val exitItem = MenuItem("Programm-Ende/Exit")
 
         menu1.items.addAll(openItem, saveItem, exitItem)
-        menuWindows.items.addAll(openRoutingTable, openCompRoutesTable, openLocoTable)
+        menuWindows.items.addAll(openRoutingTable, openCompRoutesTable, openTripsTable, openLocoTable)
         menuOptions.items.addAll(setName, dispAddresses, rasterOn) //, showMousePos) //, showScrollBars)
         menuCalc.items.addAll(cTurnouts, cNormPositions, scale200, scale50)
         menuExtra.items.addAll(cSearch)
@@ -809,6 +812,15 @@ class SX4Draw : Application() {
                 routingTable = RoutesTable(stage, this)
             } else {
                 routingTable!!.show()
+            }
+        }
+
+        openTripsTable.setOnAction { event ->
+            println("open trips table")
+            if (tripsTable == null) {
+                tripsTable = TripsTable(stage, this)
+            } else {
+                tripsTable!!.show()
             }
         }
 
@@ -1328,13 +1340,13 @@ class SX4Draw : Application() {
 
         // TODO UNDO für ca. mehrere Panel Elemente
 
-        var locos = FXCollections.observableArrayList<Loco>()
+        var locos : ObservableList<Loco> = FXCollections.observableArrayList<Loco>()
         var panelElements = ArrayList<PanelElement>()
-        var routes = FXCollections.observableArrayList<Route>()
-        var compRoutes = FXCollections.observableArrayList<CompRoute>()
+        var routes : ObservableList<Route> = FXCollections.observableArrayList<Route>()
+        var compRoutes : ObservableList<CompRoute> = FXCollections.observableArrayList<CompRoute>()
         //public static final ObservableList<Trip> trips = FXCollections.observableArrayList();
-        var trips = FXCollections.observableArrayList<Trip>()
-        var timetables = FXCollections.observableArrayList<Timetable>()
+        var trips : ObservableList<Trip> = FXCollections.observableArrayList<Trip>()
+        var timetables : ObservableList<Timetable> = FXCollections.observableArrayList<Timetable>()
 
         var lastPE: PanelElement? = null
         var panelName = ""

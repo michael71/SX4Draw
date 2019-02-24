@@ -34,27 +34,25 @@ import javax.xml.bind.annotation.*
 @XmlRootElement(name = "trip")
 //@XmlType() //TODO Does not work: propOrder = {"adr", "route", "sens1", "sens2", "loco", "stopdelay"})
 
-class Trip : Comparator<Trip>, Comparable<Trip> {
+class Trip(
+        @get:XmlAttribute    // @get: WICHTIG für KOTLIN !!!
+        var adr: Int = INVALID_INT,
 
-    @get:XmlAttribute    // @get: WICHTIG für KOTLIN !!!
-    var adr = INVALID_INT
+        @get:XmlAttribute
+        var route: Int = INVALID_INT,
 
-    @get:XmlAttribute
-    var route = INVALID_INT
+        @get:XmlAttribute
+        var sens1: Int = INVALID_INT,
 
-    @get:XmlAttribute
-    var sens1 = INVALID_INT
+        @get:XmlAttribute
+        var sens2: Int = INVALID_INT,
 
-    @get:XmlAttribute
-    var sens2 = INVALID_INT
+        @get:XmlAttribute
+        var loco: String = "",
 
-    @get:XmlAttribute
-    var loco = ""
+        @get:XmlAttribute
+        var stopdelay: Int = INVALID_INT) : Comparator<Trip>, Comparable<Trip> {
 
-    @get:XmlAttribute
-    var stopdelay = INVALID_INT
-
-    internal constructor()
 
     fun autoAddress() {
         if (adr != INVALID_INT) return
@@ -78,8 +76,8 @@ class Trip : Comparator<Trip>, Comparable<Trip> {
         return adr - other.adr
     }
 
-    override fun toString() : String {
-        return "Trip: adr=" + adr + " route=" + route + " sens1="+sens1 + " sens2=" +sens2
+    override fun toString(): String {
+        return "Trip: adr=$adr route=$route sens1=$sens1 sens2=$sens2"
     }
 
     companion object {

@@ -25,6 +25,7 @@ import de.blankedv.sx4draw.views.SX4Draw.Companion.routes
 import java.util.Comparator
 
 import org.w3c.dom.Node
+import java.lang.Exception
 import javax.xml.bind.annotation.XmlAttribute
 import javax.xml.bind.annotation.XmlRootElement
 import javax.xml.bind.annotation.XmlType
@@ -53,15 +54,49 @@ data class CompRoute (
     constructor(cr: CompRoute) : this (cr.adr, cr.btn1, cr.btn2, cr.routes)
 
     fun reverseCompRoute() : CompRoute {
-        val allsens = routes.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        val allRoutes = routes.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         var revRoutes = ""
-        // order sensors in string in reverse order of original route
-        for (i in (allsens.size -1) downTo 0) {
-            val s = allsens[i]
+        // order routes in string in reverse order of original route
+        for (i in (allRoutes.size -1) downTo 0) {
+            val s = allRoutes[i]
             if (revRoutes.isNotEmpty()) revRoutes += ","
             revRoutes += s
         }
         return CompRoute(adr+1, btn2, btn1, revRoutes)
+    }
+
+    fun getStartSensor() : Int? {
+        try {
+            val allRoutes = routes.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+            if (allRoutes.size >= 2) {
+                val rt0 = allRoutes[0].toInt()   // first route address
+                if (rt0 != null) {
+                    val rtSensors = Route.getByAddress(rt0)!!.sensors
+                    val allSensors = rtSensors.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                    return allSensors[0].toInt()
+                }
+            }
+        } catch (e : Exception) {
+
+        }
+        return null
+    }
+
+    fun getEndSensor() : Int? {
+        try {
+        val allRoutes = routes.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        if (allRoutes.size >= 2) {
+            val rt0 = allRoutes[allRoutes.size-1].toInt()   // last route address
+            if (rt0 != null) {
+                val rtSensors = Route.getByAddress(rt0)!!.sensors
+                val allSensors = rtSensors.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                return allSensors[allSensors.size -1].toInt()
+            }
+        }
+        } catch (e : Exception) {
+
+        }
+        return null
     }
 
     override fun compare(o1: CompRoute, o2: CompRoute): Int {
@@ -128,6 +163,13 @@ data class CompRoute (
 
             return null
             // TODO : Algorithm for compound route detection
+        }
+
+        fun getByAddress(a : Int): CompRoute? {
+            for (crt in compRoutes) {
+                if (crt.adr == a) return crt
+            }
+            return null
         }
     }
 }

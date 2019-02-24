@@ -17,11 +17,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package de.blankedv.sx4draw.views
 
-import de.blankedv.sx4draw.GenericAddress
-import de.blankedv.sx4draw.model.Loco
+import de.blankedv.sx4draw.Constants.INVALID_INT
+import de.blankedv.sx4draw.model.CompRoute
+import de.blankedv.sx4draw.model.Route
+import de.blankedv.sx4draw.model.Trip
 import de.blankedv.sx4draw.util.Utils
-import de.blankedv.sx4draw.views.SX4Draw.Companion.locos
-import de.blankedv.sx4draw.views.SX4Draw.Companion.panelName
+import de.blankedv.sx4draw.views.SX4Draw.Companion.trips
 
 import javafx.event.EventHandler
 import javafx.scene.Scene
@@ -36,18 +37,16 @@ import javafx.scene.control.ContextMenu
 import javafx.scene.control.MenuItem
 import javafx.scene.control.TableRow
 import javafx.util.StringConverter
-import javafx.scene.control.TablePosition
-
 
 
 /**
  * @author mblank
  */
-class LocosTable internal constructor(primaryStage: Stage, private val app: SX4Draw) {
+class TripsTable internal constructor(primaryStage: Stage, private val app: SX4Draw) {
 
-    private val tableView = TableView<Loco>()
+    private val tableView = TableView<Trip>()
 
-    internal var locosTableSceen: Scene
+    internal var tripsTableScene: Scene
     // New window (Stage)
     internal var locosWindow: Stage
 
@@ -60,7 +59,7 @@ class LocosTable internal constructor(primaryStage: Stage, private val app: SX4D
         bp.setBottom(hb);
         hb.setAlignment(Pos.CENTER);
         BorderPane.setMargin(hb, new Insets(8, 8, 8, 8)); */
-        locosTableSceen = Scene(bp, 700.0, 300.0)
+        tripsTableScene = Scene(bp, 700.0, 300.0)
         bp.center = tableView
 
         // New window (Stage)
@@ -70,8 +69,8 @@ class LocosTable internal constructor(primaryStage: Stage, private val app: SX4D
             locosWindow.close();
         }); */
 
-        locosWindow.title = "Loco Tabelle " + panelName
-        locosWindow.scene = locosTableSceen
+        locosWindow.title = "Fahrten (Trips) Tabelle"
+        locosWindow.scene = tripsTableScene
 
         // Specifies the modality for new window.
         //locosWindow.initModality(Modality.WINDOW_MODAL);
@@ -79,8 +78,8 @@ class LocosTable internal constructor(primaryStage: Stage, private val app: SX4D
         locosWindow.initOwner(primaryStage)
 
         // Set position of second window, related to primary window.
-        locosWindow.x = primaryStage.x + 500
-        locosWindow.y = primaryStage.y + 400
+        locosWindow.x = primaryStage.x + 400
+        locosWindow.y = primaryStage.y + 300
 
         createDataTables()
 
@@ -98,11 +97,14 @@ class LocosTable internal constructor(primaryStage: Stage, private val app: SX4D
 
     private fun createDataTables() {
 
-        val adrCol = TableColumn<Loco, Int>("Lok Adr")
-        val nameCol = TableColumn<Loco, String>("Name")
-        val massCol = TableColumn<Loco, Int>("Masse")
-        val vmaxCol = TableColumn<Loco, Int>("Maximalgeschw.")
+        val adrCol = TableColumn<Trip, Int>("Adr (ID)")
+        val routeCol = TableColumn<Trip, Int>("Fahrstraße")
+        val sens1Col = TableColumn<Trip, Int>("Sensor 1")
+        val sens2Col = TableColumn<Trip, Int>("Sensor 2")
+        val locoCol = TableColumn<Trip, String>("Loco (Adr,Dir,V)")
+        val stopdelayCol = TableColumn<Trip, Int>("Stopdelay[sec]")
 
+        //   <trip adr="3100" route="2300" sens1="924" sens2="902" loco="29,1,126" stopdelay="1500" />
 
 
         /* final TextFormatter<String> formatter = new TextFormatter<String>(change -> {
@@ -127,28 +129,51 @@ class LocosTable internal constructor(primaryStage: Stage, private val app: SX4D
             }
         }
 
-        tableView.columns.setAll(adrCol, nameCol, massCol, vmaxCol)
+        tableView.columns.setAll(adrCol, routeCol, sens1Col, sens2Col, locoCol, stopdelayCol)
         tableView.isEditable = true
 
-        nameCol.cellFactory = TextFieldTableCell.forTableColumn();
+        locoCol.cellFactory = TextFieldTableCell.forTableColumn();
         adrCol.cellFactory = TextFieldTableCell.forTableColumn(myStringIntConverter);
-        massCol.cellFactory = TextFieldTableCell.forTableColumn(myStringIntConverter);
-        vmaxCol.cellFactory = TextFieldTableCell.forTableColumn(myStringIntConverter);
+        //sens1Col.cellFactory = TextFieldTableCell.forTableColumn(myStringIntConverter);  -> calc from route
+        //sens2Col.cellFactory = TextFieldTableCell.forTableColumn(myStringIntConverter);  -> calc from route
+        routeCol.cellFactory = TextFieldTableCell.forTableColumn(myStringIntConverter);
+        stopdelayCol.cellFactory = TextFieldTableCell.forTableColumn(myStringIntConverter);
 
-        adrCol.setOnEditCommit { event: TableColumn.CellEditEvent<Loco, Int> ->
+        routeCol.setOnEditCommit { event: TableColumn.CellEditEvent<Trip, Int> ->
             val pos = event.tablePosition
-            val newAdr = event.newValue
+            val newRouteAdr = event.newValue
             val row = pos.row
-            val loco = event.tableView.items[row]
-            if ((newAdr > 0) and (newAdr < 100)) {
-                loco.adr = newAdr
-            } else {  // this is a workaround for a bug in javafx, value not repainted
-                adrCol.setVisible(false);
-                adrCol.setVisible(true);
+            val trip = event.tableView.items[row]
+
+            // check if the number entered is the adr of an existing route
+            val newRoute: Route? = Route.getByAddress(newRouteAdr)
+            var newCompRoute: CompRoute? = CompRoute.getByAddress(newRouteAdr)
+            if (newRoute != null) {
+                trip.route = newRouteAdr
+                val routeSensors = newRoute.sensors.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                if (routeSensors.size >= 2) {
+                    trip.sens1 = routeSensors[0].toInt()
+                    trip.sens2 = routeSensors[routeSensors.size - 1].toInt()
+                } else {
+                    trip.sens1 = INVALID_INT
+                    trip.sens2 = INVALID_INT
+                }
+            } else if (newCompRoute != null) {
+                trip.route = newRouteAdr  // new compRouteAddress
+                trip.sens1 = newCompRoute.getStartSensor() ?: INVALID_INT
+                trip.sens2 = newCompRoute.getEndSensor() ?: INVALID_INT
+            } else {
+                // NO CHANGE
+                trip.sens1 = INVALID_INT
+                trip.sens2 = INVALID_INT
+                println("ERROR: start and end sensor not found for (comp)route=$newRouteAdr")
             }
+            // this is a workaround for a bug in javafx, if not called, the row will not be repainted
+            routeCol.isVisible = false
+            routeCol.isVisible = true
         }
 
-        nameCol.setOnEditCommit { event: TableColumn.CellEditEvent<Loco, String> ->
+        /*nameCol.setOnEditCommit { event: TableColumn.CellEditEvent<Trip, String> ->
             val pos = event.tablePosition
             val newName = event.newValue
             val row = pos.row
@@ -156,7 +181,7 @@ class LocosTable internal constructor(primaryStage: Stage, private val app: SX4D
             loco.name = newName
         }
 
-        massCol.setOnEditCommit { event: TableColumn.CellEditEvent<Loco, Int> ->
+        massCol.setOnEditCommit { event: TableColumn.CellEditEvent<Trip, Int> ->
             val pos = event.tablePosition
             val newMass = event.newValue
             val row = pos.row
@@ -169,7 +194,7 @@ class LocosTable internal constructor(primaryStage: Stage, private val app: SX4D
             }
         }
 
-        vmaxCol.setOnEditCommit { event: TableColumn.CellEditEvent<Loco, Int> ->
+        vmaxCol.setOnEditCommit { event: TableColumn.CellEditEvent<Trip, Int> ->
             val pos = event.tablePosition
             val newVmax = event.newValue
             val row = pos.row
@@ -180,7 +205,8 @@ class LocosTable internal constructor(primaryStage: Stage, private val app: SX4D
                 vmaxCol.setVisible(false);
                 vmaxCol.setVisible(true);
             }
-        }
+        }  */
+
         //adrCol.setOnEditCommit( { ev -> (ev.tableView.items[ev.tablePosition.row] as Integer).adr = ev.newValue }
 
         /*massCol.setCellFactory(TextFieldTableCell.forTableColumn())
@@ -189,28 +215,24 @@ class LocosTable internal constructor(primaryStage: Stage, private val app: SX4D
         vmaxCol.setCellFactory(TextFieldTableCell.forTableColumn())
         vmaxCol.setOnEditCommit { ev -> (ev.tableView.items[ev.tablePosition.row] as Integer).vmax = ev.newValue } */
 
-        /*      tableViewData[i].setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-            chanCol.setMaxWidth(1f * Integer.MAX_VALUE * 18); // 30% width
-            chanCol.setStyle("-fx-alignment: CENTER;");
-            dataCol.setMaxWidth(1f * Integer.MAX_VALUE * 18); // 70% width
-            dataCol.setStyle("-fx-alignment: CENTER;"); */
+
         tableView.isCenterShape = true
         tableView.setRowFactory { tableView ->
-            val row = TableRow<Loco>()
+            val row = TableRow<Trip>()
             val contextMenu = ContextMenu()
-            val removeMenuItem = MenuItem("Lok löschen")
+            val removeMenuItem = MenuItem("Fahrt löschen")
             removeMenuItem.onAction = EventHandler {
                 tableView.items.remove(row.item)
             }
-            val editMenuItem = MenuItem("+ NEUE LOK")
-            editMenuItem.onAction = EventHandler {
-                locos.add(Loco(3,"name",3,160))
+            val newMenuItem = MenuItem("+ NEUE Fahrt")
+            newMenuItem.onAction = EventHandler {
+                trips.add(Trip(3500, 3000, 900, 901, "29,1,30", 1500))
             }
             /*val hideMenuItem = MenuItem("Fahrstraßen nicht mehr anzeigen")
             hideMenuItem.onAction = EventHandler {
                 app.hideAllRoutes()
             } */
-            contextMenu.items.addAll(editMenuItem, /* hideMenuItem, */ removeMenuItem)
+            contextMenu.items.addAll(newMenuItem, /* hideMenuItem, */ removeMenuItem)
             // Set context menu on row, but use a binding to make it only show for non-empty rows:
             row.contextMenuProperty().bind(
                     Bindings.`when`(row.emptyProperty())
@@ -221,21 +243,23 @@ class LocosTable internal constructor(primaryStage: Stage, private val app: SX4D
         }
 
         adrCol.cellValueFactory = PropertyValueFactory("adr")
-        nameCol.cellValueFactory = PropertyValueFactory("name")
-        massCol.cellValueFactory = PropertyValueFactory("mass")
-        vmaxCol.cellValueFactory = PropertyValueFactory("vmax")
+        routeCol.cellValueFactory = PropertyValueFactory("route")
+        sens1Col.cellValueFactory = PropertyValueFactory("sens1")
+        sens2Col.cellValueFactory = PropertyValueFactory("sens2")
+        locoCol.cellValueFactory = PropertyValueFactory("loco")
+        stopdelayCol.cellValueFactory = PropertyValueFactory("stopdelay")
 
-        tableView.items = locos
+        tableView.items = trips
 
-        println("locosTable " + tableView.items.size + " locos")
+        println("tripsTable " + tableView.items.size + " trips")
 
         // textField.setTextFormatter(formatter);
         Utils.customResize(tableView)
 
     }
 
-    //private fun editLoco(a : Int, st : Stage) {
-    //    LocoDialog.open(a , st)
-    //}
+//private fun editLoco(a : Int, st : Stage) {
+//    LocoDialog.open(a , st)
+//}
 
 }
