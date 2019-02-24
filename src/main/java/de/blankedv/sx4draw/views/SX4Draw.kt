@@ -95,7 +95,6 @@ class SX4Draw : Application() {
     private var line: Line? = null
     private val scPane = ScrollPane()
 
-    internal val showScrollBars = CheckMenuItem("ScrollBars")
     internal val dispAddresses = CheckMenuItem("Adressen anzeigen")
     internal val rasterOn = CheckMenuItem("Raster")
     internal val showMousePos = CheckMenuItem("Mauspos. anzeigen")
@@ -1202,7 +1201,7 @@ class SX4Draw : Application() {
                 panelElements, ArrayList(routes),
                 // filter "dummy compRoute" out
                 ArrayList(compRoutes.filter{it -> (it.btn1 != 0) and (it.btn2 != 0)}),
-                trips, timetables)
+                ArrayList(trips), ArrayList(timetables))
         val shortFN = File(fn).name
         val layoutConfig = LayoutConfig(shortFN, version, panelConfig)
 
@@ -1237,25 +1236,11 @@ class SX4Draw : Application() {
                 version = layoutConfig.version
                 System.out.println("filename=${currentFileName} version=$version")
                 val panelConfig = layoutConfig.getPC0()   // first PanelConfig
-                try {
-                    panelElements = panelConfig!!.getAllPanelElements()
-                    panelName = panelConfig!!.name
-                    locos = FXCollections.observableArrayList(panelConfig!!.getAllLocos())
-                    for (l in locos) println(l.toString())
-                    routes = FXCollections.observableArrayList(panelConfig!!.getAllRoutes())
-                    compRoutes = FXCollections.observableArrayList(panelConfig!!.getAllCompRoutes())
-                    trips = panelConfig!!.getAllTrips()
-                    for (t in trips) println(t.toString())
-                    timetables = panelConfig!!.getAllTimetables()
-                } catch (e: NullPointerException) {
-                    System.out.println("ERROR in reading panelConfig")
-                    System.out.println("ERROR: ${e.message}")
+                if (panelConfig != null) {
+                    loadDataFromPanelConfig(panelConfig)
+                } else {
+                    println("ERROR: empty panelConfig in layoutConfig")
                 }
-                // from write...
-                //val panelConfig = PanelConfig(panelName, panelElements, ArrayList(routes), ArrayList(compRoutes), trips, timetables)
-                //val shortFN = File(fn).name
-                //layoutConfig = LayoutConfig(shortFN, panelName, panelConfig, version)
-
                 redrawPanelElements()
                 return selectedFile.parent
             } else {
@@ -1274,7 +1259,28 @@ class SX4Draw : Application() {
         }
     }
 
-    fun getRaster(): Int {
+    private fun loadDataFromPanelConfig(pc: PanelConfig) {
+          // close open child windows
+            routingTable?.close()
+            routingTable = null
+            locosTable?.close()
+            locosTable = null
+            compRoutesTable?.close()
+            compRoutesTable = null
+        // load data from panelconfig
+            panelElements = pc.getAllPanelElements()
+            panelName = pc.name
+            locos = FXCollections.observableArrayList(pc.getAllLocos())
+            for (l in locos) println(l.toString())
+            routes = FXCollections.observableArrayList(pc.getAllRoutes())
+            compRoutes = FXCollections.observableArrayList(pc.getAllCompRoutes())
+            trips = FXCollections.observableArrayList(pc.getAllTrips())
+            for (t in trips) println(t.toString())
+            timetables = FXCollections.observableArrayList(pc.getAllTimetables())
+
+    }
+
+    private fun getRaster(): Int {
         return if (rasterOn.isSelected) {
             RASTER
         } else {
@@ -1294,27 +1300,19 @@ class SX4Draw : Application() {
 
     fun showCompRoute(compRt: CompRoute?) {
         val allRoutes = compRt!!.routes.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        var btn1 = 0
-        var btn2 = 0
         if (allRoutes.size != 0) {
             for (i in 0..(allRoutes.size-1)) {
                 val rtStr = allRoutes[i]
                 try {
                     val rtID = Integer.parseInt(rtStr)
                     val route = Route.getByAddress(rtID)
-                    if (i == 0) btn1 = route!!.btn1
-                    if (i == (allRoutes.size -1))  btn2 = route!!.btn2
-                    showRoute(route)
+                    route?.setRouteStates()
                 } catch (e : java.lang.NumberFormatException) {
                 }
             }
         }
         redrawPanelElements()
-        if ((btn1 != 0) and (btn2 != 0)) {
-            drawRTButtons(btn1, btn2)
-        } else {
-            println("ERROR: compRoute: check btn1, btn2")
-        }
+        drawRTButtons(compRt.btn1, compRt.btn2)
     }
 
     fun hideAllRoutes() {
@@ -1335,8 +1333,8 @@ class SX4Draw : Application() {
         var routes = FXCollections.observableArrayList<Route>()
         var compRoutes = FXCollections.observableArrayList<CompRoute>()
         //public static final ObservableList<Trip> trips = FXCollections.observableArrayList();
-        var trips = ArrayList<Trip>()
-        var timetables = ArrayList<Timetable>()
+        var trips = FXCollections.observableArrayList<Trip>()
+        var timetables = FXCollections.observableArrayList<Timetable>()
 
         var lastPE: PanelElement? = null
         var panelName = ""

@@ -59,7 +59,7 @@ class CompRoutesTable internal constructor(primaryStage: Stage, private val app:
         bp.setBottom(hb);
         hb.setAlignment(Pos.CENTER);
         BorderPane.setMargin(hb, new Insets(8, 8, 8, 8)); */
-        compRoutesTableSceen = Scene(bp, 700.0, 300.0)
+        compRoutesTableSceen = Scene(bp, 400.0, 300.0)
         bp.center = tableView
 
         // New window (Stage)
@@ -69,7 +69,7 @@ class CompRoutesTable internal constructor(primaryStage: Stage, private val app:
             compRouteWindow.close();
         }); */
 
-        compRouteWindow.title = "Zusammengesetzte Fahrstrassen (CompRoute) - " + panelName
+        compRouteWindow.title = "Zusammeng. Fahrstraßen (CompRoute)"
         compRouteWindow.scene = compRoutesTableSceen
 
         // Specifies the modality for new window.
@@ -89,6 +89,10 @@ class CompRoutesTable internal constructor(primaryStage: Stage, private val app:
 
     fun show() {
         compRouteWindow.show()
+    }
+
+    fun close() {
+        compRouteWindow.close()
     }
 
     private fun createDataTables() {

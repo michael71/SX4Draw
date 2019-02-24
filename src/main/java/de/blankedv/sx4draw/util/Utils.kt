@@ -141,30 +141,34 @@ object Utils {
                 defaultColor = Color.ORANGE
                 when (state) {
                     Constants.PEState.STATE_0 -> {
-                        if (g.inv == 0) {   // not inverted
+                        if ((g.inv == null) || (g.inv == 0)) {   // not inverted
                             shape = Line(g.x.toDouble(), g.y.toDouble(), g.x2.toDouble(), g.y2.toDouble())
                             shape.strokeLineCap = StrokeLineCap.ROUND
                             shape.strokeWidth = PanelElement.TRACK_WIDTH
-                        } else {
+                        } else if (g.inv == 1){
                             shape = Line(g.x.toDouble(), g.y.toDouble(), g.xt.toDouble(), g.yt.toDouble())
                             shape.strokeLineCap = StrokeLineCap.ROUND
                             shape.strokeWidth = PanelElement.TRACK_WIDTH
+                        } else {
+                            println("ERROR: invalid g.inv value")
                         }
-                        shape.fill = Color.GREEN
-                        shape.stroke = Color.GREEN
+                        //shape.fill = Color.GREEN
+                        //shape.stroke = Color.GREEN
                     }
                     Constants.PEState.STATE_1 -> {
-                        if (g.inv == 0) {   // not inverted
+                        if ((g.inv == null) || (g.inv == 0)) {   // not inverted
                             shape = Line(g.x.toDouble(), g.y.toDouble(), g.xt.toDouble(), g.yt.toDouble())
                             shape.strokeLineCap = StrokeLineCap.ROUND
                             shape.strokeWidth = PanelElement.TRACK_WIDTH
-                        } else {
+                        } else if (g.inv == 1){
                             shape = Line(g.x.toDouble(), g.y.toDouble(), g.x2.toDouble(), g.y2.toDouble())
                             shape.strokeLineCap = StrokeLineCap.ROUND
                             shape.strokeWidth = PanelElement.TRACK_WIDTH
+                        } else {
+                            println("ERROR: invalid g.inv value")
                         }
-                        shape.fill = Color.RED
-                        shape.stroke = Color.RED
+                        //shape.fill = Color.RED
+                        //shape.stroke = Color.RED
                     }
                     else -> {
                         val l1 = Line(g.x.toDouble(), g.y.toDouble(), g.x2.toDouble(), g.y2.toDouble())
@@ -174,10 +178,12 @@ object Utils {
                         l2.strokeLineCap = StrokeLineCap.ROUND
                         l2.strokeWidth = PanelElement.TRACK_WIDTH
                         shape = Shape.union(l1, l2)
-                        shape.fill = defaultColor
-                        shape.stroke = defaultColor
+                        //shape.fill = defaultColor
+                        // shape.stroke = defaultColor
                     }
                 }
+                shape.fill = defaultColor
+                shape.stroke = defaultColor
             }
             is Track -> {
                 defaultColor = Color.BLACK

@@ -92,6 +92,10 @@ class LocosTable internal constructor(primaryStage: Stage, private val app: SX4D
         locosWindow.show()
     }
 
+    fun close() {
+        locosWindow.close()
+    }
+
     private fun createDataTables() {
 
         val adrCol = TableColumn<Loco, Int>("Lok Adr")

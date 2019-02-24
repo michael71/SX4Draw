@@ -21,6 +21,7 @@ import de.blankedv.sx4draw.Constants
 import de.blankedv.sx4draw.Constants.INVALID_INT
 import de.blankedv.sx4draw.views.SX4Draw
 import de.blankedv.sx4draw.views.SX4Draw.Companion.compRoutes
+import de.blankedv.sx4draw.views.SX4Draw.Companion.routes
 import java.util.Comparator
 
 import org.w3c.dom.Node
@@ -108,6 +109,23 @@ data class CompRoute (
 
         // find a compRoute from a start routeBtn to an end routeBtn
         fun findCompRoute(from : Int, to : Int) : String? {
+            // get starting routes
+            var rtsInComp = ""
+            for (rt in routes) {
+                if (rt.btn1 == from) {
+                    // start route found
+                    rtsInComp += ""+rt.adr
+                    for (rt2 in routes) {
+                        if (rt2.btn2 == to) {
+                            // second route found
+                            rtsInComp += "," + rt2.adr
+                            return rtsInComp;
+                        }
+                    }
+                }
+
+            }
+
             return null
             // TODO : Algorithm for compound route detection
         }

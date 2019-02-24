@@ -86,12 +86,12 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
                 shape.stroke = Color.AQUA
             }
             STATE_0 -> {
-                shape.fill = Color.RED
-                shape.stroke = Color.RED
+                shape.fill = Color.AQUA //Color.RED
+                shape.stroke = Color.AQUA //Color.RED
             }
             STATE_1 -> {
-                shape.fill = Color.GREEN
-                shape.stroke = Color.GREEN
+                shape.fill = Color.AQUA //Color.GREEN
+                shape.stroke = Color.AQUA //Color.GREEN
             }
         }
     }
@@ -201,9 +201,6 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
          * in WriteConfig the NEW values are written !!
          */
         fun normPositions() {
-
-
-
             var xmin = INVALID_INT
             var xmax = INVALID_INT
             var ymin = INVALID_INT

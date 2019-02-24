@@ -57,7 +57,7 @@ class PanelConfig {
 
     @XmlElementWrapper(name = "routes")
     @get:XmlElement(name = "route")
-    private var route: List<Route>? = ArrayList<Route>()
+    private var route: ArrayList<Route>? = ArrayList<Route>()
 
     @XmlElementWrapper(name = "comproutes")
     @get:XmlElement(name = "comproute")
@@ -89,7 +89,12 @@ class PanelConfig {
         this.timetable = timetables
     }
 
-    private fun setPanelElements(pes: ArrayList<PanelElement>) {
+        private fun setPanelElements(pes: ArrayList<PanelElement>) {
+        track.clear()
+        turnout.clear()
+        sensor.clear()
+        signal.clear()
+        routebutton.clear()
         for (pe in pes) {
             when (pe.gpe) {
                 is Track -> track.add(pe.gpe as Track)

@@ -50,7 +50,7 @@ class LayoutConfig {
 
     fun getPC0() : PanelConfig? {
         if (panel.size >= 1) {
-            return panel.get(0)
+             return panel[0]
         } else {
             return null
         }

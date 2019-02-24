@@ -65,7 +65,7 @@ class RoutesTable internal constructor(primaryStage: Stage, private val app: SX4
             locosWindow.close();
         }); */
 
-        routingWindow.title = "Fahrstraßen Tabelle " + panelName
+        routingWindow.title = "Fahrstraßen (Route) Tabelle"
         routingWindow.scene = routingTableScene
 
         // Specifies the modality for new window.
@@ -85,6 +85,10 @@ class RoutesTable internal constructor(primaryStage: Stage, private val app: SX4
 
     fun show() {
         routingWindow.show()
+    }
+
+    fun close() {
+        routingWindow.close()
     }
 
     private fun createDataTables() {
