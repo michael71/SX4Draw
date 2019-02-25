@@ -54,6 +54,10 @@ class Trip(
         var stopdelay: Int = INVALID_INT) : Comparator<Trip>, Comparable<Trip> {
 
 
+    init {
+        autoAddress()
+    }
+
     fun autoAddress() {
         if (adr != INVALID_INT) return
 

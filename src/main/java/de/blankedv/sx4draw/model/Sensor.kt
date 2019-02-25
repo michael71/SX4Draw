@@ -19,15 +19,15 @@ package de.blankedv.sx4draw.model
 
 import de.blankedv.sx4draw.Constants.INVALID_INT
 import de.blankedv.sx4draw.PanelElement
-import de.blankedv.sx4draw.model.GenericPE
-import de.blankedv.sx4draw.model.IntPoint
 import de.blankedv.sx4draw.util.Utils
 import javafx.scene.shape.Line
 import javafx.util.Pair
 import java.lang.NumberFormatException
 import javax.xml.bind.annotation.XmlAttribute
 import javax.xml.bind.annotation.XmlRootElement
+import javax.xml.bind.annotation.XmlTransient
 import javax.xml.bind.annotation.XmlType
+import kotlin.properties.Delegates
 
 /**
  *
@@ -52,8 +52,19 @@ class Sensor : GenericPE {
     @get:XmlAttribute
     var y2: Int? = null
 
+    @XmlTransient
+    private var _adrStr = ""
+
     @get:XmlAttribute(name = "adr")
-    var adrStr = ""
+    var adrStr: String by Delegates.observable(_adrStr) { _, old, new ->
+        println("Sensor adrStr changed from $old to $new")
+        if (old.isNotEmpty()) {
+            val oldArry = old.split(",")
+            val newArry = new.split(",")
+            Route.sensorAddressChanged(oldArry[0], newArry[0])
+        }
+        _adrStr = new
+    }
 
     @get:XmlAttribute
     var sxadr: Int? = null
@@ -62,6 +73,7 @@ class Sensor : GenericPE {
     var sxbit: Int? = null
 
     override val ord = 1
+
 
     constructor() {}
 

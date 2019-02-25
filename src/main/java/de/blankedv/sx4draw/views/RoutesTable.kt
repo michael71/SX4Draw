@@ -40,11 +40,11 @@ import javafx.util.StringConverter
  */
 class RoutesTable internal constructor(primaryStage: Stage, private val app: SX4Draw) {
 
-    private val tableView = TableView<Route>()
 
-    internal var routingTableScene: Scene
+
+    private var routingTableScene: Scene
     // New window (Stage)
-    internal var routingWindow: Stage
+    private var routingWindow: Stage
 
     init {
 
@@ -74,8 +74,8 @@ class RoutesTable internal constructor(primaryStage: Stage, private val app: SX4
         routingWindow.initOwner(primaryStage)
 
         // Set position of second window, related to primary window.
-        routingWindow.x = primaryStage.x + 200
-        routingWindow.y = primaryStage.y + 100
+        routingWindow.x = primaryStage.x + 100
+        routingWindow.y = primaryStage.y + 50
 
         createDataTables()
 
@@ -90,6 +90,8 @@ class RoutesTable internal constructor(primaryStage: Stage, private val app: SX4
     fun close() {
         routingWindow.close()
     }
+
+
 
     private fun createDataTables() {
 
@@ -207,4 +209,12 @@ class RoutesTable internal constructor(primaryStage: Stage, private val app: SX4
 
     }
 
+    companion object {
+
+        private val tableView = TableView<Route>()
+
+        fun refresh() {
+            tableView.refresh()
+        }
+    }
 }

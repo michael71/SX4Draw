@@ -26,16 +26,12 @@ import de.blankedv.sx4draw.views.SX4Draw.Companion.trips
 
 import javafx.event.EventHandler
 import javafx.scene.Scene
-import javafx.scene.control.TableColumn
-import javafx.scene.control.TableView
 import javafx.scene.control.cell.PropertyValueFactory
 import javafx.scene.control.cell.TextFieldTableCell
 import javafx.scene.layout.BorderPane
 import javafx.stage.Stage
 import javafx.beans.binding.Bindings
-import javafx.scene.control.ContextMenu
-import javafx.scene.control.MenuItem
-import javafx.scene.control.TableRow
+import javafx.scene.control.*
 import javafx.util.StringConverter
 
 
@@ -44,11 +40,9 @@ import javafx.util.StringConverter
  */
 class TripsTable internal constructor(primaryStage: Stage, private val app: SX4Draw) {
 
-    private val tableView = TableView<Trip>()
-
     internal var tripsTableScene: Scene
     // New window (Stage)
-    internal var locosWindow: Stage
+    internal var tripsWindow: Stage
 
     init {
 
@@ -59,40 +53,44 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
         bp.setBottom(hb);
         hb.setAlignment(Pos.CENTER);
         BorderPane.setMargin(hb, new Insets(8, 8, 8, 8)); */
+        val btnAddTrip = Button("+ NEUE Fahrt");
         tripsTableScene = Scene(bp, 700.0, 300.0)
+        bp.top = btnAddTrip
         bp.center = tableView
 
         // New window (Stage)
-        locosWindow = Stage()
+        tripsWindow = Stage()
         /* btnClose.setOnAction((e) -> {
             //sxAddress.addr = -1;
             locosWindow.close();
         }); */
 
-        locosWindow.title = "Fahrten (Trips) Tabelle"
-        locosWindow.scene = tripsTableScene
+        tripsWindow.title = "Fahrten (Trips) Tabelle"
+        tripsWindow.scene = tripsTableScene
 
         // Specifies the modality for new window.
         //locosWindow.initModality(Modality.WINDOW_MODAL);
         // Specifies the owner Window (parent) for new window
-        locosWindow.initOwner(primaryStage)
+        tripsWindow.initOwner(primaryStage)
 
         // Set position of second window, related to primary window.
-        locosWindow.x = primaryStage.x + 400
-        locosWindow.y = primaryStage.y + 300
+        tripsWindow.x = primaryStage.x + 200
+        tripsWindow.y = primaryStage.y + 150
 
-        createDataTables()
+        btnAddTrip.setOnAction { trips.add(Trip(INVALID_INT, 3000, 900, 901, "29,1,30", 1500)) }
 
-        locosWindow.show()
+        show()
 
     }
 
     fun show() {
-        locosWindow.show()
+
+        createDataTables()
+        tripsWindow.show()
     }
 
     fun close() {
-        locosWindow.close()
+        tripsWindow.close()
     }
 
     private fun createDataTables() {
@@ -226,7 +224,7 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
             }
             val newMenuItem = MenuItem("+ NEUE Fahrt")
             newMenuItem.onAction = EventHandler {
-                trips.add(Trip(3500, 3000, 900, 901, "29,1,30", 1500))
+                trips.add(Trip(INVALID_INT, 3000, 900, 901, "29,1,30", 1500))
             }
             /*val hideMenuItem = MenuItem("Fahrstraßen nicht mehr anzeigen")
             hideMenuItem.onAction = EventHandler {
@@ -258,8 +256,13 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
 
     }
 
-//private fun editLoco(a : Int, st : Stage) {
-//    LocoDialog.open(a , st)
-//}
+    companion object {
+        private val tableView = TableView<Trip>()
+
+        fun refresh() {
+            tableView.refresh()
+        }
+
+    }
 
 }

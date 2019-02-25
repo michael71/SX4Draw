@@ -69,4 +69,6 @@ abstract class GenericPE() : Comparator<GenericPE>, Comparable<GenericPE> {
     fun onSamePoint(p2 : IntPoint) : Boolean {
         return ((x == p2.x) and (y == p2.y))
     }
+
+
 }

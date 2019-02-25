@@ -34,15 +34,13 @@ object Constants {
     const val RECT_X = 2000
     const val RECT_Y = 1200
 
-    const val ADDR0_ROUTEBUTTON = 3000
-    const val ADDR0_ROUTE = 3200
-    const val ADDR0_COMPROUTE = 3400
+    const val ADDR0_ROUTEBUTTON = 4000
+    const val ADDR0_ROUTE = 4300
+    const val ADDR0_COMPROUTE = 4600
     const val ADDR0_TRIP = 5000
-    const val ADDR0_TIMETABLE = 5600
-    const val ADDR0_SIGNAL = 4000
+    const val ADDR0_TIMETABLE = 5500
+    const val ADDR0_SIGNAL = 3000
     const val ADDR0_TURNOUT = 801
-
-    const val EMPTY_LOCO_NAME = "leer"
 
     enum class PEState {
         DEFAULT, MARKED, SELECTED, STATE_0, STATE_1

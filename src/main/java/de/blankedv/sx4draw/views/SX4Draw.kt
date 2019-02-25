@@ -64,7 +64,6 @@ import java.util.prefs.Preferences
 
 import de.blankedv.sx4draw.Constants.INVALID_INT
 import de.blankedv.sx4draw.Constants.DEBUG
-import de.blankedv.sx4draw.Constants.EMPTY_LOCO_NAME
 import de.blankedv.sx4draw.Constants.RASTER
 import de.blankedv.sx4draw.Constants.RECT_X
 import de.blankedv.sx4draw.Constants.RECT_Y
@@ -89,10 +88,12 @@ class SX4Draw : Application() {
 
     private var routingTable: RoutesTable? = null
     private var currentRoute: Route? = null
-    private var currentCompRoute : CompRoute? = null
+    private var currentCompRoute: CompRoute? = null
     private var locosTable: LocosTable? = null
-    private var compRoutesTable : CompRoutesTable? = null
-    private var tripsTable : TripsTable? = null
+    private var compRoutesTable: CompRoutesTable? = null
+    private var tripsTable: TripsTable? = null
+    private var timetableTable: TimetableTable? = null
+
 
     private var line: Line? = null
     private val scPane = ScrollPane()
@@ -159,7 +160,8 @@ class SX4Draw : Application() {
                         println("moveStart")
                         addToDraggedGroup()
                     }
-                    else -> { /* do nothing */ }
+                    else -> { /* do nothing */
+                    }
                 }//}
             } else if (me.button == MouseButton.SECONDARY) {
                 println("sec btn")
@@ -177,7 +179,7 @@ class SX4Draw : Application() {
         anchorPane.addEventHandler(KeyEvent.KEY_PRESSED) { t ->
             if (t.code == KeyCode.ESCAPE) {
                 println("click on escape")
-                if ((currentGUIState == GUIState.ADD_ROUTE) or (currentGUIState == GUIState.ADD_COMPROUTE)){
+                if ((currentGUIState == GUIState.ADD_ROUTE) or (currentGUIState == GUIState.ADD_COMPROUTE)) {
                     // abbruch
                     for (sel in panelElements) {
                         sel.createShapeAndSetState(Constants.PEState.DEFAULT)
@@ -319,7 +321,8 @@ class SX4Draw : Application() {
                         resetPEStates()
                         redrawPanelElements()
                     }
-                    else -> { /*do nothing */}
+                    else -> { /*do nothing */
+                    }
                 }
             }
         }
@@ -627,6 +630,7 @@ class SX4Draw : Application() {
         val openLocoTable = MenuItem("Loks anzeigen")
         val openCompRoutesTable = MenuItem("Zusammenges. Fahrstraßen anzeigen")
         val openTripsTable = MenuItem("Fahrten anzeigen")
+        val openTimetableTable = MenuItem("Fahrpläne anzeigen")
 
         val menuOptions = Menu("Optionen")
         val setName = MenuItem("Set Panel-Name")
@@ -646,7 +650,7 @@ class SX4Draw : Application() {
         val exitItem = MenuItem("Programm-Ende/Exit")
 
         menu1.items.addAll(openItem, saveItem, exitItem)
-        menuWindows.items.addAll(openRoutingTable, openCompRoutesTable, openTripsTable, openLocoTable)
+        menuWindows.items.addAll(openRoutingTable, openCompRoutesTable, openTripsTable, openTimetableTable, openLocoTable)
         menuOptions.items.addAll(setName, dispAddresses, rasterOn) //, showMousePos) //, showScrollBars)
         menuCalc.items.addAll(cTurnouts, cNormPositions, scale200, scale50)
         menuExtra.items.addAll(cSearch)
@@ -798,12 +802,9 @@ class SX4Draw : Application() {
                         }
                     } catch (e: NumberFormatException) {
                     }
-
                 }
                 redrawPanelElements()
-
             }
-
         }
 
         openRoutingTable.setOnAction { event ->
@@ -824,13 +825,18 @@ class SX4Draw : Application() {
             }
         }
 
+        openTimetableTable.setOnAction { event ->
+            println("open timetable table")
+            if (timetableTable == null) {
+                timetableTable = TimetableTable(stage, this)
+            } else {
+                timetableTable!!.show()
+            }
+        }
+
         openLocoTable.setOnAction { event ->
             println("open locos table")
             if (locosTable == null) {
-                if (locos.size == 0) {
-                    // create a dummy entry (will NOT be written to XML file)
-                    locos.add(Loco(1,EMPTY_LOCO_NAME,3,120))
-                }
                 locosTable = LocosTable(stage, this)
             } else {
                 locosTable!!.show()
@@ -840,16 +846,11 @@ class SX4Draw : Application() {
         openCompRoutesTable.setOnAction { event ->
             println("open compRoutes table")
             if (compRoutesTable == null) {
-                if (compRoutes.size == 0) {
-                    // create a dummy entry (will NOT be written to XML file)
-                    compRoutes.add(CompRoute())
-                }
                 compRoutesTable = CompRoutesTable(stage, this)
             } else {
                 compRoutesTable!!.show()
             }
         }
-
 
 
         val infoItem = MenuItem("Info")
@@ -883,7 +884,7 @@ class SX4Draw : Application() {
             }
         }
 
-        menuBar.menus.addAll(menu1, menuOptions, menuCalc, menuExtra, menuWindows,  menuInfo)
+        menuBar.menus.addAll(menu1, menuOptions, menuCalc, menuExtra, menuWindows, menuInfo)
     }
 
     private fun toggleSelectionPE(p: IntPoint) {
@@ -913,7 +914,7 @@ class SX4Draw : Application() {
     private fun editTurnout(pe: PanelElement, primStage: Stage) {
         val tu = (pe.gpe as Turnout)
         val invert = tu.inv ?: 0
-        println("IN: addr=" + tu.getAddr() + " inv=" + invert )
+        println("IN: addr=" + tu.getAddr() + " inv=" + invert)
         val initA = GenericAddress(tu.getAddr(), INVALID_INT, invert)
         val result = AddressDialog.open(pe, primStage, initA)
         if (result.addr != -1) {
@@ -1127,14 +1128,14 @@ class SX4Draw : Application() {
                 currentCompRoute = null // no routebtn at this point
             }
         } else {
-            if (rtbtn != null)  {
+            if (rtbtn != null) {
                 // creation finished - an end route button has been selected
                 currentCompRoute!!.btn2 = rtbtn.gpe.getAddr()
                 println("btn2 =" + currentCompRoute!!.btn2)
                 // check if there is such a compound route
-                val foundRoutes : String? = CompRoute.findCompRoute(currentCompRoute!!.btn1, currentCompRoute!!.btn2)
+                val foundRoutes: String? = CompRoute.findCompRoute(currentCompRoute!!.btn1, currentCompRoute!!.btn2)
                 if (foundRoutes == null) {
-                   // no such compound Route
+                    // no such compound Route
                     val alert = Alert(AlertType.INFORMATION)
                     alert.title = "Zusammenges. Fahrstraße " + currentCompRoute!!.adr + " ?"
                     alert.headerText = null
@@ -1209,10 +1210,10 @@ class SX4Draw : Application() {
 
         val panelConfig = PanelConfig(panelName,
                 // filter "dummy loco" out
-                ArrayList(locos.filter{it -> !it.name.equals(EMPTY_LOCO_NAME)}),
+                ArrayList(locos),  //.filter { it -> !it.name.equals(EMPTY_LOCO_NAME) }),
                 panelElements, ArrayList(routes),
                 // filter "dummy compRoute" out
-                ArrayList(compRoutes.filter{it -> (it.btn1 != 0) and (it.btn2 != 0)}),
+                ArrayList(compRoutes),   // .filter { it -> (it.btn1 != 0) and (it.btn2 != 0) }
                 ArrayList(trips), ArrayList(timetables))
         val shortFN = File(fn).name
         val layoutConfig = LayoutConfig(shortFN, version, panelConfig)
@@ -1272,23 +1273,27 @@ class SX4Draw : Application() {
     }
 
     private fun loadDataFromPanelConfig(pc: PanelConfig) {
-          // close open child windows
-            routingTable?.close()
-            routingTable = null
-            locosTable?.close()
-            locosTable = null
-            compRoutesTable?.close()
-            compRoutesTable = null
+        // close open child windows
+        routingTable?.close()
+        routingTable = null
+        locosTable?.close()
+        locosTable = null
+        compRoutesTable?.close()
+        compRoutesTable = null
+        tripsTable?.close()
+        tripsTable = null
+        timetableTable?.close()
+        timetableTable = null
         // load data from panelconfig
-            panelElements = pc.getAllPanelElements()
-            panelName = pc.name
-            locos = FXCollections.observableArrayList(pc.getAllLocos())
-            for (l in locos) println(l.toString())
-            routes = FXCollections.observableArrayList(pc.getAllRoutes())
-            compRoutes = FXCollections.observableArrayList(pc.getAllCompRoutes())
-            trips = FXCollections.observableArrayList(pc.getAllTrips())
-            for (t in trips) println(t.toString())
-            timetables = FXCollections.observableArrayList(pc.getAllTimetables())
+        panelElements = pc.getAllPanelElements()
+        panelName = pc.name
+        locos = FXCollections.observableArrayList(pc.getAllLocos())
+        for (l in locos) println(l.toString())
+        routes = FXCollections.observableArrayList(pc.getAllRoutes())
+        compRoutes = FXCollections.observableArrayList(pc.getAllCompRoutes())
+        trips = FXCollections.observableArrayList(pc.getAllTrips())
+        for (t in trips) println(t.toString())
+        timetables = FXCollections.observableArrayList(pc.getAllTimetables())
 
     }
 
@@ -1313,13 +1318,13 @@ class SX4Draw : Application() {
     fun showCompRoute(compRt: CompRoute?) {
         val allRoutes = compRt!!.routes.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         if (allRoutes.size != 0) {
-            for (i in 0..(allRoutes.size-1)) {
+            for (i in 0..(allRoutes.size - 1)) {
                 val rtStr = allRoutes[i]
                 try {
                     val rtID = Integer.parseInt(rtStr)
                     val route = Route.getByAddress(rtID)
                     route?.setRouteStates()
-                } catch (e : java.lang.NumberFormatException) {
+                } catch (e: java.lang.NumberFormatException) {
                 }
             }
         }
@@ -1340,13 +1345,13 @@ class SX4Draw : Application() {
 
         // TODO UNDO für ca. mehrere Panel Elemente
 
-        var locos : ObservableList<Loco> = FXCollections.observableArrayList<Loco>()
+        var locos: ObservableList<Loco> = FXCollections.observableArrayList<Loco>()
         var panelElements = ArrayList<PanelElement>()
-        var routes : ObservableList<Route> = FXCollections.observableArrayList<Route>()
-        var compRoutes : ObservableList<CompRoute> = FXCollections.observableArrayList<CompRoute>()
+        var routes: ObservableList<Route> = FXCollections.observableArrayList<Route>()
+        var compRoutes: ObservableList<CompRoute> = FXCollections.observableArrayList<CompRoute>()
         //public static final ObservableList<Trip> trips = FXCollections.observableArrayList();
-        var trips : ObservableList<Trip> = FXCollections.observableArrayList<Trip>()
-        var timetables : ObservableList<Timetable> = FXCollections.observableArrayList<Timetable>()
+        var trips: ObservableList<Trip> = FXCollections.observableArrayList<Trip>()
+        var timetables: ObservableList<Timetable> = FXCollections.observableArrayList<Timetable>()
 
         var lastPE: PanelElement? = null
         var panelName = ""

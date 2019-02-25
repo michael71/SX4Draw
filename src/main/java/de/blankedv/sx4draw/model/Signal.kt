@@ -25,7 +25,9 @@ import java.lang.NumberFormatException
 
 import javax.xml.bind.annotation.XmlAttribute
 import javax.xml.bind.annotation.XmlRootElement
+import javax.xml.bind.annotation.XmlTransient
 import javax.xml.bind.annotation.XmlType
+import kotlin.properties.Delegates
 
 
 /**
@@ -52,8 +54,21 @@ class Signal : GenericPE {
     @get:XmlAttribute
     var y2 = INVALID_INT
 
+    @XmlTransient
+    private var _adrStr = ""
+
     @get:XmlAttribute(name = "adr")
-    var adrStr = ""
+    var adrStr: String by Delegates.observable(_adrStr) { prop, old, new ->
+        val old_0 = old.split(",")[0]
+        val new_0 = new.split(",")[0]
+        Route.addressInRouteChanged(old_0, new_0)
+        if (old.contains(',')) {
+            val old_1 = old.split(",")[1]
+            val new_1 = new.split(",")[1]
+            Route.addressInRouteChanged(old_1, new_1)
+        }
+        _adrStr = new
+    }
 
     override val ord = 2
 

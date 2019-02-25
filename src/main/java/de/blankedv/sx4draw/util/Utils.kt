@@ -34,6 +34,7 @@ import javafx.scene.shape.Circle
 import javafx.scene.shape.Line
 import javafx.scene.shape.Shape
 import javafx.scene.shape.StrokeLineCap
+import java.lang.NumberFormatException
 import java.net.URL
 
 
@@ -220,4 +221,5 @@ object Utils {
 
         return Pair(shape, defaultColor)
     }
+
 }

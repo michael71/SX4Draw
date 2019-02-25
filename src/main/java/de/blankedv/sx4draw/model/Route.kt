@@ -24,6 +24,8 @@ import de.blankedv.sx4draw.views.SX4Draw.Companion.routes
 import de.blankedv.sx4draw.Constants.PEState
 import de.blankedv.sx4draw.PanelElement
 import de.blankedv.sx4draw.model.*
+import de.blankedv.sx4draw.views.RoutesTable
+import de.blankedv.sx4draw.views.SX4Draw.Companion.trips
 
 import java.util.ArrayList
 import java.util.Comparator
@@ -308,5 +310,30 @@ class Route : Comparator<Route>, Comparable<Route> {
             }
             return null
         }
+
+        // change sensor addresses in all routes and trips, if the sensor address was changed
+        fun sensorAddressChanged(oAdr : String, nAdr : String) {
+            for (rt in routes) {
+                rt.sensors = rt.sensors.replace(oAdr,nAdr)
+                for (tr in trips.filter { it -> it.route == rt.adr}) {
+                    if (tr.sens1 == oAdr.toInt()) {
+                        tr.sens1 = nAdr.toInt()
+                    }
+                    if (tr.sens2 == oAdr.toInt()) {
+                        tr.sens2 = nAdr.toInt()
+                    }
+                }
+            }
+            RoutesTable.refresh()
+        }
+
+        // change turnout/signal addresses in all routes and trips, if the turnout/signal address was changed
+        fun addressInRouteChanged(oAdr : String, nAdr : String) {
+            for (rt in routes) {
+                rt.route = rt.route.replace(oAdr,nAdr)
+            }
+            RoutesTable.refresh()
+        }
+
     }
 }

@@ -78,8 +78,8 @@ class CompRoutesTable internal constructor(primaryStage: Stage, private val app:
         compRouteWindow.initOwner(primaryStage)
 
         // Set position of second window, related to primary window.
-        compRouteWindow.x = primaryStage.x + 300
-        compRouteWindow.y = primaryStage.y + 200
+        compRouteWindow.x = primaryStage.x + 150
+        compRouteWindow.y = primaryStage.y + 100
 
         createDataTables()
 

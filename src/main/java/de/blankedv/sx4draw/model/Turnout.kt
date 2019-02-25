@@ -26,7 +26,9 @@ import de.blankedv.sx4draw.model.IntPoint
 import javafx.util.Pair
 import javax.xml.bind.annotation.XmlAttribute
 import javax.xml.bind.annotation.XmlRootElement
+import javax.xml.bind.annotation.XmlTransient
 import javax.xml.bind.annotation.XmlType
+import kotlin.properties.Delegates
 
 
 /**
@@ -63,8 +65,15 @@ class Turnout : GenericPE {
     @get:XmlAttribute
     var inv: Int? = null
 
-    @get:XmlAttribute
-    var adr = ADDR0_TURNOUT
+    @XmlTransient
+    private var _adr = ADDR0_TURNOUT
+
+    @get:XmlAttribute(name = "adr")
+    var adr: Int by Delegates.observable(_adr) { prop, old, new ->
+        println("Turnout adr changed from $old to $new")
+        Route.addressInRouteChanged(old.toString(),new.toString())
+        _adr = new
+    }
 
     @get:XmlAttribute
     var sxadr: Int? = null

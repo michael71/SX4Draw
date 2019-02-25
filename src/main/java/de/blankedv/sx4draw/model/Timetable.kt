@@ -36,23 +36,25 @@ import javax.xml.bind.annotation.XmlType
  */
 @XmlRootElement(name = "timetable")
 @XmlType
-class Timetable  : Comparator<Timetable>, Comparable<Timetable> {
+class Timetable (
 
     @get:XmlAttribute
-    var adr : Int = INVALID_INT   // is mandatory
+    var adr : Int = INVALID_INT,   // is mandatory
 
     @get:XmlAttribute
-    var time : String? = ""
+    var time : String? = "",
 
     @get:XmlAttribute
-    var trip : String = ""   // is mandatory
+    var trip : String = "",   // is mandatory
 
     @get:XmlAttribute
-    var next : String? = ""
+    var next : Int = INVALID_INT )
 
-    constructor() {
+        : Comparator<Timetable>, Comparable<Timetable> {
+
+    init {
+        autoAddress()
     }
-
 
     fun autoAddress() {
     if (adr != INVALID_INT) return
@@ -92,7 +94,7 @@ class Timetable  : Comparator<Timetable>, Comparable<Timetable> {
                 } else if (theAttribute.nodeName == "trip") {
                     tt.trip = theAttribute.nodeValue
                 } else if (theAttribute.nodeName == "next") {
-                    tt.next = theAttribute.nodeValue
+                    tt.next = Integer.parseInt(theAttribute.nodeValue)
                 }
             }
             if (tt.adr != INVALID_INT) {
