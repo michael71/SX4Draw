@@ -626,7 +626,7 @@ class SX4Draw : Application() {
         val ivSX4generic = ImageView(Image("sx4_draw_ico32.png"))
         val menu1 = Menu("File")
         val menuWindows = Menu("Fenster")
-        val openRoutingTable = MenuItem("Fahrstr. anzeigen")
+        val openRoutingTable = MenuItem("Fahrstraßen anzeigen")
         val openLocoTable = MenuItem("Loks anzeigen")
         val openCompRoutesTable = MenuItem("Zusammenges. Fahrstraßen anzeigen")
         val openTripsTable = MenuItem("Fahrten anzeigen")
