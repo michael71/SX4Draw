@@ -139,46 +139,15 @@ class CompRoutesTable internal constructor(primaryStage: Stage, private val app:
             //}
         }
 
-        btn1Col.setOnEditCommit { event: TableColumn.CellEditEvent<CompRoute, Int> ->
-            val pos = event.tablePosition
-            val newBtn1 = event.newValue
-            val row = pos.row
-            val crt = event.tableView.items[row]
-            //if ((newAdr > 0) and (newAdr < 100)) {
-            crt.btn1 = newBtn1
-            ////    adrCol.setVisible(false);
-            //   adrCol.setVisible(true);
-            //}
-        }
 
-        btn2Col.setOnEditCommit { event: TableColumn.CellEditEvent<CompRoute, Int> ->
-            val pos = event.tablePosition
-            val newBtn2 = event.newValue
-            val row = pos.row
-            val crt = event.tableView.items[row]
-            //if ((newAdr > 0) and (newAdr < 100)) {
-            crt.btn2 = newBtn2
-            ////    adrCol.setVisible(false);
-            //   adrCol.setVisible(true);
-            //}
-        }
-
-        routesCol.setOnEditCommit { event: TableColumn.CellEditEvent<CompRoute, String> ->
-            val pos = event.tablePosition
-            val newRoutes = event.newValue
-            val row = pos.row
-            val crt = event.tableView.items[row]
-            crt.routes = newRoutes
-        } */
-
-
-        /*      tableViewData[i].setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+           tableViewData[i].setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
             chanCol.setMaxWidth(1f * Integer.MAX_VALUE * 18); // 30% width
             chanCol.setStyle("-fx-alignment: CENTER;");
             dataCol.setMaxWidth(1f * Integer.MAX_VALUE * 18); // 70% width
             dataCol.setStyle("-fx-alignment: CENTER;"); */
+
         tableView.isCenterShape = true
-        tableView.setRowFactory { tableView ->
+        tableView.setRowFactory {
             val row = TableRow<CompRoute>()
             val contextMenu = ContextMenu()
             val showMenuItem = MenuItem("Zusammeng. Fahrstraße anzeigen")

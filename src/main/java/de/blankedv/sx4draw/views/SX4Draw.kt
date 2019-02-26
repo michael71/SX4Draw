@@ -22,11 +22,8 @@ import de.blankedv.sx4draw.*
 import de.blankedv.sx4draw.config.*
 import de.blankedv.sx4draw.util.*
 
-import javafx.animation.KeyFrame
-import javafx.animation.Timeline
 import javafx.application.Application
 import javafx.collections.FXCollections
-import javafx.event.ActionEvent
 import javafx.event.EventHandler
 import javafx.geometry.Orientation
 import javafx.scene.Cursor
@@ -52,7 +49,6 @@ import javafx.stage.FileChooser
 import javafx.stage.FileChooser.ExtensionFilter
 import javafx.stage.Stage
 import javafx.stage.WindowEvent
-import javafx.util.Duration
 import javafx.util.Pair
 
 import java.io.File
@@ -74,7 +70,6 @@ import de.blankedv.sx4draw.PanelElement.Companion.TRACK_WIDTH
 import de.blankedv.sx4draw.model.*
 import de.blankedv.sx4draw.util.Calc
 import javafx.collections.ObservableList
-import java.lang.NullPointerException
 
 class SX4Draw : Application() {
 
@@ -859,7 +854,7 @@ class SX4Draw : Application() {
         infoItem.graphic = ivInfo
         infoItem.setOnAction { event ->
             println("info clicked")
-            Dialogs.buildInfoAlert("Info", "SX4Draw\nhttps://opensx.net/sx4 ", "Programm Version:$version", this)
+            Dialogs.buildInfoAlertOpenSX("Info", "SX4Draw\nhttps://opensx.net/sx4 ", "Programm Version:$version", this)
         }
 
         updateItem.graphic = ivSX4generic
@@ -880,7 +875,7 @@ class SX4Draw : Application() {
             } else {
                 val title = "$vNumber ist nicht aktuell."
                 val msg = "Download der aktuellen Version $newVersion von: https://opensx.net/sx4 möglich "
-                Dialogs.buildInfoAlert(title, msg, "", this)
+                Dialogs.buildInfoAlertOpenSX(title, msg, "", this)
             }
         }
 

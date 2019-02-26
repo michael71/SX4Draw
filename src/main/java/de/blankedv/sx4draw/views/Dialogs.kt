@@ -36,7 +36,7 @@ import javafx.scene.layout.Region
  */
 object Dialogs {
 
-    fun buildInfoAlert(title: String, header: String, msg: String, app: Application) {
+    fun buildInfoAlertOpenSX(title: String, header: String, msg: String, app: Application) {
         val alert = Alert(Alert.AlertType.INFORMATION)
         alert.contentText = msg
         alert.title = title
@@ -71,9 +71,9 @@ object Dialogs {
 
     fun buildErrorAlert(title : String, header : String, content: String) {
         val alert = Alert(Alert.AlertType.ERROR)
-        alert.setTitle(title)
-        alert.setHeaderText(header)
-        alert.setContentText(content)
+        alert.title = title
+        alert.headerText = header
+        alert.contentText = content
         alert.showAndWait()
     }
 

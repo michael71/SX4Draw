@@ -100,9 +100,13 @@ class TimetableTable internal constructor(primaryStage: Stage, private val app: 
     private fun createDataTables() {
     //    <timetable adr="3300" time="0,20,40" trip="3100,3101,0" next=""/>
         val adrCol = TableColumn<Timetable, Int>("Adr (ID)")
+        adrCol.prefWidthProperty().bind(TimetableTable.tableView.widthProperty().multiply(0.1));
         val timeCol = TableColumn<Timetable, String>("Start-Zeiten")
+        timeCol.prefWidthProperty().bind(TimetableTable.tableView.widthProperty().multiply(0.3));
         val tripCol = TableColumn<Timetable, String>("Fahrten")
+        tripCol.prefWidthProperty().bind(TimetableTable.tableView.widthProperty().multiply(0.5));
         val nextCol = TableColumn<Timetable, Int>("nächster Fahrplan")
+        nextCol.prefWidthProperty().bind(TimetableTable.tableView.widthProperty().multiply(0.1));
 
         val myStringIntConverter = object : StringConverter<Int>() {
             override fun toString(`object`: Int?): String {

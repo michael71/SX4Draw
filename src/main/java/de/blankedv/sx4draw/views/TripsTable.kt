@@ -97,14 +97,16 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
         tripsWindow.close()
     }
 
-    private fun generateNewTrip() {
+    private fun generateNewTrip(): Trip? {
         val addr = Trip.getUnusedAddress()
         if (routes.isNotEmpty()) {
             val r0 = routes[0]
             var newTrip = Trip(addr, r0.adr, r0.findSens1(), r0.findSens2(), "29,1,30", 1500)
             trips.add(newTrip)
+            return newTrip
         } else {
-            Dialogs.buildErrorAlert("keine Fahrstraßen", "", "bitte erst Fahrstraßen erzeugen!")
+            Dialogs.buildErrorAlert("keine Fahrstraßen vorhanden", "", "bitte erst Fahrstraßen erzeugen!")
+            return null
         }
     }
 
@@ -115,6 +117,7 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
         val sens1Col = TableColumn<Trip, Int>("Sensor 1")
         val sens2Col = TableColumn<Trip, Int>("Sensor 2")
         val locoCol = TableColumn<Trip, String>("Loco (Adr,Dir,V)")
+        locoCol.prefWidthProperty().bind(tableView.widthProperty().multiply(0.3));
         val stopdelayCol = TableColumn<Trip, Int>("Stopdelay[sec]")
 
         //   <trip adr="3100" route="2300" sens1="924" sens2="902" loco="29,1,126" stopdelay="1500" />
@@ -146,9 +149,7 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
         tableView.isEditable = true
 
         locoCol.cellFactory = TextFieldTableCell.forTableColumn();
-        adrCol.cellFactory = TextFieldTableCell.forTableColumn(myStringIntConverter);
-        //sens1Col.cellFactory = TextFieldTableCell.forTableColumn(myStringIntConverter);  -> calc from route
-        //sens2Col.cellFactory = TextFieldTableCell.forTableColumn(myStringIntConverter);  -> calc from route
+        //adrCol.cellFactory = TextFieldTableCell.forTableColumn(myStringIntConverter);
         routeCol.cellFactory = TextFieldTableCell.forTableColumn(myStringIntConverter);
         stopdelayCol.cellFactory = TextFieldTableCell.forTableColumn(myStringIntConverter);
 
@@ -230,22 +231,20 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
 
 
         tableView.isCenterShape = true
-        tableView.setRowFactory { tableView ->
+        tableView.setRowFactory { tv ->
             val row = TableRow<Trip>()
             val contextMenu = ContextMenu()
             val removeMenuItem = MenuItem("Fahrt löschen")
             removeMenuItem.onAction = EventHandler {
-                tableView.items.remove(row.item)
+                tv.items.remove(row.item)
             }
             val newMenuItem = MenuItem("+ NEUE Fahrt")
             newMenuItem.onAction = EventHandler {
                 generateNewTrip()
             }
-            /*val hideMenuItem = MenuItem("Fahrstraßen nicht mehr anzeigen")
-            hideMenuItem.onAction = EventHandler {
-                app.hideAllRoutes()
-            } */
-            contextMenu.items.addAll(newMenuItem, /* hideMenuItem, */ removeMenuItem)
+
+            contextMenu.items.addAll(newMenuItem, removeMenuItem)
+
             // Set context menu on row, but use a binding to make it only show for non-empty rows:
             row.contextMenuProperty().bind(
                     Bindings.`when`(row.emptyProperty())
@@ -253,6 +252,7 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
                             .otherwise(contextMenu)
             )
             row
+
         }
 
         adrCol.cellValueFactory = PropertyValueFactory("adr")
@@ -272,6 +272,7 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
     }
 
     companion object {
+
         private val tableView = TableView<Trip>()
 
         fun refresh() {
