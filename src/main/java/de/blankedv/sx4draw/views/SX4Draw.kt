@@ -1094,15 +1094,14 @@ class SX4Draw : Application() {
                 rtbtn.createShapeAndSetState(PEState.MARKED)
                 val crt = currentRoute
                 showRoute(crt!!)
-                println("btn2 =" + currentRoute!!.btn2)
-                routes.add(Route(currentRoute!!))  // add a new route from btn1 to btn2
-                val revRoute = (currentRoute!!).reverseRoute()
-                routes.add(revRoute)
+                println("btn2 =" + crt.btn2)
+                routes.add(crt.copy())  // add a new route from btn1 to btn2
+                routes.add(crt.reverseRoute())  // add reverse route also
 
                 val alert = Alert(AlertType.INFORMATION)
                 alert.title = "Fahrstraße " + currentRoute!!.adr + " abgeschlossen."
                 alert.headerText = null
-                alert.contentText = "Die Signalstellungen mssen noch manuell korrigiert werden!"
+                alert.contentText = "Die Signalstellungen müssen noch manuell korrigiert werden!"
                 alert.showAndWait()
 
                 resetPEStates()
@@ -1288,11 +1287,11 @@ class SX4Draw : Application() {
         panelElements = pc.getAllPanelElements()
         panelName = pc.name
         locos = FXCollections.observableArrayList(pc.getAllLocos())
-        for (l in locos) println(l.toString())
+        //for (l in locos) println(l.toString())
         routes = FXCollections.observableArrayList(pc.getAllRoutes())
         compRoutes = FXCollections.observableArrayList(pc.getAllCompRoutes())
         trips = FXCollections.observableArrayList(pc.getAllTrips())
-        for (t in trips) println(t.toString())
+        //for (t in trips) println(t.toString())
         timetables = FXCollections.observableArrayList(pc.getAllTimetables())
 
     }

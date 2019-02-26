@@ -22,6 +22,7 @@ import de.blankedv.sx4draw.model.CompRoute
 import de.blankedv.sx4draw.model.Route
 import de.blankedv.sx4draw.model.Trip
 import de.blankedv.sx4draw.util.Utils
+import de.blankedv.sx4draw.views.SX4Draw.Companion.routes
 import de.blankedv.sx4draw.views.SX4Draw.Companion.trips
 
 import javafx.event.EventHandler
@@ -77,7 +78,10 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
         tripsWindow.x = primaryStage.x + 200
         tripsWindow.y = primaryStage.y + 150
 
-        btnAddTrip.setOnAction { trips.add(Trip(INVALID_INT, 3000, 900, 901, "29,1,30", 1500)) }
+        btnAddTrip.setOnAction {
+            generateNewTrip()
+
+        }
 
         show()
 
@@ -91,6 +95,17 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
 
     fun close() {
         tripsWindow.close()
+    }
+
+    private fun generateNewTrip() {
+        val addr = Trip.getUnusedAddress()
+        if (routes.isNotEmpty()) {
+            val r0 = routes[0]
+            var newTrip = Trip(addr, r0.adr, r0.findSens1(), r0.findSens2(), "29,1,30", 1500)
+            trips.add(newTrip)
+        } else {
+            Dialogs.buildErrorAlert("keine Fahrstraßen", "", "bitte erst Fahrstraßen erzeugen!")
+        }
     }
 
     private fun createDataTables() {
@@ -224,7 +239,7 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
             }
             val newMenuItem = MenuItem("+ NEUE Fahrt")
             newMenuItem.onAction = EventHandler {
-                trips.add(Trip(INVALID_INT, 3000, 900, 901, "29,1,30", 1500))
+                generateNewTrip()
             }
             /*val hideMenuItem = MenuItem("Fahrstraßen nicht mehr anzeigen")
             hideMenuItem.onAction = EventHandler {

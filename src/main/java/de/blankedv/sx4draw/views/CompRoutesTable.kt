@@ -122,12 +122,12 @@ class CompRoutesTable internal constructor(primaryStage: Stage, private val app:
         tableView.columns.setAll(adrCol, btn1Col, btn2Col, routesCol)
         tableView.isEditable = true
 
-        routesCol.cellFactory = TextFieldTableCell.forTableColumn();
-        adrCol.cellFactory = TextFieldTableCell.forTableColumn(myStringIntConverter);
-        btn1Col.cellFactory = TextFieldTableCell.forTableColumn(myStringIntConverter);
-        btn2Col.cellFactory = TextFieldTableCell.forTableColumn(myStringIntConverter);
+        //routesCol.cellFactory = TextFieldTableCell.forTableColumn();
+        //adrCol.cellFactory = TextFieldTableCell.forTableColumn(myStringIntConverter);
+        //btn1Col.cellFactory = TextFieldTableCell.forTableColumn(myStringIntConverter);
+        //btn2Col.cellFactory = TextFieldTableCell.forTableColumn(myStringIntConverter);
 
-        adrCol.setOnEditCommit { event: TableColumn.CellEditEvent<CompRoute, Int> ->
+        /*adrCol.setOnEditCommit { event: TableColumn.CellEditEvent<CompRoute, Int> ->
             val pos = event.tablePosition
             val newAdr = event.newValue
             val row = pos.row
@@ -169,16 +169,8 @@ class CompRoutesTable internal constructor(primaryStage: Stage, private val app:
             val row = pos.row
             val crt = event.tableView.items[row]
             crt.routes = newRoutes
-        }
+        } */
 
-
-        //adrCol.setOnEditCommit( { ev -> (ev.tableView.items[ev.tablePosition.row] as Integer).adr = ev.newValue }
-
-        /*massCol.setCellFactory(TextFieldTableCell.forTableColumn())
-        massCol.setOnEditCommit { ev -> (ev.tableView.items[ev.tablePosition.row] as Integer).mass = ev.newValue }
-
-        vmaxCol.setCellFactory(TextFieldTableCell.forTableColumn())
-        vmaxCol.setOnEditCommit { ev -> (ev.tableView.items[ev.tablePosition.row] as Integer).vmax = ev.newValue } */
 
         /*      tableViewData[i].setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
             chanCol.setMaxWidth(1f * Integer.MAX_VALUE * 18); // 30% width
@@ -205,12 +197,13 @@ class CompRoutesTable internal constructor(primaryStage: Stage, private val app:
                 tableView.items.remove(row.item)
             }
 
-            val addMenuItem = MenuItem("+ neue Zusammeng. Fahrstraße hinzufügen")
-            addMenuItem.onAction = EventHandler {
-                compRoutes.add(CompRoute(9999,9999,9999,"2200,2201"))
-            }
+            // neue zusammengesetzte Fahrstrassen nur noch graphisch erzeugbar
+            //val addMenuItem = MenuItem("+ neue Zusammeng. Fahrstraße hinzufügen")
+            //addMenuItem.onAction = EventHandler {
+            //    compRoutes.add(CompRoute(9999,9999,9999,"2200,2201"))
+            //}
 
-            contextMenu.items.addAll(showMenuItem, hideMenuItem, removeMenuItem, addMenuItem)
+            contextMenu.items.addAll(showMenuItem, hideMenuItem, removeMenuItem)  //, addMenuItem)
             // Set context menu on row, but use a binding to make it only show for non-empty rows:
             row.contextMenuProperty().bind(
                     Bindings.`when`(row.emptyProperty())

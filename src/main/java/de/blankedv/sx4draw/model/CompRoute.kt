@@ -19,6 +19,7 @@ package de.blankedv.sx4draw.model
 
 import de.blankedv.sx4draw.Constants
 import de.blankedv.sx4draw.Constants.INVALID_INT
+import de.blankedv.sx4draw.views.RoutesTable
 import de.blankedv.sx4draw.views.SX4Draw
 import de.blankedv.sx4draw.views.SX4Draw.Companion.compRoutes
 import de.blankedv.sx4draw.views.SX4Draw.Companion.routes
@@ -170,6 +171,14 @@ data class CompRoute (
                 if (crt.adr == a) return crt
             }
             return null
+        }
+
+        // change turnout/signal addresses in all routes and trips, if the turnout/signal address was changed
+        fun addressInRoutesChanged(oAdr : String, nAdr : String) {
+            for (crt in SX4Draw.compRoutes) {
+                crt.routes = crt.routes.replace(oAdr,nAdr)
+            }
+            RoutesTable.refresh()
         }
     }
 }

@@ -57,8 +57,8 @@ class Sensor : GenericPE {
 
     @get:XmlAttribute(name = "adr")
     var adrStr: String by Delegates.observable(_adrStr) { _, old, new ->
-        println("Sensor adrStr changed from $old to $new")
         if (old.isNotEmpty()) {
+            println("Sensor adrStr changed from $old to $new")
             val oldArry = old.split(",")
             val newArry = new.split(",")
             Route.sensorAddressChanged(oldArry[0], newArry[0])

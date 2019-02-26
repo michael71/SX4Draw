@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package de.blankedv.sx4draw.model
 
+import de.blankedv.sx4draw.Constants
 import de.blankedv.sx4draw.Constants.ADDR0_TRIP
 import de.blankedv.sx4draw.Constants.INVALID_INT
 import de.blankedv.sx4draw.views.SX4Draw.Companion.trips
@@ -24,6 +25,7 @@ import java.util.Comparator
 
 import org.w3c.dom.Node
 import javax.xml.bind.annotation.*
+import kotlin.properties.Delegates
 
 /**
  *
@@ -35,10 +37,10 @@ import javax.xml.bind.annotation.*
 //@XmlType() //TODO Does not work: propOrder = {"adr", "route", "sens1", "sens2", "loco", "stopdelay"})
 
 class Trip(
-        @get:XmlAttribute    // @get: WICHTIG für KOTLIN !!!
-        var adr: Int = INVALID_INT,
+        @XmlTransient
+        private var _adr: Int = INVALID_INT,
 
-        @get:XmlAttribute
+        @get:XmlAttribute   // @get: WICHTIG für KOTLIN !!!
         var route: Int = INVALID_INT,
 
         @get:XmlAttribute
@@ -54,21 +56,15 @@ class Trip(
         var stopdelay: Int = INVALID_INT) : Comparator<Trip>, Comparable<Trip> {
 
 
-    init {
-        autoAddress()
-    }
-
-    fun autoAddress() {
-        if (adr != INVALID_INT) return
-
-        var a = ADDR0_TRIP  // minumum for trips
-        for (tr in trips) {
-            if (tr.adr >= a) {
-                a = tr.adr + 1
-            }
+    @get:XmlAttribute(name = "adr")
+    var adr: Int by Delegates.observable(_adr) { prop, old, new ->
+        if (old != INVALID_INT) {
+            println("Trip adr changed from $old to $new")
+            Timetable.addressInTripChanged(old.toString(), new.toString())
         }
-        adr = a
+        _adr = new
     }
+
 
     override fun compare(o1: Trip, o2: Trip): Int {
         return o1.adr - o2.adr
@@ -85,31 +81,15 @@ class Trip(
     }
 
     companion object {
+        fun getUnusedAddress(): Int {
 
-        fun add(a: Node) {
-            val trip = Trip()
-            val attributes = a.attributes
-
-            for (i in 0 until attributes.length) {
-                val theAttribute = attributes.item(i)
-                if ((theAttribute.nodeName == "id") ||
-                        (theAttribute.nodeName == "adr")) {
-                    trip.adr = Integer.parseInt(theAttribute.nodeValue)
-                } else if (theAttribute.nodeName == "sens1") {
-                    trip.sens1 = Integer.parseInt(theAttribute.nodeValue)
-                } else if (theAttribute.nodeName == "sens2") {
-                    trip.sens2 = Integer.parseInt(theAttribute.nodeValue)
-                } else if (theAttribute.nodeName == "route" || theAttribute.nodeName == "route") {  // old def.
-                    trip.route = Integer.parseInt(theAttribute.nodeValue)
-                } else if (theAttribute.nodeName == "stopdelay") {
-                    trip.stopdelay = Integer.parseInt(theAttribute.nodeValue)
-                } else if (theAttribute.nodeName == "loco") {
-                    trip.loco = theAttribute.nodeValue
+            var a = ADDR0_TRIP  // minumum for trips
+            for (tr in trips) {
+                if (tr.adr >= a) {
+                    a = tr.adr + 1
                 }
             }
-            if (trip.adr != INVALID_INT) {
-                trips.add(trip)
-            }
+            return a
 
         }
     }

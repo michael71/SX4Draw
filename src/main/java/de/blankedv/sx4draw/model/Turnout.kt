@@ -66,12 +66,14 @@ class Turnout : GenericPE {
     var inv: Int? = null
 
     @XmlTransient
-    private var _adr = ADDR0_TURNOUT
+    private var _adr = INVALID_INT
 
     @get:XmlAttribute(name = "adr")
     var adr: Int by Delegates.observable(_adr) { prop, old, new ->
-        println("Turnout adr changed from $old to $new")
-        Route.addressInRouteChanged(old.toString(),new.toString())
+        if (old != INVALID_INT) {
+            println("Turnout adr changed from $old to $new")
+            Route.addressInRouteChanged(old.toString(), new.toString())
+        }
         _adr = new
     }
 
@@ -92,7 +94,7 @@ class Turnout : GenericPE {
         y2 = closed.y
         xt = thrown.x
         yt = thrown.y
-        adr = ADDR0_TURNOUT
+        adr  = INVALID_INT
     }
 
     override fun scalePlus() {
