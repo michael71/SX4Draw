@@ -19,7 +19,6 @@ package de.blankedv.sx4draw.views
 
 import de.blankedv.sx4draw.model.Route
 import de.blankedv.sx4draw.util.Utils
-import de.blankedv.sx4draw.views.SX4Draw.Companion.panelName
 import de.blankedv.sx4draw.views.SX4Draw.Companion.routes
 import javafx.event.EventHandler
 import javafx.scene.Scene
@@ -96,10 +95,15 @@ class RoutesTable internal constructor(primaryStage: Stage, private val app: SX4
     private fun createDataTables() {
 
         val idCol = TableColumn<Route, Int>("ID")
+        idCol.prefWidthProperty().bind(RoutesTable.tableView.widthProperty().multiply(0.1));
         val btn1Col = TableColumn<Route, Int>("Start")
+        btn1Col.prefWidthProperty().bind(RoutesTable.tableView.widthProperty().multiply(0.1));
         val btn2Col = TableColumn<Route, Int>("Ende")
+        btn2Col.prefWidthProperty().bind(RoutesTable.tableView.widthProperty().multiply(0.1));
         val routeCol = TableColumn<Route, String>("Fahrstraße")
+        routeCol.prefWidthProperty().bind(RoutesTable.tableView.widthProperty().multiply(0.55));
         val sensorsCol = TableColumn<Route, String>("Sensoren")
+        sensorsCol.prefWidthProperty().bind(RoutesTable.tableView.widthProperty().multiply(0.15));
 
 
 

@@ -22,11 +22,8 @@ import de.blankedv.sx4draw.*
 import de.blankedv.sx4draw.config.*
 import de.blankedv.sx4draw.util.*
 
-import javafx.animation.KeyFrame
-import javafx.animation.Timeline
 import javafx.application.Application
 import javafx.collections.FXCollections
-import javafx.event.ActionEvent
 import javafx.event.EventHandler
 import javafx.geometry.Orientation
 import javafx.scene.Cursor
@@ -52,7 +49,6 @@ import javafx.stage.FileChooser
 import javafx.stage.FileChooser.ExtensionFilter
 import javafx.stage.Stage
 import javafx.stage.WindowEvent
-import javafx.util.Duration
 import javafx.util.Pair
 
 import java.io.File
@@ -74,7 +70,6 @@ import de.blankedv.sx4draw.PanelElement.Companion.TRACK_WIDTH
 import de.blankedv.sx4draw.model.*
 import de.blankedv.sx4draw.util.Calc
 import javafx.collections.ObservableList
-import java.lang.NullPointerException
 
 class SX4Draw : Application() {
 
@@ -859,7 +854,7 @@ class SX4Draw : Application() {
         infoItem.graphic = ivInfo
         infoItem.setOnAction { event ->
             println("info clicked")
-            Dialogs.buildInfoAlert("Info", "SX4Draw\nhttps://opensx.net/sx4 ", "Programm Version:$version", this)
+            Dialogs.buildInfoAlertOpenSX("Info", "SX4Draw\nhttps://opensx.net/sx4 ", "Programm Version:$version", this)
         }
 
         updateItem.graphic = ivSX4generic
@@ -880,7 +875,7 @@ class SX4Draw : Application() {
             } else {
                 val title = "$vNumber ist nicht aktuell."
                 val msg = "Download der aktuellen Version $newVersion von: https://opensx.net/sx4 möglich "
-                Dialogs.buildInfoAlert(title, msg, "", this)
+                Dialogs.buildInfoAlertOpenSX(title, msg, "", this)
             }
         }
 
@@ -1094,15 +1089,14 @@ class SX4Draw : Application() {
                 rtbtn.createShapeAndSetState(PEState.MARKED)
                 val crt = currentRoute
                 showRoute(crt!!)
-                println("btn2 =" + currentRoute!!.btn2)
-                routes.add(Route(currentRoute!!))  // add a new route from btn1 to btn2
-                val revRoute = (currentRoute!!).reverseRoute()
-                routes.add(revRoute)
+                println("btn2 =" + crt.btn2)
+                routes.add(crt.copy())  // add a new route from btn1 to btn2
+                routes.add(crt.reverseRoute())  // add reverse route also
 
                 val alert = Alert(AlertType.INFORMATION)
                 alert.title = "Fahrstraße " + currentRoute!!.adr + " abgeschlossen."
                 alert.headerText = null
-                alert.contentText = "Die Signalstellungen mssen noch manuell korrigiert werden!"
+                alert.contentText = "Die Signalstellungen müssen noch manuell korrigiert werden!"
                 alert.showAndWait()
 
                 resetPEStates()
@@ -1288,11 +1282,11 @@ class SX4Draw : Application() {
         panelElements = pc.getAllPanelElements()
         panelName = pc.name
         locos = FXCollections.observableArrayList(pc.getAllLocos())
-        for (l in locos) println(l.toString())
+        //for (l in locos) println(l.toString())
         routes = FXCollections.observableArrayList(pc.getAllRoutes())
         compRoutes = FXCollections.observableArrayList(pc.getAllCompRoutes())
         trips = FXCollections.observableArrayList(pc.getAllTrips())
-        for (t in trips) println(t.toString())
+        //for (t in trips) println(t.toString())
         timetables = FXCollections.observableArrayList(pc.getAllTimetables())
 
     }

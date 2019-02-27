@@ -35,7 +35,9 @@ import org.w3c.dom.Node
 import java.lang.NumberFormatException
 import javax.xml.bind.annotation.XmlAttribute
 import javax.xml.bind.annotation.XmlRootElement
+import javax.xml.bind.annotation.XmlTransient
 import javax.xml.bind.annotation.XmlType
+import kotlin.properties.Delegates
 
 /**
  * <route adr="2201" btn1="1200" btn2="1203" route="854,1;853,0;852,0;765,2;767,0;761,0;781,0" sensors="924,928"></route>
@@ -45,22 +47,34 @@ import javax.xml.bind.annotation.XmlType
  */
 @XmlRootElement(name = "route")
 @XmlType
-class Route : Comparator<Route>, Comparable<Route> {
+class Route (
+
+    @get:XmlTransient
+    private var _adr : Int  = INVALID_INT,
 
     @get:XmlAttribute
-    var adr = INVALID_INT
+    var btn1 : Int = INVALID_INT,
 
     @get:XmlAttribute
-    var btn1 = INVALID_INT
+    var btn2 : Int = INVALID_INT,
 
     @get:XmlAttribute
-    var btn2 = INVALID_INT
+    var route : String  = "",
 
     @get:XmlAttribute
-    var route = ""
+    var sensors : String = ""
 
-    @get:XmlAttribute
-    var sensors = ""
+    ) : Comparator<Route>, Comparable<Route> {
+
+    @get:XmlAttribute(name = "adr")
+    var adr: Int by Delegates.observable(_adr) { prop, old, new ->
+        if (old != INVALID_INT) {
+            println("Route adr changed from $old to $new")
+            CompRoute.addressInRoutesChanged(old.toString(), new.toString())
+        }
+        _adr = new
+    }
+
 
     // extract PEs from string information
     private val pES: ArrayList<PanelElement>
@@ -101,32 +115,7 @@ class Route : Comparator<Route>, Comparable<Route> {
             return pes
         }
 
-    internal constructor() {
-
-    }
-
-    internal constructor(id: Int) {
-        this.adr = id
-    }
-
-    internal constructor(r: Route) {
-
-        this.adr = r.adr
-        this.btn1 = r.btn1
-        this.btn2 = r.btn2
-        this.route = r.route
-        this.sensors = r.sensors
-    }
-
-    internal constructor (a : Int, b1 : Int, b2 : Int, rt : String, sens : String) {
-        adr = a
-        btn1 = b1
-        btn2 = b2
-        route = rt
-        sensors = sens
-    }
-
-    /**
+     /**
      * add a turnout, signal or sensor to a route
      *
      * @param pe
@@ -147,6 +136,24 @@ class Route : Comparator<Route>, Comparable<Route> {
         }
     }
 
+    fun findSens1() : Int {
+        val allsens = sensors.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        if (allsens.size >= 1) {
+            return allsens[0].toInt()
+        } else {
+            return INVALID_INT
+        }
+    }
+
+    fun findSens2() : Int {
+        val allsens = sensors.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        if (allsens.size >= 1) {
+            return allsens[allsens.size-1].toInt()
+        } else {
+            return INVALID_INT
+        }
+    }
+
     fun reverseRoute() : Route {
         val allsens = sensors.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         var revSens = ""
@@ -157,6 +164,10 @@ class Route : Comparator<Route>, Comparable<Route> {
             revSens += s
         }
         return Route(adr+1, btn2, btn1, route, revSens)
+    }
+
+    fun copy() : Route {
+        return Route(adr, btn1,btn2,route, sensors)
     }
 
     /**
@@ -334,6 +345,8 @@ class Route : Comparator<Route>, Comparable<Route> {
             }
             RoutesTable.refresh()
         }
+
+
 
     }
 }
