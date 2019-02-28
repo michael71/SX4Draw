@@ -91,13 +91,14 @@ class SX4Draw : Application() {
 
 
     private var line: Line? = null
-    private val scPane = ScrollPane()
+
 
     internal val dispAddresses = CheckMenuItem("Adressen anzeigen")
     internal val rasterOn = CheckMenuItem("Raster")
     internal val showMousePos = CheckMenuItem("Mauspos. anzeigen")
     internal val mousePositionToolTip = Tooltip("")
     internal val anchorPane = AnchorPane()
+    private val scPane = ZoomableScrollPane(anchorPane)
     // internal val status = Label("status")
 
 
@@ -369,7 +370,7 @@ class SX4Draw : Application() {
         VBox.setVgrow(scPane, Priority.ALWAYS)
         HBox.setHgrow(scPane, Priority.ALWAYS)
 
-        scPane.content = anchorPane
+        //scPane.content = anchorPane
 
 
         var i = 0
@@ -633,6 +634,8 @@ class SX4Draw : Application() {
         val scale200 = MenuItem("Scale 200%")
         val scale50 = MenuItem("Scale 50%")
 
+        val zoomIn = MenuItem("Zoom IN")
+        val zoomOut = MenuItem("Zoom OUT")
 
         val menuCalc = Menu("Berechnen")
         val cTurnouts = MenuItem("Weichen berechnen")
@@ -646,7 +649,7 @@ class SX4Draw : Application() {
 
         menu1.items.addAll(openItem, saveItem, exitItem)
         menuWindows.items.addAll(openRoutingTable, openCompRoutesTable, openTripsTable, openTimetableTable, openLocoTable)
-        menuOptions.items.addAll(setName, dispAddresses, rasterOn) //, showMousePos) //, showScrollBars)
+        menuOptions.items.addAll(setName, dispAddresses, rasterOn, zoomIn, zoomOut) //, showMousePos) //, showScrollBars)
         menuCalc.items.addAll(cTurnouts, cNormPositions, scale200, scale50)
         menuExtra.items.addAll(cSearch)
 
@@ -736,6 +739,17 @@ class SX4Draw : Application() {
             println("scale 50%")
             PanelElement.scaleMinus()
             redrawPanelElements()
+        }
+
+
+        zoomIn.setOnAction {
+            println("Zoom In")
+            scPane.zoomIn()
+        }
+
+        zoomOut.setOnAction {
+            println("Zoom In")
+            scPane.zoomOut()
         }
 
         dispAddresses.setOnAction {
