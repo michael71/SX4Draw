@@ -112,6 +112,21 @@ class Turnout : GenericPE {
 
     }
 
+    override fun scaleMinus() {
+        val dx = x / 2
+        val dy = y / 2
+        x = x / 2
+        y = y / 2
+
+        // do not scale x2/y2 BUT TRANSLATE
+
+        x2 -= dx
+        y2 -= dy
+        xt -= dx
+        yt -= dy
+
+    }
+
     override fun getAddr(): Int {
         return adr
     }

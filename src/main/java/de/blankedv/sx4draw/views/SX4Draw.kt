@@ -748,7 +748,7 @@ class SX4Draw : Application() {
         }
 
         zoomOut.setOnAction {
-            println("Zoom In")
+            println("Zoom Out")
             scPane.zoomOut()
         }
 
@@ -1347,8 +1347,8 @@ class SX4Draw : Application() {
 
     companion object {
 
-        var vNumber = 0.43
-        var vString = "22 Feb 2019"
+        var vNumber = 0.44
+        var vString = "28 Feb 2019"
         var version = "$vNumber - $vString"
 
         // TODO UNDO für ca. mehrere Panel Elemente

@@ -2,7 +2,7 @@
 <jnlp spec="1.0" xmlns:jfx="http://javafx.com" href="sx4draw.jnlp">
   <information>
     <title>sx4draw</title>
-    <vendor>mb</vendor>
+    <vendor>IBM Klub BB - Sparte Modellbahn - MB</vendor>
     <description>sx4draw</description>
     <offline-allowed/>
   </information>
@@ -16,7 +16,7 @@
     <jar href="kotlin-stdlib-jdk8-1.3.20.jar" size="13751" download="eager" />
     <jar href="kotlin-test-1.3.20.jar" size="29074" download="eager" />
     <jar href="kotlin-test-common-1.3.20.jar" size="4452" download="eager" />
-    <jar href="sx4draw.jar" size="470598" download="eager" />
+    <jar href="sx4draw.jar" size="562435" download="eager" />
   </resources>
   <jfx:javafx-desc  width="600" height="400" main-class="de.blankedv.sx4draw.views.SX4Draw"  name="sx4draw" />
   <update check="background"/>
