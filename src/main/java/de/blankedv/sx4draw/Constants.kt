@@ -23,6 +23,7 @@ package de.blankedv.sx4draw
 
 object Constants {
 
+    const val SXMIN_USED = 11
     const val SXMAX_USED = 1068 // max sx address used (106, bit 8)
     const val LBMIN = 1200  // minimum virtual address
     const val LBMAX = 9999
@@ -41,6 +42,8 @@ object Constants {
     const val ADDR0_TIMETABLE = 5500
     const val ADDR0_SIGNAL = 3000
     const val ADDR0_TURNOUT = 801
+
+    const val DEF_SENSOR_ADRSTR = "901,1901"
 
     enum class PEState {
         DEFAULT, MARKED, SELECTED, STATE_0, STATE_1

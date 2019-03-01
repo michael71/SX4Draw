@@ -19,6 +19,8 @@ package de.blankedv.sx4draw.views
 
 import de.blankedv.sx4draw.Constants.INVALID_INT
 import de.blankedv.sx4draw.Constants.LBMIN
+import de.blankedv.sx4draw.Constants.SXMAX_USED
+import de.blankedv.sx4draw.Constants.SXMIN_USED
 import de.blankedv.sx4draw.GenericAddress
 import de.blankedv.sx4draw.PanelElement
 import de.blankedv.sx4draw.model.Sensor
@@ -46,25 +48,25 @@ import javafx.stage.Stage
  */
 object AddressDialog {
 
-    internal val spinner1000 = Spinner<Int>(0, 9, 0)
-    internal val spinner100 = Spinner<Int>(0, 9, 0)
-    internal val spinner10 = Spinner<Int>(0, 9, 0)
-    internal val spinner1 = Spinner<Int>(0, 9, 0)
+    private val spinner1000 = Spinner<Int>(0, 9, 0)
+    private val spinner100 = Spinner<Int>(0, 9, 0)
+    private val spinner10 = Spinner<Int>(0, 9, 0)
+    private val spinner1 = Spinner<Int>(0, 9, 0)
     //internal var spin1 = arrayOf(spinner1000, spinner100, spinner10, spinner1)
-    internal val lblAdr = Label(" Adresse")
-    internal val cbInv = CheckBox()
-    internal val lblSecondaryAdr = Label(" 2.Adr?")
-    internal val cbSec = CheckBox()
+    private val lblAdr = Label(" Adresse")
+    private val cbInv = CheckBox()
+    private val lblSecondaryAdr = Label(" 2.Adr?")
+    private val cbSec = CheckBox()
 
     // select orientation (ONLY for SIGNAL)
-    internal val choiceBoxOrient = ChoiceBox(FXCollections.observableArrayList(
+    private val choiceBoxOrient = ChoiceBox(FXCollections.observableArrayList(
             "0°", "45°", "90°", "135°", "180°", "225°", "270°", "315°")
     )
 
 
     fun open(pe: PanelElement, primaryStage: Stage, genA: GenericAddress): GenericAddress {
 
-        println("genAr=" + genA.toString())
+        println("genAdr=${genA}")
 
         val title = ("Adresse " + pe.gpe::class.simpleName
                 + " Pos.= " + pe.gpe.x + "," + pe.gpe.y)
@@ -76,6 +78,7 @@ object AddressDialog {
         spinner100.valueFactory.value = in100
         spinner10.valueFactory.value = in10
         spinner1.valueFactory.value = in1
+        updateAddress(pe, genA) // for address label display
 
         val lblInv = Label(" invertiert")
 
@@ -171,11 +174,11 @@ object AddressDialog {
         val secondScene = Scene(grid, 420.0, 160.0)
         // New window (Stage)
         val newWindow = Stage()
-        btnCancel.setOnAction { _ ->
+        btnCancel.setOnAction {
             genA.addr = -1
             newWindow.close()
         }
-        btnSave.setOnAction { _ ->
+        btnSave.setOnAction {
             updateAddress(pe, genA)
             newWindow.close()
         }
@@ -203,9 +206,9 @@ object AddressDialog {
                 + spinner10.value * 10
                 + spinner1.value)
         if (genA.addr >= LBMIN) {
-            lblAdr.text = " Virt.-Adr"
-        } else {
-            lblAdr.text = " SX-Adr"
+            lblAdr.text = " Virt.-Adr\n >=1200"
+        } else if ((genA.addr >= SXMIN_USED) && (genA.addr <= SXMAX_USED)) {
+            lblAdr.text = " SX-Adr\n 1.1-106.8"
             if (spinner1.value == 0) {
                 spinner1.valueFactory.value = 1
                 genA.addr = (spinner1000.value * 1000
@@ -219,6 +222,29 @@ object AddressDialog {
                         + spinner10.value * 10
                         + spinner1.value)
             }
+        } else if (genA.addr < SXMIN_USED){
+            // too low, invalid adresse, reset spinners to 11 (SXMIN_USED)
+
+            spinner1000.valueFactory.value = 0
+            spinner100.valueFactory.value = 0
+            spinner10.valueFactory.value = 1
+            spinner1.valueFactory.value = 1
+
+             genA.addr = (spinner1000.value * 1000
+                    + spinner100.value * 100
+                    + spinner10.value * 10
+                    + spinner1.value)
+        } else  {
+            // too high, reset to 1200 (lbmin)
+            spinner1000.valueFactory.value = 1
+            spinner100.valueFactory.value = 2
+            spinner10.valueFactory.value = 0
+            spinner1.valueFactory.value = 0
+
+            genA.addr = (spinner1000.value * 1000
+                    + spinner100.value * 100
+                    + spinner10.value * 10
+                    + spinner1.value)
         }
 
         if (cbInv.isSelected) {

@@ -19,6 +19,7 @@ package de.blankedv.sx4draw.model
 
 import de.blankedv.sx4draw.Constants.ADDR0_TURNOUT
 import de.blankedv.sx4draw.Constants.INVALID_INT
+import de.blankedv.sx4draw.Constants.SXMIN_USED
 import de.blankedv.sx4draw.PanelElement
 import de.blankedv.sx4draw.model.GenericPE
 import de.blankedv.sx4draw.model.IntPoint
@@ -70,7 +71,7 @@ class Turnout : GenericPE {
 
     @get:XmlAttribute(name = "adr")
     var adr: Int by Delegates.observable(_adr) { prop, old, new ->
-        if (old != INVALID_INT) {
+        if ((old != INVALID_INT) && (old > SXMIN_USED) && (new > SXMIN_USED)) {
             println("Turnout adr changed from $old to $new")
             Route.addressInRouteChanged(old.toString(), new.toString())
         }

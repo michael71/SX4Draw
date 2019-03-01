@@ -48,7 +48,6 @@ import javafx.scene.shape.StrokeLineCap
 import javafx.stage.FileChooser
 import javafx.stage.FileChooser.ExtensionFilter
 import javafx.stage.Stage
-import javafx.stage.WindowEvent
 import javafx.util.Pair
 
 import java.io.File
@@ -73,6 +72,12 @@ import javafx.collections.ObservableList
 
 class SX4Draw : Application() {
 
+    // FIXED: String replace funktioniert nicht für Weichen-Adressenänderung (werte unter 11 = SXMIN_USED ausgeschlossen)
+
+    // FIXED Fahrstraßenanzeige löschen, wenn neue Fahrst. erstellt wird
+
+    // TODO UNDO für ca. mehrere Panel Elemente
+
     private var lineGroup: Group? = null
     private val draggedGroup = Group()
     private var raster: Group? = null
@@ -89,15 +94,13 @@ class SX4Draw : Application() {
     private var tripsTable: TripsTable? = null
     private var timetableTable: TimetableTable? = null
 
-
     private var line: Line? = null
 
-
-    internal val dispAddresses = CheckMenuItem("Adressen anzeigen")
-    internal val rasterOn = CheckMenuItem("Raster")
-    internal val showMousePos = CheckMenuItem("Mauspos. anzeigen")
-    internal val mousePositionToolTip = Tooltip("")
-    internal val anchorPane = AnchorPane()
+    private val dispAddresses = CheckMenuItem("Adressen anzeigen")
+    private val rasterOn = CheckMenuItem("Raster")
+    private val showMousePos = CheckMenuItem("Mauspos. anzeigen")
+    private val mousePositionToolTip = Tooltip("")
+    private val anchorPane = AnchorPane()
     private val scPane = ZoomableScrollPane(anchorPane)
     // internal val status = Label("status")
 
@@ -192,7 +195,6 @@ class SX4Draw : Application() {
         canvas!!.cursor = Cursor.DEFAULT
         canvas!!.addEventHandler(MouseEvent.MOUSE_PRESSED) { me ->
             val poi = IntPoint(me.x, me.y)
-            val end: IntPoint
             start = IntPoint.toRaster(poi, getRaster())
             println("canvas mouse pressed x=" + poi.x + " y=" + poi.y + " currentGUIState=" + currentGUIState.name)
             if (me.button == MouseButton.PRIMARY) {
@@ -202,7 +204,7 @@ class SX4Draw : Application() {
                     SX4Draw.GUIState.ADD_TRACK -> line = startNewLine(start, TRACK_WIDTH)
                     SX4Draw.GUIState.ADD_SIGNAL -> {
                         val sig = Signal(poiRast)
-                        if (!isPETypeOn(poiRast)) {
+                        if (!isPanelElementAlreadyOnPoint(poiRast)) {
                             val pe = PanelElement(sig)
                             lineGroup!!.children.add(pe.shape)
                             panelElements.add(pe)
@@ -212,7 +214,7 @@ class SX4Draw : Application() {
                     }
                     SX4Draw.GUIState.ADD_ROUTEBTN -> {
                         val rt = RouteButton(poiRast)
-                        if (!isPETypeOn(poiRast)) {
+                        if (!isPanelElementAlreadyOnPoint(poiRast)) {
                             val pe = PanelElement(rt)
                             lineGroup!!.children.add(pe.shape)
                             panelElements.add(pe)
@@ -222,7 +224,7 @@ class SX4Draw : Application() {
                     }
                     SX4Draw.GUIState.ADD_SENSOR_US -> {
                         val se = Sensor(poiRast)
-                        if (!isPETypeOn(poiRast)) {
+                        if (!isPanelElementAlreadyOnPoint(poiRast)) {
                             val pe = PanelElement(se)
                             lineGroup!!.children.add(pe.shape)
                             panelElements.add(pe)
@@ -357,8 +359,8 @@ class SX4Draw : Application() {
 
 
         vb!!.children.addAll(menuBar, buttons, scPane)    //, status);
-        scPane.isFitToHeight = true;
-        scPane.isFitToWidth = true;
+        scPane.isFitToHeight = true
+        scPane.isFitToWidth = true
         scPane.maxWidth = RECT_X.toDouble()
         scPane.maxHeight = RECT_Y.toDouble()
         vb!!.maxWidth = RECT_X.toDouble()
@@ -393,7 +395,7 @@ class SX4Draw : Application() {
 
         primaryStage.show()
 
-        primaryStage.setOnCloseRequest { _: WindowEvent ->
+        primaryStage.setOnCloseRequest {
             saveOnExit(prefs, primaryStage)
             System.exit(0)
         }
@@ -441,7 +443,7 @@ class SX4Draw : Application() {
         btnMove.isSelected = false
         btnSelect.text = "Select"
         btnSelect.graphic = selIcon
-        btnSelect.setOnAction { _ -> enterSelectState() }
+        btnSelect.setOnAction { enterSelectState() }
 
         btnUnSelect.text = "Unselect"
         //btnUnSelect.setGraphic(selIcon);
@@ -514,6 +516,9 @@ class SX4Draw : Application() {
             if (PanelElement.addressesAvail()) {
                 currentGUIState = GUIState.ADD_ROUTE
                 canvas!!.cursor = Cursor.CLOSED_HAND
+                currentRoute = null
+                PanelElement.resetState()   // unselect all PE
+                redrawPanelElements()
             } else {
 
                 val alert = Alert(AlertType.WARNING)
@@ -532,6 +537,9 @@ class SX4Draw : Application() {
             if (PanelElement.addressesAvail()) {
                 currentGUIState = GUIState.ADD_COMPROUTE
                 canvas!!.cursor = Cursor.CLOSED_HAND
+                currentCompRoute = null
+                PanelElement.resetState()    // unselect all PE
+                redrawPanelElements()
             } else {
 
                 val alert = Alert(AlertType.WARNING)
@@ -816,7 +824,7 @@ class SX4Draw : Application() {
             }
         }
 
-        openRoutingTable.setOnAction { event ->
+        openRoutingTable.setOnAction {
             println("openrouting table")
             if (routingTable == null) {
                 routingTable = RoutesTable(stage, this)
@@ -825,7 +833,7 @@ class SX4Draw : Application() {
             }
         }
 
-        openTripsTable.setOnAction { event ->
+        openTripsTable.setOnAction {
             println("open trips table")
             if (tripsTable == null) {
                 tripsTable = TripsTable(stage, this)
@@ -834,7 +842,7 @@ class SX4Draw : Application() {
             }
         }
 
-        openTimetableTable.setOnAction { event ->
+        openTimetableTable.setOnAction {
             println("open timetable table")
             if (timetableTable == null) {
                 timetableTable = TimetableTable(stage, this)
@@ -843,7 +851,7 @@ class SX4Draw : Application() {
             }
         }
 
-        openLocoTable.setOnAction { event ->
+        openLocoTable.setOnAction {
             println("open locos table")
             if (locosTable == null) {
                 locosTable = LocosTable(stage, this)
@@ -852,7 +860,7 @@ class SX4Draw : Application() {
             }
         }
 
-        openCompRoutesTable.setOnAction { event ->
+        openCompRoutesTable.setOnAction {
             println("open compRoutes table")
             if (compRoutesTable == null) {
                 compRoutesTable = CompRoutesTable(stage, this)
@@ -1024,14 +1032,14 @@ class SX4Draw : Application() {
     }
 
     private fun drawRTButtons(btn1: Int, btn2: Int) {
-        val bt1 = PanelElement.getPeByAddress(btn1)!![0]
-        val bt2 = PanelElement.getPeByAddress(btn2)!![0]
+        val bt1 = PanelElement.getPeByAddress(btn1)[0]
+        val bt2 = PanelElement.getPeByAddress(btn2)[0]
 
         gc!!.strokeText("1", (bt1.gpe.x - 4).toDouble(), (bt1.gpe.y + 4).toDouble())
         gc!!.strokeText("2", (bt2.gpe.x - 4).toDouble(), (bt2.gpe.y + 4).toDouble())
     }
 
-    fun redrawPanelElements() {
+    private fun redrawPanelElements() {
         if (DEBUG) {
             println("redrawPES() nPE=" + panelElements.size)
         }
@@ -1195,13 +1203,11 @@ class SX4Draw : Application() {
                 ExtensionFilter("Panel Files", "panel*.xml*"))
         val selectedFile = fileChooser.showSaveDialog(stage)
         if (selectedFile != null) {
-
             var fn = selectedFile.toString()
             if (!fn.endsWith(".xml")) {
                 fn = "$fn.xml"
             }
-            prepareLCAndWrite(fn)
-            //WriteConfig.toXML(fn, panelName);  // OLD
+            prepareLayoutConfigAndWrite(fn)
             currentFileName = selectedFile.name
             return selectedFile.parent
         } else {
@@ -1210,22 +1216,19 @@ class SX4Draw : Application() {
 
     }
 
-    private fun prepareLCAndWrite(fn: String) {
+    private fun prepareLayoutConfigAndWrite(fn: String) {
 
         val df = SimpleDateFormat("yyyyMMdd_HHmmss")
         val version = df.format(Date())
         System.out.println("creating Config, filename=$fn panelName=$panelName")
 
         val panelConfig = PanelConfig(panelName,
-                // filter "dummy loco" out
-                ArrayList(locos),  //.filter { it -> !it.name.equals(EMPTY_LOCO_NAME) }),
+                ArrayList(locos),
                 panelElements, ArrayList(routes),
-                // filter "dummy compRoute" out
-                ArrayList(compRoutes),   // .filter { it -> (it.btn1 != 0) and (it.btn2 != 0) }
+                ArrayList(compRoutes),
                 ArrayList(trips), ArrayList(timetables))
         val shortFN = File(fn).name
         val layoutConfig = LayoutConfig(shortFN, version, panelConfig)
-
         WriteConfig.toXML(fn, layoutConfig)
     }
 
@@ -1255,7 +1258,7 @@ class SX4Draw : Application() {
             if (layoutConfig != null) {
                 currentFileName = selectedFile.name
                 version = layoutConfig.version
-                System.out.println("filename=${currentFileName} version=$version")
+                System.out.println("filename=$currentFileName version=$version")
                 val panelConfig = layoutConfig.getPC0()   // first PanelConfig
                 if (panelConfig != null) {
                     loadDataFromPanelConfig(panelConfig)
@@ -1325,7 +1328,7 @@ class SX4Draw : Application() {
 
     fun showCompRoute(compRt: CompRoute?) {
         val allRoutes = compRt!!.routes.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        if (allRoutes.size != 0) {
+        if (allRoutes.isNotEmpty()) {
             for (i in 0..(allRoutes.size - 1)) {
                 val rtStr = allRoutes[i]
                 try {
@@ -1347,11 +1350,11 @@ class SX4Draw : Application() {
 
     companion object {
 
-        var vNumber = 0.44
-        var vString = "28 Feb 2019"
+        var vNumber = 0.45
+        var vString = "01 Mar 2019"
         var version = "$vNumber - $vString"
 
-        // TODO UNDO für ca. mehrere Panel Elemente
+
 
         var locos: ObservableList<Loco> = FXCollections.observableArrayList<Loco>()
         var panelElements = ArrayList<PanelElement>()
@@ -1390,7 +1393,7 @@ class SX4Draw : Application() {
         private fun selectedPE(x: Double, y: Double): PanelElement? {
             // do the search from top element (SensorUS, RouteButton) to bottom (track)
             val peListRev = ArrayList(panelElements)
-            Collections.sort(peListRev, Collections.reverseOrder())
+            peListRev.sortDescending()
             for (pe in peListRev) {
                 val result = pe.gpe.isTouched(IntPoint(x, y))
                 if (result.key) {
@@ -1402,8 +1405,8 @@ class SX4Draw : Application() {
 
         private fun selectedPENotTrack(x: Double, y: Double): PanelElement? {
             val peListRev = ArrayList(panelElements)
-            Collections.sort(peListRev)
-            Collections.sort(peListRev, Collections.reverseOrder())
+            peListRev.sortDescending()
+           // JAVA Collections.sort(peListRev, Collections.reverseOrder())
             for (pe in peListRev) {
                 if (pe.gpe !is Track) {
                     val result = pe.gpe.isTouched(IntPoint(x, y))
@@ -1417,8 +1420,7 @@ class SX4Draw : Application() {
 
         private fun selectedPENotTrackInclState(x: Double, y: Double): Pair<PanelElement, Int>? {
             val peListRev = ArrayList(panelElements)
-            Collections.sort(peListRev)
-            Collections.sort(peListRev, Collections.reverseOrder())
+            peListRev.sortDescending()
             for (pe in peListRev) {
                 if (pe.gpe !is Track) {
                     val result = pe.gpe.isTouched(IntPoint(x, y))
@@ -1443,7 +1445,7 @@ class SX4Draw : Application() {
             return null
         }
 
-        private fun isPETypeOn(poi: IntPoint): Boolean {
+        private fun isPanelElementAlreadyOnPoint(poi: IntPoint): Boolean {
             var found = false
             for (pe in panelElements) {
                 if (Math.abs(poi.x - pe.gpe.x) <= 1 && Math.abs(poi.y - pe.gpe.y) <= 1) {

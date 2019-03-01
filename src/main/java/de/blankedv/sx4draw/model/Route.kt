@@ -325,7 +325,9 @@ class Route (
         // change sensor addresses in all routes and trips, if the sensor address was changed
         fun sensorAddressChanged(oAdr : String, nAdr : String) {
             for (rt in routes) {
-                rt.sensors = rt.sensors.replace(oAdr,nAdr)
+                val oldSensors = rt.sensors
+                rt.sensors = oldSensors.replace(oAdr,nAdr)
+                println("rt.sensors old=$oldSensors new=${rt.sensors}")
                 for (tr in trips.filter { it -> it.route == rt.adr}) {
                     if (tr.sens1 == oAdr.toInt()) {
                         tr.sens1 = nAdr.toInt()
@@ -341,7 +343,9 @@ class Route (
         // change turnout/signal addresses in all routes and trips, if the turnout/signal address was changed
         fun addressInRouteChanged(oAdr : String, nAdr : String) {
             for (rt in routes) {
-                rt.route = rt.route.replace(oAdr,nAdr)
+                val oldRoute = rt.route
+                rt.route = oldRoute.replace(oAdr,nAdr)
+                println("rt.route old=$oldRoute new=${rt.route}")
             }
             RoutesTable.refresh()
         }

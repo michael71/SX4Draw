@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package de.blankedv.sx4draw.model
 
+import de.blankedv.sx4draw.Constants
 import de.blankedv.sx4draw.Constants.ADDR0_SIGNAL
 import de.blankedv.sx4draw.Constants.INVALID_INT
 import de.blankedv.sx4draw.util.Utils
@@ -59,13 +60,17 @@ class Signal : GenericPE {
 
     @get:XmlAttribute(name = "adr")
     var adrStr: String by Delegates.observable(_adrStr) { prop, old, new ->
-        val old_0 = old.split(",")[0]
-        val new_0 = new.split(",")[0]
-        Route.addressInRouteChanged(old_0, new_0)
-        if (old.contains(',')) {
-            val old_1 = old.split(",")[1]
-            val new_1 = new.split(",")[1]
-            Route.addressInRouteChanged(old_1, new_1)
+        val old0 = old.split(",")[0]
+        val new0 = new.split(",")[0]
+        if (old0.isNotEmpty() && (old0.toInt() > Constants.SXMIN_USED) && (new0.toInt() > Constants.SXMIN_USED)) {
+            Route.addressInRouteChanged(old0, new0)
+            if (old.contains(',')) {
+                val old1 = old.split(",")[1]
+                val new1 = new.split(",")[1]
+                if (old1.isNotEmpty() && (old1.toInt() > Constants.SXMIN_USED) && (new1.toInt() > Constants.SXMIN_USED)) {
+                    Route.addressInRouteChanged(old1, new1)
+                }
+            }
         }
         _adrStr = new
     }
