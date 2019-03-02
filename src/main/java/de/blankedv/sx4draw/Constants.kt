@@ -23,6 +23,10 @@ package de.blankedv.sx4draw
 
 object Constants {
 
+    const val versionNumber = 0.46
+    const val versionDate = "02 Mar 2019"
+    const val progVersion = "$versionNumber - $versionDate"
+
     const val SXMIN_USED = 11
     const val SXMAX_USED = 1068 // max sx address used (106, bit 8)
     const val LBMIN = 1200  // minimum virtual address

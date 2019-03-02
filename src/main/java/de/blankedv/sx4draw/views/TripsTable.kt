@@ -21,7 +21,6 @@ import de.blankedv.sx4draw.Constants.INVALID_INT
 import de.blankedv.sx4draw.model.CompRoute
 import de.blankedv.sx4draw.model.Route
 import de.blankedv.sx4draw.model.Trip
-import de.blankedv.sx4draw.util.Utils
 import de.blankedv.sx4draw.views.SX4Draw.Companion.routes
 import de.blankedv.sx4draw.views.SX4Draw.Companion.trips
 
@@ -33,6 +32,7 @@ import javafx.scene.layout.BorderPane
 import javafx.stage.Stage
 import javafx.beans.binding.Bindings
 import javafx.scene.control.*
+import javafx.scene.layout.HBox
 import javafx.util.StringConverter
 
 
@@ -55,8 +55,11 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
         hb.setAlignment(Pos.CENTER);
         BorderPane.setMargin(hb, new Insets(8, 8, 8, 8)); */
         val btnAddTrip = Button("+ NEUE Fahrt");
+        val btnChangeLoco = Button("Zug ändern")
         tripsTableScene = Scene(bp, 700.0, 300.0)
-        bp.top = btnAddTrip
+        val vb = HBox(5.0)
+        vb.children.addAll(btnAddTrip, btnChangeLoco)
+        bp.top = vb
         bp.center = tableView
 
         // New window (Stage)
@@ -80,6 +83,11 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
 
         btnAddTrip.setOnAction {
             generateNewTrip()
+
+        }
+
+        btnChangeLoco.setOnAction {
+            changeLocoInTrips(primaryStage)
 
         }
 
@@ -110,16 +118,39 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
         }
     }
 
+    private fun changeLocoInTrips(stage: Stage) {
+        val res = ChangeTrainDialog.open(stage)
+        if (res.loco1 != INVALID_INT) {
+            println("changing " + res.loco1 + ",*," + res.speed1 + " to " + res.loco2 + ",*," + res.speed2 + " invert Dir=" + res.invertDir)
+            for (tr in trips.filter { it -> it.loco.substringBefore(',') == res.loco1.toString() }) {
+                println("changing trip=" + tr.adr)
+                if (res.invertDir) {
+                    tr.loco = tr.loco.replace(res.loco1.toString() + ",1," + res.speed1, res.loco1.toString() + ",X," + res.speed1)   // temp
+                    tr.loco = tr.loco.replace(res.loco1.toString() + ",0," + res.speed1, res.loco2.toString() + ",1," + res.speed2)
+                    tr.loco = tr.loco.replace(res.loco1.toString() + ",X," + res.speed1, res.loco2.toString() + ",0," + res.speed2)
+                } else {
+                    tr.loco = tr.loco.replace(res.loco1.toString() + ",0," + res.speed1, res.loco2.toString() + ",0," + res.speed2)
+                    tr.loco = tr.loco.replace(res.loco1.toString() + ",1," + res.speed1, res.loco2.toString() + ",1," + res.speed2)
+                }
+            }
+            refresh()
+        }
+    }
+
     private fun createDataTables() {
 
         val adrCol = TableColumn<Trip, Int>("Adr (ID)")
+        adrCol.prefWidthProperty().bind(tableView.widthProperty().multiply(0.1));
         val routeCol = TableColumn<Trip, Int>("Fahrstraße")
+        routeCol.prefWidthProperty().bind(tableView.widthProperty().multiply(0.15));
         val sens1Col = TableColumn<Trip, Int>("Sensor 1")
+        sens1Col.prefWidthProperty().bind(tableView.widthProperty().multiply(0.15));
         val sens2Col = TableColumn<Trip, Int>("Sensor 2")
-        val locoCol = TableColumn<Trip, String>("Loco (Adr,Dir,V)")
-        locoCol.prefWidthProperty().bind(tableView.widthProperty().multiply(0.3));
+        sens2Col.prefWidthProperty().bind(tableView.widthProperty().multiply(0.15));
+        val locoCol = TableColumn<Trip, String>("Zug (Adr,Dir,Geschw.)")
+        locoCol.prefWidthProperty().bind(tableView.widthProperty().multiply(0.25));
         val stopdelayCol = TableColumn<Trip, Int>("Stopdelay[sec]")
-
+        stopdelayCol.prefWidthProperty().bind(tableView.widthProperty().multiply(0.2));
         //   <trip adr="3100" route="2300" sens1="924" sens2="902" loco="29,1,126" stopdelay="1500" />
 
 
@@ -267,7 +298,7 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
         println("tripsTable " + tableView.items.size + " trips")
 
         // textField.setTextFormatter(formatter);
-        Utils.customResize(tableView)
+        // Utils.customResize(tableView)
 
     }
 

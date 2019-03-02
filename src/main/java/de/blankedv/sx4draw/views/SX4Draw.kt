@@ -63,6 +63,8 @@ import de.blankedv.sx4draw.Constants.RASTER
 import de.blankedv.sx4draw.Constants.RECT_X
 import de.blankedv.sx4draw.Constants.RECT_Y
 import de.blankedv.sx4draw.Constants.PEState
+import de.blankedv.sx4draw.Constants.progVersion
+import de.blankedv.sx4draw.Constants.versionNumber
 
 import de.blankedv.sx4draw.PanelElement.Companion.SENSOR_WIDTH
 import de.blankedv.sx4draw.PanelElement.Companion.TRACK_WIDTH
@@ -876,7 +878,7 @@ class SX4Draw : Application() {
         infoItem.graphic = ivInfo
         infoItem.setOnAction { event ->
             println("info clicked")
-            Dialogs.buildInfoAlertOpenSX("Info", "SX4Draw\nhttps://opensx.net/sx4 ", "Programm Version:$version", this)
+            Dialogs.buildInfoAlertOpenSX("Info", "SX4Draw\nhttps://opensx.net/sx4 ", "Programm Version:$progVersion", this)
         }
 
         updateItem.graphic = ivSX4generic
@@ -885,17 +887,17 @@ class SX4Draw : Application() {
             // does not work as expected ProgressIndicator p1 = new ProgressIndicator();
             //anchorPane.getChildren().add(p1);
             // gets never diplayes:   status.setText("checking version ...");
-            // TODO move to async as soon as using kotlin
+            // TODO move to async
             val newVersion = Utils.readLastVersionFromURL()
             // status.setText("");
             //anchorPane.getChildren().remove(p1);
             println("read from github: $newVersion")
             if (newVersion < 0.0) {
                 Dialogs.buildErrorAlert("Error", "Konnte die aktuelle Version nicht von Github lesen!", "?")
-            } else if (newVersion <= vNumber) {
-                Dialogs.buildInformationAlert("keine neue Version vorhanden", "", "Version $version ist aktuell", this)
+            } else if (newVersion <= versionNumber) {
+                Dialogs.buildInformationAlert("keine neue Version vorhanden", "", "Version $versionNumber ist aktuell", this)
             } else {
-                val title = "$vNumber ist nicht aktuell."
+                val title = "$versionNumber ist nicht aktuell."
                 val msg = "Download der aktuellen Version $newVersion von: https://opensx.net/sx4 möglich "
                 Dialogs.buildInfoAlertOpenSX(title, msg, "", this)
             }
@@ -1257,7 +1259,7 @@ class SX4Draw : Application() {
             val layoutConfig = ReadConfig.fromXML(selectedFile.toString())
             if (layoutConfig != null) {
                 currentFileName = selectedFile.name
-                version = layoutConfig.version
+                val version = layoutConfig.version
                 System.out.println("filename=$currentFileName version=$version")
                 val panelConfig = layoutConfig.getPC0()   // first PanelConfig
                 if (panelConfig != null) {
@@ -1350,9 +1352,6 @@ class SX4Draw : Application() {
 
     companion object {
 
-        var vNumber = 0.45
-        var vString = "01 Mar 2019"
-        var version = "$vNumber - $vString"
 
 
 
