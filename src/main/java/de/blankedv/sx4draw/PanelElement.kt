@@ -34,8 +34,9 @@ import javafx.scene.shape.Line
 import javafx.scene.shape.Shape
 
 /**
- * generic panel element - contains data model (Track, Sensor, ...) plus
- * state plus graphical representation (Shape)
+ * generic panel element - contains data model (Track, Sensor, ...)
+ *                         + state
+ *                         + graphical representation (Shape)
  *
  * @author mblank
  */
@@ -71,27 +72,56 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
         setColorFromState()
     }
 
-    private fun setColorFromState() {
-        when (state) {
-            DEFAULT -> {
-                shape.fill = defaultColor
-                shape.stroke = defaultColor
+    fun setColorFromState() {
+        if (gpe is Signal) {
+            when (state) {
+                DEFAULT -> {
+                    shape.fill = defaultColor
+                    shape.stroke = defaultColor
+                }
+                SELECTED -> {
+                    shape.fill = Color.RED
+                    shape.stroke = Color.RED
+                }
+                MARKED -> {
+                    shape.fill = Color.AQUA
+                    shape.stroke = Color.AQUA
+                }
+                STATE_0 -> {
+                    shape.fill = Color.RED
+                    shape.stroke = Color.RED
+                }
+                STATE_1 -> {
+                    shape.fill = Color.GREEN
+                    shape.stroke = Color.GREEN
+                }
+                STATE_2 -> {
+                    shape.fill = Color.GOLD
+                    shape.stroke = Color.GOLD
+                }
+                STATE_3 -> {
+                    shape.fill = Color.PINK
+                    shape.stroke = Color.PINK
+                }
             }
-            SELECTED -> {
-                shape.fill = Color.RED
-                shape.stroke = Color.RED
-            }
-            MARKED -> {
-                shape.fill = Color.AQUA
-                shape.stroke = Color.AQUA
-            }
-            STATE_0 -> {
-                shape.fill = Color.AQUA //Color.RED
-                shape.stroke = Color.AQUA //Color.RED
-            }
-            STATE_1 -> {
-                shape.fill = Color.AQUA //Color.GREEN
-                shape.stroke = Color.AQUA //Color.GREEN
+        } else {
+            when (state) {
+                DEFAULT -> {
+                    shape.fill = defaultColor
+                    shape.stroke = defaultColor
+                }
+                SELECTED -> {
+                    shape.fill = Color.RED
+                    shape.stroke = Color.RED
+                }
+                MARKED,
+                STATE_0,
+                STATE_1,
+                STATE_2,
+                STATE_3 -> {
+                    shape.fill = Color.AQUA
+                    shape.stroke = Color.AQUA
+                }
             }
         }
     }
@@ -110,7 +140,7 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
         if (addr == INVALID_INT) {
             return   // don't draw invalid int
         }
-        val sAddr: String
+        var sAddr: String
         if (addr < LBMIN) {
             gc.fill = Color.LIGHTBLUE
             sAddr = (addr / 10).toString() + "." + addr % 10
@@ -118,6 +148,7 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
             gc.fill = Color.LIGHTSALMON
             sAddr = "" + addr
         }
+        if (gpe.getAddr2() != INVALID_INT) sAddr += "+"
 
         gc.fillRect(gpe.x.toDouble(), gpe.y.toDouble() - 11.0, (8 * sAddr.length).toDouble(), 12.0)
         gc.strokeText(sAddr, gpe.x.toDouble(), gpe.y.toDouble())
@@ -143,7 +174,7 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
 
         const val TOUCH_RADIUS = 7
         const val TRACK_WIDTH = 5.0
-        const val SENSOR_WIDTH = 4.0
+        const val SENSOR_WIDTH = 3.5
 
         /**
          * search for a panel element(or elements) when only the address is known

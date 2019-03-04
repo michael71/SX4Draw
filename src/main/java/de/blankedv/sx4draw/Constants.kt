@@ -23,8 +23,8 @@ package de.blankedv.sx4draw
 
 object Constants {
 
-    const val versionNumber = 0.46
-    const val versionDate = "02 Mar 2019"
+    const val versionNumber = 0.48
+    private const val versionDate = "04 Mar 2019"
     const val progVersion = "$versionNumber - $versionDate"
 
     const val SXMIN_USED = 11
@@ -47,10 +47,10 @@ object Constants {
     const val ADDR0_SIGNAL = 3000
     const val ADDR0_TURNOUT = 801
 
-    const val DEF_SENSOR_ADRSTR = "901,1901"
+    const val DEFAULT_SENSOR_ADRSTR = "901,1901"
 
     enum class PEState {
-        DEFAULT, MARKED, SELECTED, STATE_0, STATE_1
+        DEFAULT, MARKED, SELECTED, STATE_0, STATE_1, STATE_2, STATE_3
     }
 
 

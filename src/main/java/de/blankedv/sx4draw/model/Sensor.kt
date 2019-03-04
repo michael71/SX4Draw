@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 package de.blankedv.sx4draw.model
 
 import de.blankedv.sx4draw.Constants
-import de.blankedv.sx4draw.Constants.DEF_SENSOR_ADRSTR
+import de.blankedv.sx4draw.Constants.DEFAULT_SENSOR_ADRSTR
 import de.blankedv.sx4draw.Constants.INVALID_INT
 import de.blankedv.sx4draw.PanelElement
 import de.blankedv.sx4draw.util.Utils
@@ -55,11 +55,11 @@ class Sensor : GenericPE {
     var y2: Int? = null
 
     @XmlTransient
-    private var _adrStr = DEF_SENSOR_ADRSTR
+    private var _adrStr = DEFAULT_SENSOR_ADRSTR
 
     @get:XmlAttribute(name = "adr")
     var adrStr: String by Delegates.observable(_adrStr) { _, old, new ->
-        if (old.isNotEmpty() && !old.equals(DEF_SENSOR_ADRSTR)) {
+        if (old.isNotEmpty() && !old.equals(DEFAULT_SENSOR_ADRSTR)) {
             println("Sensor adrStr changed from $old to $new")
             val oldArry = old.split(",")
             val newArry = new.split(",")

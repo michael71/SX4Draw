@@ -23,7 +23,6 @@ import de.blankedv.sx4draw.views.SX4Draw.Companion.routes
 
 import de.blankedv.sx4draw.Constants.PEState
 import de.blankedv.sx4draw.PanelElement
-import de.blankedv.sx4draw.model.*
 import de.blankedv.sx4draw.views.RoutesTable
 import de.blankedv.sx4draw.views.SX4Draw.Companion.trips
 
@@ -32,7 +31,6 @@ import java.util.Comparator
 
 import javafx.util.Pair
 import org.w3c.dom.Node
-import java.lang.NumberFormatException
 import javax.xml.bind.annotation.XmlAttribute
 import javax.xml.bind.annotation.XmlRootElement
 import javax.xml.bind.annotation.XmlTransient
@@ -47,24 +45,24 @@ import kotlin.properties.Delegates
  */
 @XmlRootElement(name = "route")
 @XmlType
-class Route (
+class Route(
 
-    @get:XmlTransient
-    private var _adr : Int  = INVALID_INT,
+        @get:XmlTransient
+        private var _adr: Int = INVALID_INT,
 
-    @get:XmlAttribute
-    var btn1 : Int = INVALID_INT,
+        @get:XmlAttribute
+        var btn1: Int = INVALID_INT,
 
-    @get:XmlAttribute
-    var btn2 : Int = INVALID_INT,
+        @get:XmlAttribute
+        var btn2: Int = INVALID_INT,
 
-    @get:XmlAttribute
-    var route : String  = "",
+        @get:XmlAttribute
+        var route: String = "",
 
-    @get:XmlAttribute
-    var sensors : String = ""
+        @get:XmlAttribute
+        var sensors: String = ""
 
-    ) : Comparator<Route>, Comparable<Route> {
+) : Comparator<Route>, Comparable<Route> {
 
     @get:XmlAttribute(name = "adr")
     var adr: Int by Delegates.observable(_adr) { prop, old, new ->
@@ -115,28 +113,7 @@ class Route (
             return pes
         }
 
-     /**
-     * add a turnout, signal or sensor to a route
-     *
-     * @param pe
-     */
-    fun addElement(pe: PanelElement) {
-        when (pe.gpe) {
-            is Sensor -> if (sensors.isEmpty()) {
-                sensors = "" + pe.gpe.getAddr()
-            } else {
-                sensors = sensors + "," + pe.gpe.getAddr()
-            }
-            is Turnout -> if (route.isEmpty()) {
-                route = "" + pe.gpe.getAddr() + ",0"
-            } else {
-                route = route + ";" + pe.gpe.getAddr() + ",0"
-            }
-            else -> {}
-        }
-    }
-
-    fun findSens1() : Int {
+    fun findSens1(): Int {
         val allsens = sensors.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         if (allsens.size >= 1) {
             return allsens[0].toInt()
@@ -145,33 +122,33 @@ class Route (
         }
     }
 
-    fun findSens2() : Int {
+    fun findSens2(): Int {
         val allsens = sensors.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         if (allsens.size >= 1) {
-            return allsens[allsens.size-1].toInt()
+            return allsens[allsens.size - 1].toInt()
         } else {
             return INVALID_INT
         }
     }
 
-    fun reverseRoute() : Route {
+    fun reverseRoute(): Route {
         val allsens = sensors.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         var revSens = ""
         // order sensors in string in reverse order of original route
-        for (i in (allsens.size -1) downTo 0) {
+        for (i in (allsens.size - 1) downTo 0) {
             val s = allsens[i]
-              if (revSens.isNotEmpty()) revSens += ","
+            if (revSens.isNotEmpty()) revSens += ","
             revSens += s
         }
-        return Route(adr+1, btn2, btn1, route, revSens)
+        return Route(adr + 1, btn2, btn1, route, revSens)
     }
 
-    fun copy() : Route {
-        return Route(adr, btn1,btn2,route, sensors)
+    fun copy(): Route {
+        return Route(adr, btn1, btn2, route, sensors)
     }
 
     /**
-     * add a turnout, signal or sensor to a route
+     * add a turnout, signal or sensor to a route (with a state)
      *
      * @param peSt
      */
@@ -188,12 +165,59 @@ class Route (
                 route = route + ";" + peSt.key.gpe.getAddr() + "," + peSt.value
             }
             is Signal -> if (route.isEmpty()) {
-                route = "" + peSt.key.gpe.getAddr() + ",0"
+                route = "" + peSt.key.gpe.getAddr() + "," + peSt.value
             } else {
-                route = route + ";" + peSt.key.gpe.getAddr() + ",0"
+                route = route + ";" + peSt.key.gpe.getAddr() + "," + peSt.value
             }
-            else -> {}
+            else -> {
+            }
         }
+    }
+
+    // when building routes, the desired signal state can be set
+    // when addr2!=INVALID_INT, state can be 0...3   (else: 0/1 only)
+    fun incrementSignalState(pe: PanelElement): PEState {
+        val addr = pe.gpe.getAddr()
+        val nBit2 = (pe.gpe.getAddr2() != INVALID_INT)   // second address => 2 bit signal, values 0..3
+        var oldState = route.substringAfter("$addr,")
+        println("oldSt-1 $oldState")
+        oldState = oldState.substring(0..0)
+        println("oldSt-2 $oldState")
+        var newState = "1"
+        var result: PEState
+        when (oldState) {
+            "0" -> {
+                newState = "1"; result = PEState.STATE_1      // hp1 green
+            }
+            "1" -> {
+                if (nBit2) {
+                    newState = "2"; result = PEState.STATE_2    // hp2 yellow
+                }
+                else {
+                    newState = "0"; result = PEState.STATE_0
+                }
+            }
+            "2" -> {
+                if (nBit2) {
+                    newState = "3"; result = PEState.STATE_3   // sh0 red/white
+                }
+                else {
+                    newState = "0"; result = PEState.STATE_0
+                }
+            }
+            "3" -> {
+                newState = "0"; result = PEState.STATE_0      // hp0 red
+            }
+            else -> {
+                newState = "0"; result = PEState.STATE_0
+            }
+        }
+        val o = "$addr,$oldState"
+        val n = "$addr,$newState"
+        println("oldSt=$oldState newSt=$newState, old.route=$route")
+        route = route.replace(o, n)
+        println("new.route=$route")
+        return result
     }
 
     /**
@@ -205,7 +229,7 @@ class Route (
         val pes = pES  // implicit setRouteState
         println("setMarked, n=${pes.size}")
         if (mark) {
-            for (pe : PanelElement in pes) {
+            for (pe: PanelElement in pes) {
                 pe.createShapeAndSetState(PEState.MARKED)
             }
         } else {
@@ -234,11 +258,11 @@ class Route (
                     val rst = Integer.parseInt(elementAndState[1])
                     val peList = PanelElement.getPeByAddress(a)
                     for (pe in peList) {
-                        if (rst == 0) {
-                            pe.createShapeAndSetState(PEState.STATE_0)
-                        } else {
-                            pe.createShapeAndSetState(PEState.STATE_1)
-                            // TODO distinguish between 1 and 2 (=yellow)
+                        when (rst) {
+                            0 -> pe.createShapeAndSetState(PEState.STATE_0)
+                            1 -> pe.createShapeAndSetState(PEState.STATE_1)
+                            2 -> pe.createShapeAndSetState(PEState.STATE_2)
+                            3 -> pe.createShapeAndSetState(PEState.STATE_3)
                         }
                         println("set pe.adr=" + pe.gpe.getAddr() + " rst=" + rst)
                     }
@@ -258,7 +282,7 @@ class Route (
                     val sensList = PanelElement.getPeByAddress(a)
                     for (pe in sensList) {
                         pe.createShapeAndSetState(PEState.MARKED)
-                        println("sensor="+(pe.gpe  as Sensor).getAddr())
+                        println("sensor=" + (pe.gpe as Sensor).getAddr())
                     }
                 }
             } catch (e: Exception) {
@@ -288,7 +312,7 @@ class Route (
             for (i in 0 until attributes.length) {
                 val theAttribute = attributes.item(i)
                 if ((theAttribute.nodeName == "id") ||
-                     (theAttribute.nodeName == "adr") ) {
+                        (theAttribute.nodeName == "adr")) {
                     rt.adr = Integer.parseInt(theAttribute.nodeValue)
                 } else if (theAttribute.nodeName == "btn1") {
                     rt.btn1 = Integer.parseInt(theAttribute.nodeValue)
@@ -315,7 +339,7 @@ class Route (
             return newID + 1
         }
 
-        fun getByAddress(a : Int): Route? {
+        fun getByAddress(a: Int): Route? {
             for (rt in routes) {
                 if (rt.adr == a) return rt
             }
@@ -323,12 +347,12 @@ class Route (
         }
 
         // change sensor addresses in all routes and trips, if the sensor address was changed
-        fun sensorAddressChanged(oAdr : String, nAdr : String) {
+        fun sensorAddressChanged(oAdr: String, nAdr: String) {
             for (rt in routes) {
                 val oldSensors = rt.sensors
-                rt.sensors = oldSensors.replace(oAdr,nAdr)
+                rt.sensors = oldSensors.replace(oAdr, nAdr)
                 println("rt.sensors old=$oldSensors new=${rt.sensors}")
-                for (tr in trips.filter { it -> it.route == rt.adr}) {
+                for (tr in trips.filter { it -> it.route == rt.adr }) {
                     if (tr.sens1 == oAdr.toInt()) {
                         tr.sens1 = nAdr.toInt()
                     }
@@ -341,15 +365,14 @@ class Route (
         }
 
         // change turnout/signal addresses in all routes and trips, if the turnout/signal address was changed
-        fun addressInRouteChanged(oAdr : String, nAdr : String) {
+        fun addressInRouteChanged(oAdr: String, nAdr: String) {
             for (rt in routes) {
                 val oldRoute = rt.route
-                rt.route = oldRoute.replace(oAdr,nAdr)
+                rt.route = oldRoute.replace(oAdr, nAdr)
                 println("rt.route old=$oldRoute new=${rt.route}")
             }
             RoutesTable.refresh()
         }
-
 
 
     }

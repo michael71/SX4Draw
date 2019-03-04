@@ -57,6 +57,7 @@ object AddressDialog {
     private val cbInv = CheckBox()
     private val lblSecondaryAdr = Label(" 2.Adr?")
     private val cbSec = CheckBox()
+    private var resultA = GenericAddress(0)
 
     // select orientation (ONLY for SIGNAL)
     private val choiceBoxOrient = ChoiceBox(FXCollections.observableArrayList(
@@ -66,63 +67,70 @@ object AddressDialog {
 
     fun open(pe: PanelElement, primaryStage: Stage, genA: GenericAddress): GenericAddress {
 
+        resultA = genA.copy()
+
         println("genAdr=${genA}")
 
         val title = ("Adresse " + pe.gpe::class.simpleName
                 + " Pos.= " + pe.gpe.x + "," + pe.gpe.y)
-        val in1000 = genA.addr / 1000
-        val in100 = (genA.addr - in1000 * 1000) / 100
-        val in10 = (genA.addr - in1000 * 1000 - in100 * 100) / 10
-        val in1 = genA.addr - in1000 * 1000 - in100 * 100 - in10 * 10
+        val in1000 = resultA.addr / 1000
+        val in100 = (resultA.addr - in1000 * 1000) / 100
+        val in10 = (resultA.addr - in1000 * 1000 - in100 * 100) / 10
+        val in1 = resultA.addr - in1000 * 1000 - in100 * 100 - in10 * 10
         spinner1000.valueFactory.value = in1000
         spinner100.valueFactory.value = in100
         spinner10.valueFactory.value = in10
         spinner1.valueFactory.value = in1
-        updateAddress(pe, genA) // for address label display
+        choiceBoxOrient.selectionModel.select(0)
 
         val lblInv = Label(" invertiert")
+        val lblOrient = Label(" Orient.")
 
+        // display (Turnout) or hide (else) check box for inverted data
         when (pe.gpe) {
             is Turnout -> {
-                cbInv.isSelected = (genA.inv != 0)
+                cbInv.isSelected = (resultA.inv != 0)
                 cbInv.isVisible = true
                 lblInv.isVisible = true
-                genA.addr2 = INVALID_INT
+                resultA.addr2 = INVALID_INT
                 cbSec.isVisible = false
                 lblSecondaryAdr.isVisible = false
             }
             is Signal,
             is Sensor -> {
-                genA.inv = 0
+                resultA.inv = 0
                 cbInv.isVisible = false
+                cbInv.isSelected = false
                 lblInv.isVisible = false
-                cbSec.isSelected = (genA.addr2 != INVALID_INT)
+                cbSec.isSelected = (resultA.addr2 != INVALID_INT)
                 cbSec.isVisible = true
                 lblSecondaryAdr.isVisible = true
             }
             else -> {
-                println("ERROR: AddressDialog, not allowed class="+pe.gpe::class)
+                println("ERROR: AddressDialog, class=" + pe.gpe::class + " not allowed" )
             }
         }
 
-        val lblOrient = Label(" Orient.")
 
+        // display or hide choiceBox for (signal-) orientation
         if (pe.gpe is Signal) {
-            genA.orient = genA.orient
-            choiceBoxOrient.selectionModel.select(genA.orient)
+            choiceBoxOrient.selectionModel.select(resultA.orient)
+            //println("cb.select=${choiceBoxOrient.selectionModel.selectedIndex}")
             choiceBoxOrient.isDisable = false
             choiceBoxOrient.isVisible = true
             lblOrient.isVisible = true
         } else {
-            genA.orient = 0
+            resultA.orient = 0
             choiceBoxOrient.isDisable = true
             choiceBoxOrient.isVisible = false
             lblOrient.isVisible = false
         }
 
-        val addrListener = ChangeListener<Int> { _, _, _ -> updateAddress(pe, genA) }
+        updateAddressLabel()
 
-        val invListener = ChangeListener<Boolean> { _, _, _ -> updateAddress(pe, genA) }
+        val addrListener = ChangeListener<Int> { _, _, _ -> updateAddress(pe) }
+
+        val invListener = ChangeListener<Boolean> { _, _, _ -> updateAddress(pe) }
 
         spinner1000.valueProperty().addListener(addrListener)
         spinner100.valueProperty().addListener(addrListener)
@@ -175,11 +183,11 @@ object AddressDialog {
         // New window (Stage)
         val newWindow = Stage()
         btnCancel.setOnAction {
-            genA.addr = -1
+            resultA.addr = -1
             newWindow.close()
         }
         btnSave.setOnAction {
-            updateAddress(pe, genA)
+            updateAddress(pe)
             newWindow.close()
         }
         newWindow.title = title
@@ -197,32 +205,33 @@ object AddressDialog {
 
         newWindow.showAndWait()
 
-        return genA
+        return resultA
     }
 
-    private fun updateAddress(pe: PanelElement, genA : GenericAddress) {
-        genA.addr = (spinner1000.value * 1000
+    private fun updateAddress(pe: PanelElement) {
+        resultA.addr = (spinner1000.value * 1000
                 + spinner100.value * 100
                 + spinner10.value * 10
                 + spinner1.value)
-        if (genA.addr >= LBMIN) {
-            lblAdr.text = " Virt.-Adr\n >=1200"
-        } else if ((genA.addr >= SXMIN_USED) && (genA.addr <= SXMAX_USED)) {
-            lblAdr.text = " SX-Adr\n 1.1-106.8"
+
+        updateAddressLabel()
+
+        // filter out invalid SX addresses
+        if ((resultA.addr in SXMIN_USED..SXMAX_USED)) {
             if (spinner1.value == 0) {
                 spinner1.valueFactory.value = 1
-                genA.addr = (spinner1000.value * 1000
+                resultA.addr = (spinner1000.value * 1000
                         + spinner100.value * 100
                         + spinner10.value * 10
                         + spinner1.value)
             } else if (spinner1.value == 9) {
                 spinner1.valueFactory.value = 8
-                genA.addr = (spinner1000.value * 1000
+                resultA.addr = (spinner1000.value * 1000
                         + spinner100.value * 100
                         + spinner10.value * 10
                         + spinner1.value)
             }
-        } else if (genA.addr < SXMIN_USED){
+        } else if (resultA.addr < SXMIN_USED) {
             // too low, invalid adresse, reset spinners to 11 (SXMIN_USED)
 
             spinner1000.valueFactory.value = 0
@@ -230,39 +239,52 @@ object AddressDialog {
             spinner10.valueFactory.value = 1
             spinner1.valueFactory.value = 1
 
-             genA.addr = (spinner1000.value * 1000
+            resultA.addr = (spinner1000.value * 1000
                     + spinner100.value * 100
                     + spinner10.value * 10
                     + spinner1.value)
-        } else  {
-            // too high, reset to 1200 (lbmin)
+        } else if (resultA.addr in (SXMAX_USED+1)..(LBMIN-1)){
+            // too high for SX, too low for lanbahn, reset to 1200 (lbmin)
             spinner1000.valueFactory.value = 1
             spinner100.valueFactory.value = 2
             spinner10.valueFactory.value = 0
             spinner1.valueFactory.value = 0
 
-            genA.addr = (spinner1000.value * 1000
+            resultA.addr = (spinner1000.value * 1000
                     + spinner100.value * 100
                     + spinner10.value * 10
                     + spinner1.value)
         }
 
+        // get "inv" result
         if (cbInv.isSelected) {
-            genA.inv = 1
+            resultA.inv = 1
         } else {
-            genA.inv = 0
+            resultA.inv = 0
         }
+
+        // get secondary address, if cbSec is selected
         if (cbSec.isSelected) {
             when (pe.gpe) {
-                is Sensor -> genA.addr2 = genA.addr + 1000
-                is Signal -> genA.addr2 = genA.addr + 1
-                else -> genA.addr2 = INVALID_INT
+                is Sensor -> resultA.addr2 = resultA.addr + 1000
+                is Signal -> resultA.addr2 = resultA.addr + 1
+                else -> resultA.addr2 = INVALID_INT
             }
         } else {
-            genA.addr2 = INVALID_INT
+            resultA.addr2 = INVALID_INT
         }
-        genA.orient = choiceBoxOrient.selectionModel.selectedIndex
+
+        // get orientation index (0..7)
+        resultA.orient = choiceBoxOrient.selectionModel.selectedIndex
+        //println("cb.select=${choiceBoxOrient.selectionModel.selectedIndex} res.orient=${resultA.orient}")
     }
 
+    private fun updateAddressLabel() {
+        if (resultA.addr >= LBMIN) {
+            lblAdr.text = " Virt.-Adr\n >=1200"
+        } else if ((resultA.addr >= SXMIN_USED) && (resultA.addr <= SXMAX_USED)) {
+            lblAdr.text = " SX-Adr\n 1.1-106.8"
+        }
 
+    }
 }

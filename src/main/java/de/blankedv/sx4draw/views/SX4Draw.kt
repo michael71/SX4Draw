@@ -53,7 +53,6 @@ import javafx.util.Pair
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.ArrayList
-import java.util.Collections
 import java.util.Date
 import java.util.prefs.Preferences
 
@@ -961,11 +960,12 @@ class SX4Draw : Application() {
         val si = (pe.gpe as Signal)
         val orientation = Utils.signalDX2ToOrient(IntPoint(
                 (pe.gpe as Signal).x2 - pe.gpe.x, (pe.gpe as Signal).y2 - pe.gpe.y))
-        val initA = GenericAddress(si.getAddr(), si.getAddr2(), 0, orient = orientation)
-        val result = AddressDialog.open(pe, primStage, initA)
+        println("IN: orient=$orientation")
+        val initialAddress = GenericAddress(si.getAddr(), si.getAddr2(), 0, orientation)
+        val result = AddressDialog.open(pe, primStage, initialAddress)
         if (result.addr != -1) {
             println("OUT: addr=" + result.addr + " addr2=" + result.addr2 + " inv=" + result.inv + " orient=" + result.orient)
-            val addressOK = Dialogs.checkAddress(initA, result)
+            val addressOK = Dialogs.checkAddress(initialAddress, result)
             if (!addressOK) {
                 println("addressOK=false")
                 return  // do nothing
@@ -975,10 +975,10 @@ class SX4Draw : Application() {
             } else {
                 si.adrStr = "" + result.addr
             }
-            val d = Utils.signalOrientToDXY2(result.orient)
-            println("or=" + result.orient + " dx=" + d.x + " dy=" + d.y)
-            si.x2 = si.x + d.x
-            si.y2 = si.y + d.y
+            val delta = Utils.signalOrientToDXY2(result.orient)
+            println("or=" + result.orient + " dx=" + delta.x + " dy=" + delta.y)
+            si.x2 = si.x + delta.x
+            si.y2 = si.y + delta.y
             pe.recreateShape()  // orientation might have changed, create new
             lastPE = pe
             btnUndo.isDisable = false
@@ -1082,7 +1082,7 @@ class SX4Draw : Application() {
         }
     }
 
-    private fun createRoute(poi: IntPoint) {
+    private fun createRoute(poi: IntPoint) {  // primaryStage: Stage) {
         val rtbtn = getRouteBtn(poi)
         if (currentRoute == null) {
             // initialize new route
@@ -1102,9 +1102,28 @@ class SX4Draw : Application() {
                 // continue to add elements to route
                 val peSt = selectedPENotTrackInclState(poi.x.toDouble(), poi.y.toDouble())
                 if (peSt != null) {
+                    //PopupChoice.open(primaryStage)
                     // add to route and mark
-                    currentRoute!!.addElement(peSt)
-                    peSt.key.createShapeAndSetState(PEState.MARKED)
+                    // for signals: change desired state in route by clicking until state reached
+                    if (peSt.key.gpe is Signal) {
+                        if ((lastSignalAddr == 0) || (peSt.key.gpe.getAddr() != lastSignalAddr)) {
+                            // hit for the first time, create new signal and set to 1=green
+                            currentRoute!!.addElement(Pair(peSt.key, 1))
+                            lastSignalAddr = peSt.key.gpe.getAddr()
+                            lastSignalState = 1
+                            peSt.key.createShapeAndSetState(PEState.STATE_1)
+                        } else {
+                            // editing existing signal
+                            val newState = currentRoute!!.incrementSignalState(peSt.key)
+                            peSt.key.state = newState
+                            peSt.key.setColorFromState()
+                        }
+                    } else {
+                        lastSignalAddr = 0
+                        currentRoute!!.addElement(peSt)
+                        peSt.key.createShapeAndSetState(PEState.MARKED)
+                    }
+
                     redrawPanelElements()
                 }
             } else {
@@ -1365,6 +1384,8 @@ class SX4Draw : Application() {
 
         var lastPE: PanelElement? = null
         var panelName = ""
+        var lastSignalAddr : Int = 0
+        var lastSignalState = 0
 
         var start = IntPoint(0, 0)
         private val btnUndo = Button()

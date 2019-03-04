@@ -201,7 +201,7 @@ object Utils {
                 if (g.x2 != null) {//DE type of sensor
                     shape = Line(g.x.toDouble(), g.y.toDouble(), g.x2!!.toDouble(), g.y2!!.toDouble())
                     shape.strokeWidth = PanelElement.SENSOR_WIDTH
-                    shape.strokeDashArray.addAll(15.0, 10.0)
+                    shape.strokeDashArray.addAll(6.0, 12.0)
                     shape.strokeLineCap = StrokeLineCap.ROUND
                 } else {  //US Type SENSOR
                     shape = Circle(g.x.toDouble(), g.y.toDouble(), 8.0, Color.ORANGE)
