@@ -117,8 +117,6 @@ class SX4Draw : Application() {
     override fun start(primaryStage: Stage) {
         primaryStage.title = "Panel XML File Creator (Name: ???)"
         primaryStage.icons.add(Image("sx4_draw_ico64.png"))
-        //primaryStage.getIcons().add(new Image("file:sx4_ico256.png"));
-        //primaryStage.getIcons().add(new Image("file:sx4_iconx.png"));
 
         val prefs = Preferences.userNodeForPackage(this.javaClass)
 
