@@ -71,7 +71,7 @@ import de.blankedv.sx4draw.util.Calc
 import javafx.collections.ObservableList
 
 
-class SX4Draw : Application() {
+open class SX4Draw : Application() {
 
     // FIXED: String replace funktioniert nicht für Weichen-Adressenänderung (werte unter 11 = SXMIN_USED ausgeschlossen)
 
@@ -108,6 +108,20 @@ class SX4Draw : Application() {
     private var currentFileName = ""
 
     private val application = this
+
+    private val btnUndo = Button()
+    private val btnAddTrack = ToggleButton()
+    private val btnAddSensor = ToggleButton()
+    private val btnAddSensorUS = ToggleButton()
+    private val btnAddSignal = ToggleButton()
+    private val btnRouteBtn = ToggleButton()
+    private val btnAddRoute = ToggleButton()
+    private val btnAddCompRoute = ToggleButton()
+    private val btnSelect = ToggleButton()
+    private val btnUnSelect = Button()
+    private val btnMove = ToggleButton()
+    private val btnDelete = Button()
+    private val toggleGroup = ToggleGroup()
 
     enum class GUIState {
         ADD_TRACK, ADD_SENSOR, ADD_SENSOR_US, ADD_SIGNAL, ADD_ROUTEBTN, ADD_ROUTE, ADD_COMPROUTE, SELECT, MOVE
@@ -1268,6 +1282,90 @@ class SX4Draw : Application() {
         redrawPanelElements()
     }
 
+    private fun selectedPE(x: Double, y: Double): PanelElement? {
+        // do the search from top element (SensorUS, RouteButton) to bottom (track)
+        val peListRev = ArrayList(panelElements)
+        peListRev.sortDescending()
+        for (pe in peListRev) {
+            val result = pe.gpe.isTouched(IntPoint(x, y))
+            if (result.key) {
+                return pe
+            }
+        }
+        return null
+    }
+
+    private fun selectedPENotTrack(x: Double, y: Double): PanelElement? {
+        val peListRev = ArrayList(panelElements)
+        peListRev.sortDescending()
+        // JAVA Collections.sort(peListRev, Collections.reverseOrder())
+        for (pe in peListRev) {
+            if (pe.gpe !is Track) {
+                val result = pe.gpe.isTouched(IntPoint(x, y))
+                if (result.key) {
+                    return pe
+                }
+            }
+        }
+        return null
+    }
+
+    private fun selectedPENotTrackInclState(x: Double, y: Double): Pair<PanelElement, Int>? {
+        val peListRev = ArrayList(panelElements)
+        peListRev.sortDescending()
+        for (pe in peListRev) {
+            if (pe.gpe !is Track) {
+                val result = pe.gpe.isTouched(IntPoint(x, y))
+                if (result.key) {
+                    return Pair(pe, result.value)
+                }
+            }
+        }
+        return null
+    }
+
+    private fun getRouteBtn(p: IntPoint): PanelElement? {
+        for (pe in panelElements) {
+            if (pe.gpe is RouteButton) {
+                val result = pe.gpe.isTouched(p)
+                if (result.key) {
+                    return pe
+                }
+
+            }
+        }
+        return null
+    }
+
+    private fun isPanelElementAlreadyOnPoint(poi: IntPoint): Boolean {
+        for (pe in panelElements) {
+            if (Math.abs(poi.x - pe.gpe.x) <= 1 && Math.abs(poi.y - pe.gpe.y) <= 1) {
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun checkSelection() {
+        if (PanelElement.atLeastOneSelected()) {
+            btnDelete.isDisable = false
+            btnMove.isDisable = false
+        } else {
+            btnDelete.isDisable = true
+            btnMove.isDisable = true
+        }
+    }
+
+    private fun drawAddresses(gc: GraphicsContext) {
+        gc.clearRect(0.0, 0.0, RECT_X.toDouble(), RECT_Y.toDouble())
+        gc.lineWidth = 1.0
+        gc.stroke = Color.BLUE
+        gc.fill = Color.LIGHTBLUE
+        for (pe in panelElements) {
+            pe.drawAddress(gc)
+        }
+    }
+
     companion object {
 
         var locos: ObservableList<Loco> = FXCollections.observableArrayList<Loco>()
@@ -1284,112 +1382,17 @@ class SX4Draw : Application() {
         var lastSignalState = 0
 
         var start = IntPoint(0, 0)
-        private val btnUndo = Button()
-        private val btnAddTrack = ToggleButton()
-        private val btnAddSensor = ToggleButton()
-        private val btnAddSensorUS = ToggleButton()
-        private val btnAddSignal = ToggleButton()
-        private val btnRouteBtn = ToggleButton()
-        private val btnAddRoute = ToggleButton()
-        private val btnAddCompRoute = ToggleButton()
-        private val btnSelect = ToggleButton()
-        private val btnUnSelect = Button()
-        private val btnMove = ToggleButton()
-        private val btnDelete = Button()
-        private val toggleGroup = ToggleGroup()
+
 
 
         /**
          * @param args the command line arguments
          */
-        fun main(args: Array<String>) {
-            Application.launch(*args)
-        }
+        //fun main(args: Array<String>) {
+        //    Application.launch(*args)
+        //}
 
-        private fun selectedPE(x: Double, y: Double): PanelElement? {
-            // do the search from top element (SensorUS, RouteButton) to bottom (track)
-            val peListRev = ArrayList(panelElements)
-            peListRev.sortDescending()
-            for (pe in peListRev) {
-                val result = pe.gpe.isTouched(IntPoint(x, y))
-                if (result.key) {
-                    return pe
-                }
-            }
-            return null
-        }
 
-        private fun selectedPENotTrack(x: Double, y: Double): PanelElement? {
-            val peListRev = ArrayList(panelElements)
-            peListRev.sortDescending()
-           // JAVA Collections.sort(peListRev, Collections.reverseOrder())
-            for (pe in peListRev) {
-                if (pe.gpe !is Track) {
-                    val result = pe.gpe.isTouched(IntPoint(x, y))
-                    if (result.key) {
-                        return pe
-                    }
-                }
-            }
-            return null
-        }
-
-        private fun selectedPENotTrackInclState(x: Double, y: Double): Pair<PanelElement, Int>? {
-            val peListRev = ArrayList(panelElements)
-            peListRev.sortDescending()
-            for (pe in peListRev) {
-                if (pe.gpe !is Track) {
-                    val result = pe.gpe.isTouched(IntPoint(x, y))
-                    if (result.key) {
-                        return Pair(pe, result.value)
-                    }
-                }
-            }
-            return null
-        }
-
-        private fun getRouteBtn(p: IntPoint): PanelElement? {
-            for (pe in panelElements) {
-                if (pe.gpe is RouteButton) {
-                    val result = pe.gpe.isTouched(p)
-                    if (result.key) {
-                        return pe
-                    }
-
-                }
-            }
-            return null
-        }
-
-        private fun isPanelElementAlreadyOnPoint(poi: IntPoint): Boolean {
-            var found = false
-            for (pe in panelElements) {
-                if (Math.abs(poi.x - pe.gpe.x) <= 1 && Math.abs(poi.y - pe.gpe.y) <= 1) {
-                    found = true
-                }
-            }
-            return found
-        }
-
-        private fun checkSelection() {
-            if (PanelElement.atLeastOneSelected()) {
-                btnDelete.isDisable = false
-                btnMove.isDisable = false
-            } else {
-                btnDelete.isDisable = true
-                btnMove.isDisable = true
-            }
-        }
-
-        private fun drawAddresses(gc: GraphicsContext) {
-            gc.clearRect(0.0, 0.0, RECT_X.toDouble(), RECT_Y.toDouble())
-            gc.lineWidth = 1.0
-            gc.stroke = Color.BLUE
-            gc.fill = Color.LIGHTBLUE
-            for (pe in panelElements) {
-                pe.drawAddress(gc)
-            }
-        }
     }
 }
 
