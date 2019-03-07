@@ -26,6 +26,9 @@ import de.blankedv.sx4draw.model.Turnout
 import de.blankedv.sx4draw.model.Track
 import de.blankedv.sx4draw.model.Signal
 import de.blankedv.sx4draw.model.Sensor
+import de.blankedv.sx4draw.views.Dialogs
+import javafx.application.Application
+import javafx.application.Platform
 import java.util.concurrent.atomic.AtomicLong
 
 import javafx.scene.control.TableView
@@ -36,7 +39,8 @@ import javafx.scene.shape.Shape
 import javafx.scene.shape.StrokeLineCap
 import java.lang.NumberFormatException
 import java.net.URL
-
+import kotlinx.coroutines.*
+import java.io.FileNotFoundException
 
 /**
  * @author mblank
@@ -126,13 +130,7 @@ object Utils {
         return INVALID_INT
     }
 
-    @JvmStatic
-    fun readLastVersionFromURL(): Double {
-        val urlObject = URL("https://raw.githubusercontent.com/michael71/SX4Draw/master/version.txt")
-        val versionFromGithub = urlObject.readText()
-        return versionFromGithub.toDouble()
 
-    }
 
     fun createShape(g : GenericPE, state : Constants.PEState) : Pair<Shape, Color> {
         var shape : Shape = Line(0.0,0.0,1.0,1.0)
@@ -222,4 +220,32 @@ object Utils {
         return Pair(shape, defaultColor)
     }
 
+    fun checkVersion(app : Application) {
+        println("checking version ...")
+        GlobalScope.launch {
+            // only for test: delay(20000)
+            val urlObject = URL("https://raw.githubusercontent.com/michael71/SX4Draw/master/version.txt")
+            var newVersion = - 0.1
+            try {
+                newVersion = urlObject.readText().toDouble()
+            } catch (e : FileNotFoundException) {
+                println("ERROR: wrong url for version retrieval")
+            }
+            println("read from github: $newVersion")
+            Platform.runLater() {   // must be run on JFX thread
+                when {
+                    newVersion < 0.0 -> Dialogs.buildErrorAlert("Error",
+                            "Konnte die aktuelle Version nicht von Github lesen!", "?")
+                    newVersion <= Constants.versionNumber ->  Dialogs.buildInformationAlert(
+                            "keine neue Version vorhanden", "",
+                                "Version ${Constants.versionNumber} ist aktuell", app)
+                    else -> {
+                        val title = "${Constants.versionNumber} ist nicht aktuell."
+                        val msg = "Download der aktuellen Version $newVersion von: https://opensx.net/sx4 möglich "
+                        Dialogs.buildInfoAlertOpenSX(title, msg, "", app)
+                    }
+                }
+            }
+        }
+    }
 }
