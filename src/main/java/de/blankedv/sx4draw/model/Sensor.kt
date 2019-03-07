@@ -59,7 +59,7 @@ class Sensor : GenericPE {
 
     @get:XmlAttribute(name = "adr")
     var adrStr: String by Delegates.observable(_adrStr) { _, old, new ->
-        if (old.isNotEmpty() && !old.equals(DEFAULT_SENSOR_ADRSTR)) {
+        if (old.isNotEmpty() && !(old.equals(new)) && !old.equals(DEFAULT_SENSOR_ADRSTR)) {
             println("Sensor adrStr changed from $old to $new")
             val oldArry = old.split(",")
             val newArry = new.split(",")

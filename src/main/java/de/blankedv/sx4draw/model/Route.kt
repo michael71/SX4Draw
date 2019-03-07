@@ -180,9 +180,9 @@ class Route(
         val addr = pe.gpe.getAddr()
         val nBit2 = (pe.gpe.getAddr2() != INVALID_INT)   // second address => 2 bit signal, values 0..3
         var oldState = route.substringAfter("$addr,")
-        println("oldSt-1 $oldState")
+        //println("oldSt-1 $oldState")
         oldState = oldState.substring(0..0)
-        println("oldSt-2 $oldState")
+        //println("oldSt-2 $oldState")
         var newState = "1"
         var result: PEState
         when (oldState) {
@@ -214,9 +214,9 @@ class Route(
         }
         val o = "$addr,$oldState"
         val n = "$addr,$newState"
-        println("oldSt=$oldState newSt=$newState, old.route=$route")
+        //println("oldSt=$oldState newSt=$newState, old.route=$route")
         route = route.replace(o, n)
-        println("new.route=$route")
+        //println("new.route=$route")
         return result
     }
 
@@ -351,7 +351,7 @@ class Route(
             for (rt in routes) {
                 val oldSensors = rt.sensors
                 rt.sensors = oldSensors.replace(oAdr, nAdr)
-                println("rt.sensors old=$oldSensors new=${rt.sensors}")
+                //println("rt.sensors old=$oldSensors new=${rt.sensors}")
                 for (tr in trips.filter { it -> it.route == rt.adr }) {
                     if (tr.sens1 == oAdr.toInt()) {
                         tr.sens1 = nAdr.toInt()
@@ -369,7 +369,7 @@ class Route(
             for (rt in routes) {
                 val oldRoute = rt.route
                 rt.route = oldRoute.replace(oAdr, nAdr)
-                println("rt.route old=$oldRoute new=${rt.route}")
+                //println("rt.route old=$oldRoute new=${rt.route}")
             }
             RoutesTable.refresh()
         }

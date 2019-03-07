@@ -71,7 +71,7 @@ class Turnout : GenericPE {
 
     @get:XmlAttribute(name = "adr")
     var adr: Int by Delegates.observable(_adr) { prop, old, new ->
-        if ((old != INVALID_INT) && (old > SXMIN_USED) && (new > SXMIN_USED)) {
+        if ((old != INVALID_INT) && (old > SXMIN_USED) && (new > SXMIN_USED) && (old != new)) {
             println("Turnout adr changed from $old to $new")
             Route.addressInRouteChanged(old.toString(), new.toString())
         }

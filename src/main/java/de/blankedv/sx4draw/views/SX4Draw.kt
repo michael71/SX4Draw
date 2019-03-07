@@ -129,19 +129,7 @@ class SX4Draw : Application() {
             if (me.button == MouseButton.PRIMARY) {
                 println("prim btn")
                 when (currentGUIState) {
-                    SX4Draw.GUIState.ADD_TRACK, SX4Draw.GUIState.ADD_SIGNAL, SX4Draw.GUIState.ADD_SENSOR,
-                    SX4Draw.GUIState.ADD_SENSOR_US, SX4Draw.GUIState.ADD_ROUTEBTN, GUIState.ADD_COMPROUTE ->
-                        // this does not work ....
-                        //MyPoint start = IntPoint.toRaster(poi);
-                        //line = startNewLine(start);
-                        //
-                        println("should start new line ...")
                     SX4Draw.GUIState.SELECT ->
-                        // if (me.isControlDown()) {
-                        //    toggleSelectionPENotTrack(poi);
-                        //} else if (me.isShiftDown()) {
-                        //    toggleSelectionPENotTrackNotSensor(poi);
-                        //} else {
                         toggleSelectionPE(poi)
                     SX4Draw.GUIState.MOVE -> {
                         moveStart.x = me.x.toInt()
@@ -151,7 +139,7 @@ class SX4Draw : Application() {
                     }
                     else -> { /* do nothing */
                     }
-                }//}
+                }
             } else if (me.button == MouseButton.SECONDARY) {
                 println("sec btn")
                 editPanelElement(poi, primaryStage)
@@ -171,7 +159,6 @@ class SX4Draw : Application() {
                     for (sel in panelElements) {
                         sel.createShapeAndSetState(Constants.PEState.DEFAULT)
                     }
-                    //redrawPanelElements();
                     currentRoute = null // reset
                     currentCompRoute = null
                 }
@@ -191,41 +178,28 @@ class SX4Draw : Application() {
                 when (currentGUIState) {
                     SX4Draw.GUIState.ADD_TRACK -> line = startNewLine(start, TRACK_WIDTH)
                     SX4Draw.GUIState.ADD_SIGNAL -> {
-                        val sig = Signal(poiRast)
                         if (!isPanelElementAlreadyOnPoint(poiRast)) {
-                            val pe = PanelElement(sig)
-                            lineGroup.children.add(pe.shape)
-                            panelElements.add(pe)
-                            lastPE = pe
-                            btnUndo.isDisable = false
+                            val pe = PanelElement(Signal(poiRast))
+                            addNewPanelElement(pe)
                         }
                     }
                     SX4Draw.GUIState.ADD_ROUTEBTN -> {
-                        val rt = RouteButton(poiRast)
                         if (!isPanelElementAlreadyOnPoint(poiRast)) {
-                            val pe = PanelElement(rt)
-                            lineGroup.children.add(pe.shape)
-                            panelElements.add(pe)
-                            lastPE = pe
-                            btnUndo.isDisable = false
+                            val pe = PanelElement(RouteButton(poiRast))
+                            addNewPanelElement(pe)
                         }
                     }
                     SX4Draw.GUIState.ADD_SENSOR_US -> {
-                        val se = Sensor(poiRast)
                         if (!isPanelElementAlreadyOnPoint(poiRast)) {
-                            val pe = PanelElement(se)
-                            lineGroup.children.add(pe.shape)
-                            panelElements.add(pe)
-                            lastPE = pe
-                            btnUndo.isDisable = false
-
+                            val pe = PanelElement(Sensor(poiRast))
+                            addNewPanelElement(pe)
                         }
                     }
                     SX4Draw.GUIState.ADD_ROUTE -> createRoute(poi)
                     SX4Draw.GUIState.ADD_COMPROUTE -> createCompRoute(poi)
                     SX4Draw.GUIState.ADD_SENSOR -> {
                         line = startNewLine(start, SENSOR_WIDTH)
-                        line!!.strokeDashArray.addAll(15.0, 10.0)
+                        line!!.strokeDashArray.addAll(6.0, 12.0)
                         line!!.stroke = Color.YELLOW
                     }
                     SX4Draw.GUIState.SELECT ->
@@ -363,6 +337,13 @@ class SX4Draw : Application() {
             System.exit(0)
         }
 
+    }
+
+    private fun addNewPanelElement(pe: PanelElement) {
+        lineGroup.children.add(pe.shape)
+        panelElements.add(pe)
+        lastPE = pe
+        btnUndo.isDisable = false
     }
 
     private fun createButtonBar(): HBox {
@@ -918,11 +899,12 @@ class SX4Draw : Application() {
     private fun editPanelElement(poi: IntPoint, primStage: Stage) {
         val pe = selectedPENotTrack(poi.x.toDouble(), poi.y.toDouble())
         // all panel elements except tracks have an address
-        println("editing pe =" + pe.toString())
+
         if (pe != null) {
+            println("editing pe =" + pe::class.simpleName)
             when (pe.gpe) {
                 is RouteButton -> {
-                    println("no address editing for route button")
+                    println("address of route button cannot be changed")
                     return
                 }
                 is Turnout -> editTurnout(pe, primStage)

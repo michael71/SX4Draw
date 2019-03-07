@@ -62,9 +62,10 @@ class Signal : GenericPE {
     var adrStr: String by Delegates.observable(_adrStr) { prop, old, new ->
         val old0 = old.split(",")[0]
         val new0 = new.split(",")[0]
-        if (old0.isNotEmpty() && (old0.toInt() > Constants.SXMIN_USED) && (new0.toInt() > Constants.SXMIN_USED)) {
+        if (old0.isNotEmpty() && (old0.toInt() > Constants.SXMIN_USED) && (new0.toInt() > Constants.SXMIN_USED)
+                && (!old0.equals(new0))) {
             Route.addressInRouteChanged(old0, new0)
-            if (old.contains(',')) {
+            if (old.contains(',')) {   // signal has two addresses
                 val old1 = old.split(",")[1]
                 val new1 = new.split(",")[1]
                 if (old1.isNotEmpty() && (old1.toInt() > Constants.SXMIN_USED) && (new1.toInt() > Constants.SXMIN_USED)) {
