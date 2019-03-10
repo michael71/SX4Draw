@@ -78,6 +78,12 @@ open class SX4Draw : Application() {
     // FIXED Fahrstraßenanzeige löschen, wenn neue Fahrst. erstellt wird
 
     // TODO UNDO für ca. mehrere Panel Elemente
+    // TODO bug sensoren umbenennen  901-991 => ersetzt auch 1901 => 1991  ??
+    // ';' bzw ',' voranstellen bei routes/sensors und dann ;333, ersetzen durch ;1234, und so weiter..
+    // TODO  zusammengesetzte Fahrstrasse graphisch aufsetzen
+    //      welche fahrstrassen gibt es? welche fehlen noch?
+
+    // TODO  weichen automatisch adressieren
 
     private val lineGroup  = Group()
     private val draggedGroup = Group()
@@ -828,8 +834,8 @@ open class SX4Draw : Application() {
     private fun editTurnout(pe: PanelElement, primStage: Stage) {
         val tu = (pe.gpe as Turnout)
         val invert = tu.inv ?: 0
-        println("IN: addr=" + tu.getAddr() + " inv=" + invert)
-        val initA = GenericAddress(tu.getAddr(), INVALID_INT, invert)
+        println("IN: addr=" + tu.adr + " inv=" + invert)
+        val initA = GenericAddress(tu.adr, INVALID_INT, invert)
         val result = AddressDialog.open(pe, primStage, initA)
         if (result.addr != -1) {
             println("OUT: addr=" + result.addr + " addr2=" + result.addr2 + " inv=" + result.inv + " orient=" + result.orient)
@@ -844,6 +850,7 @@ open class SX4Draw : Application() {
             } else {
                 tu.inv = 1
             }
+            if (result.reNumber) Route.addressInRouteChanged(initA.addr.toString(), tu.adr.toString())
             println("tu addr=" + tu.adr + " tu.inv=" + tu.inv)
             pe.recreateShape()
             redrawPanelElements()
@@ -871,6 +878,7 @@ open class SX4Draw : Application() {
             } else {
                 si.adrStr = "" + result.addr
             }
+            if (result.reNumber) Route.addressInRouteChanged(initialAddress.addr.toString(), result.addr.toString())
             val delta = Utils.signalOrientToDXY2(result.orient)
             println("or=" + result.orient + " dx=" + delta.x + " dy=" + delta.y)
             si.x2 = si.x + delta.x
@@ -902,7 +910,7 @@ open class SX4Draw : Application() {
             } else {
                 se.adrStr = "" + result.addr
             }
-
+            if (result.reNumber) Route.sensorAddressChanged(initA.addr.toString(), result.addr.toString())
             redrawPanelElements()
         } else {
             println("no address selected")
@@ -918,8 +926,15 @@ open class SX4Draw : Application() {
             println("editing pe =" + pe::class.simpleName)
             when (pe.gpe) {
                 is RouteButton -> {
-                    println("address of route button cannot be changed")
-                    return
+                    if (isDisplayRouteButtons) {
+                        // clear route buttons
+                        redrawPanelElements()
+                        isDisplayRouteButtons = false
+                    } else {
+                        isDisplayRouteButtons = true
+                        val rtb = pe.gpe as RouteButton
+                        dispRouteEndButtons(rtb)
+                    }
                 }
                 is Turnout -> editTurnout(pe, primStage)
                 is Signal -> editSignal(pe, primStage)
@@ -1251,6 +1266,18 @@ open class SX4Draw : Application() {
         }
     }
 
+    private fun dispRouteEndButtons(rtBtn : RouteButton) {
+        gc.strokeText("1", (rtBtn.x - 4).toDouble(), (rtBtn.y + 4).toDouble())
+        for (rt in routes.filter{ it -> it.btn1 == rtBtn.adr}) {
+            val bt2 = PanelElement.getPeByAddress(rt.btn2)[0]
+            gc.strokeText("2", (bt2.gpe.x - 4).toDouble(), (bt2.gpe.y + 4).toDouble())
+        }
+        for (crt in compRoutes.filter{ it -> it.btn1 == rtBtn.adr}) {
+            val bt2 = PanelElement.getPeByAddress(crt.btn2)[0]
+            gc.strokeText("2", (bt2.gpe.x - 4).toDouble(), (bt2.gpe.y + 4).toDouble())
+        }
+    }
+
     fun showRoute(rt: Route?) {
         if (rt != null) {
             println("showRoute rt=${rt.adr}")
@@ -1383,7 +1410,7 @@ open class SX4Draw : Application() {
 
         var start = IntPoint(0, 0)
 
-
+        var isDisplayRouteButtons = false
 
         /**
          * @param args the command line arguments

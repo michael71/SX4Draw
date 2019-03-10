@@ -54,21 +54,8 @@ class Sensor : GenericPE {
     @get:XmlAttribute
     var y2: Int? = null
 
-    @XmlTransient
-    private var _adrStr = DEFAULT_SENSOR_ADRSTR
-
     @get:XmlAttribute(name = "adr")
-    var adrStr: String by Delegates.observable(_adrStr) { _, old, new ->
-        if (old.isNotEmpty() && !(old.equals(new)) && !old.equals(DEFAULT_SENSOR_ADRSTR)) {
-            println("Sensor adrStr changed from $old to $new")
-            val oldArry = old.split(",")
-            val newArry = new.split(",")
-            if ((oldArry[0].toInt() > Constants.SXMIN_USED) && (newArry[0].toInt() > Constants.SXMIN_USED)) {
-                Route.sensorAddressChanged(oldArry[0], newArry[0])
-            }
-        }
-        _adrStr = new
-    }
+    var adrStr = DEFAULT_SENSOR_ADRSTR
 
     @get:XmlAttribute
     var sxadr: Int? = null

@@ -55,26 +55,8 @@ class Signal : GenericPE {
     @get:XmlAttribute
     var y2 = INVALID_INT
 
-    @XmlTransient
-    private var _adrStr = ""
-
     @get:XmlAttribute(name = "adr")
-    var adrStr: String by Delegates.observable(_adrStr) { prop, old, new ->
-        val old0 = old.split(",")[0]
-        val new0 = new.split(",")[0]
-        if (old0.isNotEmpty() && (old0.toInt() > Constants.SXMIN_USED) && (new0.toInt() > Constants.SXMIN_USED)
-                && (!old0.equals(new0))) {
-            Route.addressInRouteChanged(old0, new0)
-            if (old.contains(',')) {   // signal has two addresses
-                val old1 = old.split(",")[1]
-                val new1 = new.split(",")[1]
-                if (old1.isNotEmpty() && (old1.toInt() > Constants.SXMIN_USED) && (new1.toInt() > Constants.SXMIN_USED)) {
-                    Route.addressInRouteChanged(old1, new1)
-                }
-            }
-        }
-        _adrStr = new
-    }
+    var adrStr = ""
 
     override val ord = 2
 
@@ -134,11 +116,11 @@ class Signal : GenericPE {
     }
 
     private fun autoAddress() {
-        var a = ADDR0_SIGNAL // default for signal
+        var a = ADDR0_SIGNAL // default virtual address for signal
         for (pe in panelElements) {
             if (pe.gpe is Signal) {
                 if (pe.gpe.getAddr() >= a) {
-                    a = pe.gpe.getAddr() + 1
+                    a = pe.gpe.getAddr() + 1  // virtual address needs no "second bit/second addr"
                 }
             }
         }

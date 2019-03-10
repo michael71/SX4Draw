@@ -17,12 +17,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package de.blankedv.sx4draw.model
 
+import de.blankedv.sx4draw.Constants
 import de.blankedv.sx4draw.Constants.ADDR0_TURNOUT
 import de.blankedv.sx4draw.Constants.INVALID_INT
 import de.blankedv.sx4draw.Constants.SXMIN_USED
 import de.blankedv.sx4draw.PanelElement
 import de.blankedv.sx4draw.model.GenericPE
 import de.blankedv.sx4draw.model.IntPoint
+import de.blankedv.sx4draw.views.SX4Draw
 
 import javafx.util.Pair
 import javax.xml.bind.annotation.XmlAttribute
@@ -66,17 +68,8 @@ class Turnout : GenericPE {
     @get:XmlAttribute
     var inv: Int? = null
 
-    @XmlTransient
-    private var _adr = INVALID_INT
-
     @get:XmlAttribute(name = "adr")
-    var adr: Int by Delegates.observable(_adr) { prop, old, new ->
-        if ((old != INVALID_INT) && (old > SXMIN_USED) && (new > SXMIN_USED) && (old != new)) {
-            println("Turnout adr changed from $old to $new")
-            Route.addressInRouteChanged(old.toString(), new.toString())
-        }
-        _adr = new
-    }
+    var adr = INVALID_INT
 
     @get:XmlAttribute
     var sxadr: Int? = null
@@ -95,14 +88,14 @@ class Turnout : GenericPE {
         y2 = closed.y
         xt = thrown.x
         yt = thrown.y
-        adr  = INVALID_INT
+        autoAddress()
     }
 
     override fun scalePlus() {
         val dx = x
         val dy = y
-        x = 2 * x
-        y = 2 * y
+        x += x
+        y += y
 
         // do not scale x2/y2 BUT TRANSLATE
 
@@ -116,11 +109,10 @@ class Turnout : GenericPE {
     override fun scaleMinus() {
         val dx = x / 2
         val dy = y / 2
-        x = x / 2
-        y = y / 2
+        x /= 2
+        y /= 2
 
         // do not scale x2/y2 BUT TRANSLATE
-
         x2 -= dx
         y2 -= dy
         xt -= dx
@@ -137,6 +129,17 @@ class Turnout : GenericPE {
         return INVALID_INT
     }
 
+    private fun autoAddress() {
+        var a = Constants.ADDR0_TURNOUT
+        for (pe in SX4Draw.panelElements) {
+            if (pe.gpe is Turnout) {
+                if (pe.gpe.getAddr() >= a) {
+                    a = pe.gpe.getAddr() + 1
+                }
+            }
+        }
+        adr = a
+    }
 
     override fun isTouched(touch: IntPoint): Pair<Boolean, Int> {
         // check first for (x2,y2) touch (state 0)

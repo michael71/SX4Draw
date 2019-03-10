@@ -349,9 +349,14 @@ class Route(
         // change sensor addresses in all routes and trips, if the sensor address was changed
         fun sensorAddressChanged(oAdr: String, nAdr: String) {
             for (rt in routes) {
-                val oldSensors = rt.sensors
-                rt.sensors = oldSensors.replace(oAdr, nAdr)
-                //println("rt.sensors old=$oldSensors new=${rt.sensors}")
+                val oldSensors = "," + rt.sensors +","
+                rt.sensors = oldSensors.replace(","+oAdr+",", ","+nAdr+",")
+
+                // remove leading and trailing ","
+                if (rt.sensors[0] == ',') rt.sensors = rt.sensors.substring(1)
+                if (rt.sensors[rt.sensors.length-1] == ',') rt.sensors = rt.sensors.dropLast(1)
+                println("rt.sensors old=$oldSensors new=${rt.sensors}")
+
                 for (tr in trips.filter { it -> it.route == rt.adr }) {
                     if (tr.sens1 == oAdr.toInt()) {
                         tr.sens1 = nAdr.toInt()
@@ -367,9 +372,11 @@ class Route(
         // change turnout/signal addresses in all routes and trips, if the turnout/signal address was changed
         fun addressInRouteChanged(oAdr: String, nAdr: String) {
             for (rt in routes) {
-                val oldRoute = rt.route
-                rt.route = oldRoute.replace(oAdr, nAdr)
-                //println("rt.route old=$oldRoute new=${rt.route}")
+                val oldRoute = ";"+rt.route
+                rt.route = oldRoute.replace(";"+oAdr+",", ";"+nAdr+",")
+                // remove leading ";"
+                if (rt.route[0] == ';') rt.route = rt.route.substring(1)
+                println("rt.route old=$oldRoute new=${rt.route}")
             }
             RoutesTable.refresh()
         }
