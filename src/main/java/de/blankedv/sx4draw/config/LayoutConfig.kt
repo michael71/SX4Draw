@@ -26,34 +26,34 @@ import javax.xml.bind.annotation.*
 
 //This statement means that class "LayoutConfig.java" is the root-element
 @XmlRootElement(name = "layout-config")
-class LayoutConfig {
+class /**/ LayoutConfig {
     // see https://blog.scottlogic.com/2016/04/04/practical-kotlin.html
 
     @get:XmlAttribute
-    var fileName = ""
+    var filename = ""
 
     @get:XmlAttribute
     var version = "0001"
 
     @XmlElementWrapper(name = "panels")
     @get:XmlElement(name = "panel")
-    private val panel  = ArrayList<PanelConfig>()
+    private val panel = ArrayList<PanelConfig>()
 
     constructor()
 
-    constructor(fn : String,  ve: String, pc: PanelConfig) {
-        this.fileName = fn
+    constructor(fn: String, ve: String, pc: PanelConfig) {
+        this.filename = fn
         panel.add(pc)
 
-          this.version = ve
+        this.version = ve
     }
 
-    fun getPC0() : PanelConfig? {
+    fun getPC0(): PanelConfig? {
         if (panel.size >= 1) {
-             return panel[0]
+            return panel[0]
         } else {
             return null
         }
     }
 
-   }
+}
