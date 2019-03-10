@@ -23,7 +23,7 @@ package de.blankedv.sx4draw
 
 object Constants {
 
-    const val versionNumber = 0.51
+    const val versionNumber = 0.52
     private const val versionDate = "10 Mar 2019"
     const val progVersion = "$versionNumber - $versionDate"
 

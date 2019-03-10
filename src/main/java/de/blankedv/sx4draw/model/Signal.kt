@@ -105,8 +105,8 @@ class Signal : GenericPE {
     }
 
     override fun scaleMinus() {
-        val dx = x
-        val dy = y
+        val dx = x / 2
+        val dy = y / 2
         x = x / 2
         y = y / 2
 
