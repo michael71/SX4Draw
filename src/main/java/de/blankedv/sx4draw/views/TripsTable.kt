@@ -242,7 +242,7 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
             val trip = event.tableView.items[row]
             if (newStartdelay != null) {
                 if (newStartdelay in 0..60000) {
-                    trip.stopdelay = newStartdelay
+                    trip.startdelay = newStartdelay
                 } else { // this is a workaround for a bug in javafx, value not repainted
                     startdelayCol.isVisible = false
                     startdelayCol.isVisible = true
