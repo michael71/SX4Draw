@@ -41,6 +41,13 @@ import java.lang.NumberFormatException
 import java.net.URL
 import kotlinx.coroutines.*
 import java.io.FileNotFoundException
+import java.io.IOException
+import java.nio.channels.FileLock
+import java.nio.file.StandardOpenOption
+import java.nio.channels.FileChannel
+import java.io.File
+
+
 
 /**
  * @author mblank
@@ -247,5 +254,23 @@ object Utils {
                 }
             }
         }
+    }
+
+    fun isOtherInstanceRunning() : Boolean {
+        val userHome = System.getProperty("user.home")
+        val file = File(userHome, "sx4draw.lock")
+        try {
+            val fc = FileChannel.open(file.toPath(),
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.WRITE)
+            val lock = fc.tryLock()
+            if (lock == null) {
+                println("another instance is running")
+                return true
+            }
+        } catch (e: IOException) {
+            throw Error(e)
+        }
+        return false
     }
 }

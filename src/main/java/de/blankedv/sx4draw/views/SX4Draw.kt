@@ -357,6 +357,12 @@ open class SX4Draw : Application() {
             System.exit(0)
         }
 
+        if (Utils.isOtherInstanceRunning()) {
+            Dialogs.buildErrorAlert("ERROR",
+                    "eine andere Instance von SX4Draw läuft bereits!","Programm wird jetzt beendet.")
+            System.exit(0)
+        }
+
     }
 
     private fun addNewPanelElement(pe: PanelElement) {
