@@ -43,7 +43,6 @@ import javafx.util.StringConverter
 class TimetableTable internal constructor(primaryStage: Stage, private val app: SX4Draw) {
 
 
-
     internal var timetablesTableScene: Scene
     // New window (Stage)
     internal var timetablesWindow: Stage
@@ -51,12 +50,7 @@ class TimetableTable internal constructor(primaryStage: Stage, private val app: 
     init {
 
         val bp = BorderPane()
-        /* HBox hb = new HBox(15);
-        Button btnClose = new Button("close");
-        hb.getChildren().addAll(btnClose);
-        bp.setBottom(hb);
-        hb.setAlignment(Pos.CENTER);
-        BorderPane.setMargin(hb, new Insets(8, 8, 8, 8)); */
+
         val btnAddTimetable = Button("+ NEUER Fahrplan");
         timetablesTableScene = Scene(bp, 700.0, 300.0)
         bp.top = btnAddTimetable
@@ -64,10 +58,6 @@ class TimetableTable internal constructor(primaryStage: Stage, private val app: 
 
         // New window (Stage)
         timetablesWindow = Stage()
-        /* btnClose.setOnAction((e) -> {
-            //sxAddress.addr = -1;
-            locosWindow.close();
-        }); */
 
         timetablesWindow.title = "Fahrpläne (Timetables) Tabelle"
         timetablesWindow.scene = timetablesTableScene
@@ -81,8 +71,8 @@ class TimetableTable internal constructor(primaryStage: Stage, private val app: 
         timetablesWindow.x = primaryStage.x + 250
         timetablesWindow.y = primaryStage.y + 200
 
-        btnAddTimetable.setOnAction {  timetables.add(Timetable(INVALID_INT)) }
-        
+        btnAddTimetable.setOnAction { timetables.add(Timetable(INVALID_INT)) }
+
         show()
 
     }
@@ -98,15 +88,13 @@ class TimetableTable internal constructor(primaryStage: Stage, private val app: 
     }
 
     private fun createDataTables() {
-    //    <timetable adr="3300" time="0,20,40" trip="3100,3101,0" next=""/>
+        //    <timetable adr="3300" time="0,20,40" trip="3100,3101,0" next=""/>
         val adrCol = TableColumn<Timetable, Int>("Adr (ID)")
         adrCol.prefWidthProperty().bind(TimetableTable.tableView.widthProperty().multiply(0.1));
-        val timeCol = TableColumn<Timetable, String>("Start-Zeiten")
-        timeCol.prefWidthProperty().bind(TimetableTable.tableView.widthProperty().multiply(0.3));
         val tripCol = TableColumn<Timetable, String>("Fahrten")
-        tripCol.prefWidthProperty().bind(TimetableTable.tableView.widthProperty().multiply(0.5));
+        tripCol.prefWidthProperty().bind(TimetableTable.tableView.widthProperty().multiply(0.7));
         val nextCol = TableColumn<Timetable, Int>("nächster Fahrplan")
-        nextCol.prefWidthProperty().bind(TimetableTable.tableView.widthProperty().multiply(0.1));
+        nextCol.prefWidthProperty().bind(TimetableTable.tableView.widthProperty().multiply(0.2));
 
         val myStringIntConverter = object : StringConverter<Int>() {
             override fun toString(`object`: Int?): String {
@@ -125,90 +113,42 @@ class TimetableTable internal constructor(primaryStage: Stage, private val app: 
             }
         }
 
-        tableView.columns.setAll(adrCol, timeCol, tripCol, nextCol)
+        tableView.columns.setAll(adrCol, tripCol, nextCol)
         tableView.isEditable = true
 
-        timeCol.cellFactory = TextFieldTableCell.forTableColumn();
         tripCol.cellFactory = TextFieldTableCell.forTableColumn();
         adrCol.cellFactory = TextFieldTableCell.forTableColumn(myStringIntConverter);
         nextCol.cellFactory = TextFieldTableCell.forTableColumn(myStringIntConverter);
 
-
-        /*routeCol.setOnEditCommit { event: TableColumn.CellEditEvent<Trip, Int> ->
+        tripCol.setOnEditCommit { event: TableColumn.CellEditEvent<Timetable, String> ->
             val pos = event.tablePosition
-            val newRouteAdr = event.newValue
+            val newTrips = event.newValue
             val row = pos.row
             val timetable = event.tableView.items[row]
+            timetable.trip = newTrips
+        }
 
-            // check if the number entered is the adr of an existing route
-            val newRoute: Route? = Route.getByAddress(newRouteAdr)
-            var newCompRoute: CompRoute? = CompRoute.getByAddress(newRouteAdr)
-            if (newRoute != null) {
-                trip.route = newRouteAdr
-                val routeSensors = newRoute.sensors.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                if (routeSensors.size >= 2) {
-                    trip.sens1 = routeSensors[0].toInt()
-                    trip.sens2 = routeSensors[routeSensors.size - 1].toInt()
-                } else {
-                    trip.sens1 = INVALID_INT
-                    trip.sens2 = INVALID_INT
+        nextCol.setOnEditCommit { event: TableColumn.CellEditEvent<Timetable, Int> ->
+            val pos = event.tablePosition
+            val newNext = event.newValue
+            val row = pos.row
+            val timetable = event.tableView.items[row]
+            if (newNext != null) {
+                var found = false
+                for (tt in timetables) {
+                    if (newNext == tt.adr) found = true
                 }
-            } else if (newCompRoute != null) {
-                trip.route = newRouteAdr  // new compRouteAddress
-                trip.sens1 = newCompRoute.getStartSensor() ?: INVALID_INT
-                trip.sens2 = newCompRoute.getEndSensor() ?: INVALID_INT
-            } else {
-                // NO CHANGE
-                trip.sens1 = INVALID_INT
-                trip.sens2 = INVALID_INT
-                println("ERROR: start and end sensor not found for (comp)route=$newRouteAdr")
+                if (found or (newNext == 0) or (newNext == INVALID_INT)) {
+                    timetable.next = newNext
+                    return@setOnEditCommit
+                }
             }
-            // this is a workaround for a bug in javafx, if not called, the row will not be repainted
-            routeCol.isVisible = false
-            routeCol.isVisible = true
-        } */
-
-        /*nameCol.setOnEditCommit { event: TableColumn.CellEditEvent<Trip, String> ->
-            val pos = event.tablePosition
-            val newName = event.newValue
-            val row = pos.row
-            val loco = event.tableView.items[row]
-            loco.name = newName
+            // this is a workaround for a bug in javafx, value not repainted
+            Dialogs.buildErrorAlert("Fahrpläne", "",
+                    "Nicht erlaubt, es muss eine existierende Fahrplannummer oder 0 gewählt werden.")
+            nextCol.isVisible = false
+            nextCol.isVisible = true
         }
-
-        massCol.setOnEditCommit { event: TableColumn.CellEditEvent<Trip, Int> ->
-            val pos = event.tablePosition
-            val newMass = event.newValue
-            val row = pos.row
-            val loco = event.tableView.items[row]
-            if ((newMass >= 1) and (newMass <= 5)) {
-                loco.mass = newMass
-            } else {  // this is a workaround for a bug in javafx, value not repainted
-                massCol.setVisible(false);
-                massCol.setVisible(true);
-            }
-        }
-
-        vmaxCol.setOnEditCommit { event: TableColumn.CellEditEvent<Trip, Int> ->
-            val pos = event.tablePosition
-            val newVmax = event.newValue
-            val row = pos.row
-            val loco = event.tableView.items[row]
-            if ((newVmax >= 30) and (newVmax <= 300)) {
-                loco.vmax = 10 * (newVmax / 10)  // in steps of ten
-            } else {  // this is a workaround for a bug in javafx, value not repainted
-                vmaxCol.setVisible(false);
-                vmaxCol.setVisible(true);
-            }
-        }  */
-
-        //adrCol.setOnEditCommit( { ev -> (ev.tableView.items[ev.tablePosition.row] as Integer).adr = ev.newValue }
-
-        /*massCol.setCellFactory(TextFieldTableCell.forTableColumn())
-        massCol.setOnEditCommit { ev -> (ev.tableView.items[ev.tablePosition.row] as Integer).mass = ev.newValue }
-
-        vmaxCol.setCellFactory(TextFieldTableCell.forTableColumn())
-        vmaxCol.setOnEditCommit { ev -> (ev.tableView.items[ev.tablePosition.row] as Integer).vmax = ev.newValue } */
 
 
         tableView.isCenterShape = true
@@ -238,9 +178,9 @@ class TimetableTable internal constructor(primaryStage: Stage, private val app: 
         }
 
         adrCol.cellValueFactory = PropertyValueFactory("adr")
-        timeCol.cellValueFactory = PropertyValueFactory("time")
         tripCol.cellValueFactory = PropertyValueFactory("trip")
         nextCol.cellValueFactory = PropertyValueFactory("next")
+
 
 
         tableView.items = timetables
@@ -252,15 +192,15 @@ class TimetableTable internal constructor(primaryStage: Stage, private val app: 
 
     }
 
-//private fun editLoco(a : Int, st : Stage) {
+    //private fun editLoco(a : Int, st : Stage) {
 //    LocoDialog.open(a , st)
 //}
- companion object {
-    private val tableView = TableView<Timetable>()
+    companion object {
+        private val tableView = TableView<Timetable>()
 
-    fun refresh() {
-        tableView.refresh()
+        fun refresh() {
+            tableView.refresh()
+        }
+
     }
-
- }
 }

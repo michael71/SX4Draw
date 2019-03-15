@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<layout-config fileName="panel_ibm99.xml" version="20190304_194827">
+<layout-config filename="panel_ibm99.xml" version="20190304_194827">
     <panels>
         <panel name="IBM2019/3">
             <locos>

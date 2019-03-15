@@ -31,43 +31,38 @@ import javax.xml.bind.annotation.XmlRootElement
 import javax.xml.bind.annotation.XmlType
 
 /**
- * <timetable adr="3300" time="0,20,40" trip="3100,3101,0" next=""/>
+ * <timetable adr="5500" trip="3100,3101,0" next="5501"/>
  *
  * @author mblank
  */
 @XmlRootElement(name = "timetable")
 @XmlType
-class Timetable (
+class Timetable(
 
-    @get:XmlAttribute
-    var adr : Int = INVALID_INT,   // is mandatory
+        @get:XmlAttribute
+        var adr: Int = INVALID_INT,   // is mandatory
 
-    @get:XmlAttribute
-    var time : String? = "",
+        @get:XmlAttribute
+        var trip: String = "",   // is mandatory
 
-    @get:XmlAttribute
-    var trip : String = "",   // is mandatory
-
-    @get:XmlAttribute
-    var next : Int = INVALID_INT )
-
-        : Comparator<Timetable>, Comparable<Timetable> {
+        @get:XmlAttribute
+        var next: Int = 0) : Comparator<Timetable>, Comparable<Timetable> {
 
     init {
         autoAddress()
     }
 
-    fun autoAddress() {
-    if (adr != INVALID_INT) return
+    private fun autoAddress() {
+        if (adr != INVALID_INT) return
 
-    var a = Constants.ADDR0_TIMETABLE
-    for (tt in SX4Draw.timetables) {
-        if (tt.adr >= a) {
-            a = tt.adr + 1
+        var a = Constants.ADDR0_TIMETABLE
+        for (tt in SX4Draw.timetables) {
+            if (tt.adr >= a) {
+                a = tt.adr + 1
+            }
         }
+        adr = a
     }
-    adr = a
-}
 
     override fun compare(o1: Timetable, o2: Timetable): Int {
         // if adr can be =null use:   val o2id = (o2.adr)?: -1
@@ -80,7 +75,6 @@ class Timetable (
 
     companion object {
 
-
         fun add(a: Node) {
             val tt = Timetable()
             val attributes = a.attributes
@@ -88,10 +82,8 @@ class Timetable (
             for (i in 0 until attributes.length) {
                 val theAttribute = attributes.item(i)
                 if ((theAttribute.nodeName == "id") ||
-                        (theAttribute.nodeName == "adr")  )  {
+                        (theAttribute.nodeName == "adr")) {
                     tt.adr = Integer.parseInt(theAttribute.nodeValue)
-                } else if (theAttribute.nodeName == "time") {
-                    tt.time = theAttribute.nodeValue
                 } else if (theAttribute.nodeName == "trip") {
                     tt.trip = theAttribute.nodeValue
                 } else if (theAttribute.nodeName == "next") {
@@ -99,18 +91,18 @@ class Timetable (
                 }
             }
             if (tt.adr != INVALID_INT) {
-               timetables.add(tt)
+                timetables.add(tt)
             }
 
         }
 
-        // change turnout/signal addresses in all routes and trips, if the turnout/signal address was changed
-        fun addressInTripChanged(oAdr : String, nAdr : String) {
+        /* no longer used.
+        fun addressInTripChanged(oAdr: String, nAdr: String) {
             for (tt in SX4Draw.timetables) {
-                tt.trip = tt.trip.replace(oAdr,nAdr)
+                tt.trip = tt.trip.replace(oAdr, nAdr)
             }
             RoutesTable.refresh()
-        }
+        }  */
 
     }
 }

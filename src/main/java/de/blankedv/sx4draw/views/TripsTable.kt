@@ -21,6 +21,7 @@ import de.blankedv.sx4draw.Constants.INVALID_INT
 import de.blankedv.sx4draw.model.CompRoute
 import de.blankedv.sx4draw.model.Route
 import de.blankedv.sx4draw.model.Trip
+import de.blankedv.sx4draw.views.SX4Draw.Companion.locos
 import de.blankedv.sx4draw.views.SX4Draw.Companion.routes
 import de.blankedv.sx4draw.views.SX4Draw.Companion.trips
 
@@ -56,7 +57,7 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
         BorderPane.setMargin(hb, new Insets(8, 8, 8, 8)); */
         val btnAddTrip = Button("+ NEUE Fahrt");
         val btnChangeLoco = Button("Zug ändern")
-        tripsTableScene = Scene(bp, 700.0, 300.0)
+        tripsTableScene = Scene(bp, 720.0, 300.0)
         val vb = HBox(5.0)
         vb.children.addAll(btnAddTrip, btnChangeLoco)
         bp.top = vb
@@ -140,17 +141,20 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
     private fun createDataTables() {
 
         val adrCol = TableColumn<Trip, Int>("Adr (ID)")
-        adrCol.prefWidthProperty().bind(tableView.widthProperty().multiply(0.1));
+        adrCol.prefWidthProperty().bind(tableView.widthProperty().multiply(0.10));
         val routeCol = TableColumn<Trip, Int>("Fahrstraße")
-        routeCol.prefWidthProperty().bind(tableView.widthProperty().multiply(0.15));
+        routeCol.prefWidthProperty().bind(tableView.widthProperty().multiply(0.12));
         val sens1Col = TableColumn<Trip, Int>("Sensor 1")
-        sens1Col.prefWidthProperty().bind(tableView.widthProperty().multiply(0.15));
+        sens1Col.prefWidthProperty().bind(tableView.widthProperty().multiply(0.10));
         val sens2Col = TableColumn<Trip, Int>("Sensor 2")
-        sens2Col.prefWidthProperty().bind(tableView.widthProperty().multiply(0.15));
+        sens2Col.prefWidthProperty().bind(tableView.widthProperty().multiply(0.10));
+
+        val startdelayCol = TableColumn<Trip, Int>("Startdelay[msec]")
+        startdelayCol.prefWidthProperty().bind(tableView.widthProperty().multiply(0.17));
+        val stopdelayCol = TableColumn<Trip, Int>("Stopdelay[msec]")
+        stopdelayCol.prefWidthProperty().bind(tableView.widthProperty().multiply(0.16));
         val locoCol = TableColumn<Trip, String>("Zug (Adr,Dir,Geschw.)")
         locoCol.prefWidthProperty().bind(tableView.widthProperty().multiply(0.25));
-        val stopdelayCol = TableColumn<Trip, Int>("Stopdelay[sec]")
-        stopdelayCol.prefWidthProperty().bind(tableView.widthProperty().multiply(0.2));
         //   <trip adr="3100" route="2300" sens1="924" sens2="902" loco="29,1,126" stopdelay="1500" />
 
 
@@ -176,13 +180,13 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
             }
         }
 
-        tableView.columns.setAll(adrCol, routeCol, sens1Col, sens2Col, locoCol, stopdelayCol)
+        tableView.columns.setAll(adrCol, routeCol, sens1Col, sens2Col, startdelayCol, stopdelayCol, locoCol)
         tableView.isEditable = true
 
-        locoCol.cellFactory = TextFieldTableCell.forTableColumn();
-        //adrCol.cellFactory = TextFieldTableCell.forTableColumn(myStringIntConverter);
-        routeCol.cellFactory = TextFieldTableCell.forTableColumn(myStringIntConverter);
-        stopdelayCol.cellFactory = TextFieldTableCell.forTableColumn(myStringIntConverter);
+        locoCol.cellFactory = TextFieldTableCell.forTableColumn()
+        routeCol.cellFactory = TextFieldTableCell.forTableColumn(myStringIntConverter)
+        startdelayCol.cellFactory = TextFieldTableCell.forTableColumn(myStringIntConverter)
+        stopdelayCol.cellFactory = TextFieldTableCell.forTableColumn(myStringIntConverter)
 
         routeCol.setOnEditCommit { event: TableColumn.CellEditEvent<Trip, Int> ->
             val pos = event.tablePosition
@@ -218,39 +222,54 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
             routeCol.isVisible = true
         }
 
-        /*nameCol.setOnEditCommit { event: TableColumn.CellEditEvent<Trip, String> ->
+        locoCol.setOnEditCommit { event: TableColumn.CellEditEvent<Trip, String> ->
             val pos = event.tablePosition
-            val newName = event.newValue
+            val newLocoVal = event.newValue
             val row = pos.row
-            val loco = event.tableView.items[row]
-            loco.name = newName
-        }
-
-        massCol.setOnEditCommit { event: TableColumn.CellEditEvent<Trip, Int> ->
-            val pos = event.tablePosition
-            val newMass = event.newValue
-            val row = pos.row
-            val loco = event.tableView.items[row]
-            if ((newMass >= 1) and (newMass <= 5)) {
-                loco.mass = newMass
-            } else {  // this is a workaround for a bug in javafx, value not repainted
-                massCol.setVisible(false);
-                massCol.setVisible(true);
+            val trip = event.tableView.items[row]
+            if (isValidLocoVal(newLocoVal)) {
+                trip.loco = newLocoVal
+            } else {
+                locoCol.isVisible = false
+                locoCol.isVisible = true
             }
         }
 
-        vmaxCol.setOnEditCommit { event: TableColumn.CellEditEvent<Trip, Int> ->
+        startdelayCol.setOnEditCommit { event: TableColumn.CellEditEvent<Trip, Int> ->
             val pos = event.tablePosition
-            val newVmax = event.newValue
+            val newStartdelay = event.newValue
             val row = pos.row
-            val loco = event.tableView.items[row]
-            if ((newVmax >= 30) and (newVmax <= 300)) {
-                loco.vmax = 10 * (newVmax / 10)  // in steps of ten
+            val trip = event.tableView.items[row]
+            if (newStartdelay != null) {
+                if (newStartdelay in 0..60000) {
+                    trip.stopdelay = newStartdelay
+                } else { // this is a workaround for a bug in javafx, value not repainted
+                    startdelayCol.isVisible = false
+                    startdelayCol.isVisible = true
+                }
             } else {  // this is a workaround for a bug in javafx, value not repainted
-                vmaxCol.setVisible(false);
-                vmaxCol.setVisible(true);
+                startdelayCol.isVisible = false
+                startdelayCol.isVisible = true
             }
-        }  */
+        }
+
+        stopdelayCol.setOnEditCommit { event: TableColumn.CellEditEvent<Trip, Int> ->
+            val pos = event.tablePosition
+            val newStopdelay = event.newValue
+            val row = pos.row
+            val trip = event.tableView.items[row]
+            if (newStopdelay != null) {
+                if (newStopdelay in 0..60000) {
+                    trip.stopdelay = newStopdelay
+                } else { // this is a workaround for a bug in javafx, value not repainted
+                    stopdelayCol.isVisible = false
+                    stopdelayCol.isVisible = true
+                }
+            } else {  // this is a workaround for a bug in javafx, value not repainted
+                stopdelayCol.isVisible = false
+                stopdelayCol.isVisible = true
+            }
+        }
 
         //adrCol.setOnEditCommit( { ev -> (ev.tableView.items[ev.tablePosition.row] as Integer).adr = ev.newValue }
 
@@ -290,8 +309,11 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
         routeCol.cellValueFactory = PropertyValueFactory("route")
         sens1Col.cellValueFactory = PropertyValueFactory("sens1")
         sens2Col.cellValueFactory = PropertyValueFactory("sens2")
-        locoCol.cellValueFactory = PropertyValueFactory("loco")
+
+        startdelayCol.cellValueFactory = PropertyValueFactory("startdelay")
         stopdelayCol.cellValueFactory = PropertyValueFactory("stopdelay")
+
+        locoCol.cellValueFactory = PropertyValueFactory("loco")
 
         tableView.items = trips
 
@@ -299,6 +321,40 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
 
         // textField.setTextFormatter(formatter);
         // Utils.customResize(tableView)
+
+    }
+
+    private fun isValidLocoVal(s: String): Boolean {
+        val spLoco = s.split(",")
+
+        // check if we have 3 elements, 1. locoAddr, 2. dir, 3. speed
+        if (spLoco.size != 3) return false
+
+        // check if loco address is valid
+        val locoAddr = spLoco[0].toInt()
+        var found = false
+        for (l in locos) {
+            if (locoAddr == l.adr) found = true
+        }
+        if (found == false) {
+            Dialogs.buildErrorAlert("loco string (Adr,Dir,V)", "", "Nicht erlaubt, die Lokadresse muss eine der Adressen aus der Loktabelle sein.")
+            return false
+        }
+
+        // check if dir is valid
+        if (!(spLoco[1].equals("0") or !spLoco[1].equals("1"))) {
+            Dialogs.buildErrorAlert("loco string (Adr,Dir,V)", "", "Nicht erlaubt, die Fahrtrichtung muss 0 oder 1 sein.")
+            return false
+        }
+
+        // check speed setting
+        if ((spLoco[2].toInt() <= 0) or (spLoco[2].toInt() > 31)) {
+            Dialogs.buildErrorAlert("loco string (Adr,Dir,V)", "", "Nicht erlaubt, die Geschwindigkeitsstufe muss zwischen 1 und 31 liegen.")
+
+            return false
+        }
+
+        return true
 
     }
 

@@ -37,8 +37,8 @@ import kotlin.properties.Delegates
 //@XmlType() //TODO Does not work: propOrder = {"adr", "route", "sens1", "sens2", "loco", "stopdelay"})
 
 class Trip(
-        @XmlTransient
-        private var _adr: Int = INVALID_INT,
+        @get:XmlAttribute  // @get: WICHTIG für KOTLIN !!!
+        var adr: Int = INVALID_INT,
 
         @get:XmlAttribute   // @get: WICHTIG für KOTLIN !!!
         var route: Int = INVALID_INT,
@@ -53,17 +53,10 @@ class Trip(
         var loco: String = "",
 
         @get:XmlAttribute
+        var startdelay: Int = 0,
+
+        @get:XmlAttribute
         var stopdelay: Int = INVALID_INT) : Comparator<Trip>, Comparable<Trip> {
-
-
-    @get:XmlAttribute(name = "adr")
-    var adr: Int by Delegates.observable(_adr) { prop, old, new ->
-        if (old != INVALID_INT) {
-            println("Trip adr changed from $old to $new")
-            Timetable.addressInTripChanged(old.toString(), new.toString())
-        }
-        _adr = new
-    }
 
 
     override fun compare(o1: Trip, o2: Trip): Int {
