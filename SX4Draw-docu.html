@@ -1,0 +1,673 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 6.1.5.2 (Linux)"/>
+	<meta name="created" content="2019-01-22T09:27:44.208501397"/>
+	<meta name="changed" content="2019-03-22T09:55:00.839942846"/>
+	<style type="text/css">
+		@page { size: 21cm 29.7cm; margin: 2cm }
+		p { margin-bottom: 0.25cm; line-height: 115%; background: transparent }
+		p.western { font-size: 11pt }
+		p.cjk { font-size: 10pt }
+		h2 { margin-top: 0.35cm; margin-bottom: 0.21cm; background: transparent; page-break-after: avoid }
+		h2.western { font-family: "Liberation Sans", sans-serif; font-size: 16pt; font-weight: bold }
+		h2.cjk { font-family: "Noto Sans CJK SC Regular"; font-size: 16pt; font-weight: bold }
+		h2.ctl { font-family: "Lohit Devanagari"; font-size: 16pt; font-weight: bold }
+		pre { background: transparent }
+		pre.western { font-family: "Liberation Mono", monospace; font-size: 10pt }
+		pre.cjk { font-family: "DejaVu Sans Mono", monospace; font-size: 10pt }
+		pre.ctl { font-family: "Liberation Mono", monospace; font-size: 10pt }
+		h3 { margin-top: 0.25cm; margin-bottom: 0.21cm; background: transparent; page-break-after: avoid }
+		h3.western { font-family: "Liberation Sans", sans-serif; font-size: 14pt; font-weight: bold }
+		h3.cjk { font-family: "Noto Sans CJK SC Regular"; font-size: 14pt; font-weight: bold }
+		h3.ctl { font-family: "Lohit Devanagari"; font-size: 14pt; font-weight: bold }
+		a:link { color: #000080; so-language: zxx; text-decoration: underline }
+		a.sdfootnoteanc { font-size: 57% }
+	</style>
+</head>
+<body lang="de-DE" link="#000080" vlink="#800000" dir="ltr"><p align="center" style="margin-top: 0.42cm; margin-bottom: 0.21cm; line-height: 100%; page-break-after: avoid">
+<font face="Liberation Sans, sans-serif"><font size="6" style="font-size: 28pt"><b>SX4Draw
+Programm zum Generieren von „panel.xml“ Files</b></font></font></p>
+<p class="western"><font size="3" style="font-size: 12pt">(Michael
+Blank, Stand 22. März 2019 – SW rev 0.53)</font></p>
+<p class="western"><br/>
+<br/>
+
+</p>
+<p class="western" style="margin-bottom: 0cm; line-height: 100%">Mit
+dem „SX4Draw“ Programm kann graphisch ein Gleisbildstellwerk
+generiert werden, das dann als XML-File für <b>SX4</b> und
+<b>LanbahnPanel</b> etc abgespeichert werden kann. Neben dem reinen
+Gleisbild können auch Fahrstraßen graphisch am Bildschirm entworfen
+werden und zu Zugfahrten und Fahrplänen verarbeitet werden.</p>
+<p class="western" style="margin-bottom: 0cm; line-height: 100%"><br/>
+
+</p>
+<div id="Inhaltsverzeichnis1" dir="ltr">
+	<div id="Inhaltsverzeichnis1_Head" dir="ltr"><p style="margin-top: 0.42cm; margin-bottom: 0.21cm; line-height: 100%; page-break-after: avoid">
+		<font face="Liberation Sans, sans-serif"><font size="4" style="font-size: 16pt"><b>Inhaltsverzeichnis</b></font></font></p>
+	</div>
+	<p style="margin-left: 0.5cm; margin-bottom: 0cm; line-height: 100%; background: #eeeeee; page-break-before: auto">
+	<a href="#__RefHeading___Toc591_2232269589">Installation/Aufruf des
+	Programms	1</a></p>
+	<p style="margin-left: 0.5cm; margin-bottom: 0cm; line-height: 100%; background: #eeeeee; page-break-before: auto">
+	<a href="#__RefHeading___Toc593_2232269589">Start und Zeichnen von
+	Gleisen, Sensoren und Signalen	2</a></p>
+	<p style="margin-left: 0.5cm; margin-bottom: 0cm; line-height: 100%; background: #eeeeee; page-break-before: auto">
+	<a href="#__RefHeading___Toc595_2232269589">Weichen	3</a></p>
+	<p style="margin-left: 0.5cm; margin-bottom: 0cm; line-height: 100%; background: #eeeeee; page-break-before: auto">
+	<a href="#__RefHeading___Toc597_2232269589">SX-Adressen, virtuelle
+	Adressen	3</a></p>
+	<p style="margin-left: 0.5cm; margin-bottom: 0cm; line-height: 100%; background: #eeeeee; page-break-before: auto">
+	<a href="#__RefHeading___Toc599_2232269589">File Menü	5</a></p>
+	<p style="margin-left: 0.5cm; margin-bottom: 0cm; line-height: 100%; background: #eeeeee; page-break-before: auto">
+	<a href="#__RefHeading___Toc601_2232269589">Einzelne Panel-Elemente
+	löschen	5</a></p>
+	<p style="margin-left: 0.5cm; margin-bottom: 0cm; line-height: 100%; background: #eeeeee; page-break-before: auto">
+	<a href="#__RefHeading___Toc603_2232269589">Eingabe eines
+	„panelname“	5</a></p>
+	<p style="margin-left: 0.5cm; margin-bottom: 0cm; line-height: 100%; background: #eeeeee; page-break-before: auto">
+	<a href="#__RefHeading___Toc605_2232269589">Verschieben von
+	Panel-Elementen	5</a></p>
+	<p style="margin-left: 0.5cm; margin-bottom: 0cm; line-height: 100%; background: #eeeeee; page-break-before: auto">
+	<a href="#__RefHeading___Toc607_2232269589">Bearbeiten von ganzen
+	Panels	5</a></p>
+	<p style="margin-left: 0.5cm; margin-bottom: 0cm; line-height: 100%; background: #eeeeee; page-break-before: auto">
+	<a href="#__RefHeading___Toc661_3825881407">Zoom In / Zoom Out	6</a></p>
+	<p style="margin-left: 0.5cm; margin-bottom: 0cm; line-height: 100%; background: #eeeeee; page-break-before: auto">
+	<a href="#__RefHeading___Toc609_2232269589">Fahrstraßen (Routing)	7</a></p>
+	<p style="margin-left: 0.5cm; margin-bottom: 0cm; line-height: 100%; background: #eeeeee; page-break-before: auto">
+	<a href="#__RefHeading___Toc611_2232269589">Fahrstraßen graphisch
+	erstellen	8</a></p>
+	<p style="margin-left: 0.5cm; margin-bottom: 0cm; line-height: 100%; background: #eeeeee; page-break-before: auto">
+	<a href="#__RefHeading___Toc673_3825881407">Welche Fahrstraßen sind
+	schon eingegeben?	9</a></p>
+	<p style="margin-left: 0.5cm; margin-bottom: 0cm; line-height: 100%; background: #eeeeee; page-break-before: auto">
+	<a href="#__RefHeading___Toc613_2232269589">Zusammengesetzte
+	Fahrstraßen	9</a></p>
+	<p style="margin-left: 0.5cm; margin-bottom: 0cm; line-height: 100%; background: #eeeeee; page-break-before: auto">
+	<a href="#__RefHeading___Toc615_2232269589">Fahrten	10</a></p>
+	<p style="margin-left: 0.5cm; margin-bottom: 0cm; line-height: 100%; background: #eeeeee; page-break-before: auto">
+	<a href="#__RefHeading___Toc675_3825881407">Fahrpläne
+	(Timetable)	11</a></p>
+	<p style="margin-left: 0.5cm; margin-bottom: 0cm; line-height: 100%; background: #eeeeee; page-break-before: auto">
+	<a href="#__RefHeading___Toc677_3825881407">Lok-Tabelle	12</a></p>
+	<p style="margin-left: 0.5cm; margin-bottom: 0cm; line-height: 100%; background: #eeeeee; page-break-before: auto">
+	<a href="#__RefHeading___Toc619_2232269589">Adressensuche	13</a></p>
+	<p style="margin-left: 0.5cm; margin-bottom: 0cm; line-height: 100%; background: #eeeeee; page-break-before: auto">
+	<a href="#__RefHeading___Toc621_2232269589">Bekannte Fehler in
+	Rev.0.48	13</a></p>
+	<p style="margin-left: 1cm; margin-bottom: 0cm; line-height: 100%"><a href="#__RefHeading___Toc679_3825881407">	13</a></p>
+	<p style="margin-left: 1cm; margin-bottom: 0cm; line-height: 100%"><a href="#__RefHeading___Toc681_3825881407">Anhang
+	- zu Fahrstraßen im xml-File:	14</a></p>
+</div>
+<p class="western"><br/>
+<br/>
+
+</p>
+<h2 class="western"><a name="__RefHeading___Toc591_2232269589"></a>Installation/Aufruf
+des Programms</h2>
+<p class="western" style="margin-bottom: 0cm; line-height: 100%">Das
+Programm ist ein Java-Programm, das als Zip-File heruntergeladen (zB
+„SX4Draw-0.43.zip“) und dann in ein Verzeichnis entzipped werden
+kann. In diesem Verzeichnis kann dann (unter Linux, Windows und MacOS
+– vorher muss Java installiert werden) das<span style="text-decoration: none">
+Programm mit</span></p>
+<p class="western" style="margin-bottom: 0cm; line-height: 100%; text-decoration: none">
+<br/>
+
+</p>
+<p class="western" style="margin-bottom: 0cm; line-height: 100%; text-decoration: none">
+    <font face="Courier New, monospace"><font size="2" style="font-size: 10pt">java
+-jar SX4Draw.jar </font></font>
+</p>
+<p class="western" style="margin-bottom: 0cm; line-height: 100%; text-decoration: none">
+<br/>
+
+</p>
+<p class="western" style="margin-bottom: 0cm; line-height: 100%"><span style="text-decoration: none">a</span><span style="text-decoration: none">usgeführt
+werden. Es öffnet sich eine leere Zeichenfläche, auf der </span><span style="text-decoration: none">ein</span><span style="text-decoration: none">
+Gleisplan gezeichnet werden kann:</span></p>
+<p class="western" style="margin-bottom: 0cm; line-height: 100%; text-decoration: none">
+<img src="SX4Draw-docu_html_82db3db3a4e31d7f.png" name="Bild12" align="left" width="480" height="246">
+  <br clear="left"/>
+</img>
+<br/>
+
+</p>
+<h2 class="western"><a name="__RefHeading___Toc593_2232269589"></a>Start
+und Zeichnen von Gleisen, Sensoren und Signalen</h2>
+<p class="western" style="margin-bottom: 0cm; line-height: 100%">Mit
+den Buttons:</p>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%; text-decoration: none">
+<img src="SX4Draw-docu_html_5f55a8a44b94653e.png" name="Bild1" align="left" width="446" height="30">
+  <br clear="left"/>
+</img>
+kann
+jeweils ein „Panel-Element“ ausgewählt werden, also Gleise,
+Sensoren, Signal, Fahrstraßen (Route) oder zusammengesetzte
+Fahrstraße (CompRoute), die man zum Gleisplan (Panel) hinzufügen
+kann.</p>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%; text-decoration: none">
+<br/>
+
+</p>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+<span style="text-decoration: none">Man beginnt am Besten mit dem
+Zeichnen der Gleise – nach Auswahl von „+ Track“ können Gleise
+als Linien gezeichnet werden. Mi</span><span style="text-decoration: none">t
+Maus-Click </span><span style="text-decoration: none">wird </span><span style="text-decoration: none">ein
+Track begonnen (StartPunkt), </span><span style="text-decoration: none">dann
+bei </span><span style="text-decoration: none"> gedrückter </span><span style="text-decoration: none">linker
+</span><span style="text-decoration: none">Maus</span><span style="text-decoration: none">taste</span><span style="text-decoration: none">
+an einen Endpunkt gezogen </span><span style="text-decoration: none">und</span><span style="text-decoration: none">
+Loslassen beendet d</span><span style="text-decoration: none">as
+Gleis (den</span><span style="text-decoration: none"> Track</span><span style="text-decoration: none">)</span><span style="text-decoration: none">.
+</span><span style="text-decoration: none">Die Lage der Gleise wird
+hierbei a</span><span style="text-decoration: none"><span style="background: transparent">uf
+</span></span><span style="text-decoration: none"><span style="background: transparent">
+0 Grad, 45 Grad und 90 Grad </span></span><span style="text-decoration: none"><span style="background: transparent">eingeschränkt.
+</span></span><span style="text-decoration: none"><span style="background: transparent">Alle
+Gleise </span></span><span style="text-decoration: none"><span style="background: transparent">und
+Signale, Weichen, Fahrstraßentasten etc </span></span><span style="text-decoration: none"><span style="background: transparent">liegen
+auf einem </span></span><span style="text-decoration: none"><span style="background: transparent">1</span></span><span style="text-decoration: none"><span style="background: transparent">0x</span></span><span style="text-decoration: none"><span style="background: transparent">1</span></span><span style="text-decoration: none"><span style="background: transparent">0
+Raster</span></span><span style="text-decoration: none"><span style="background: transparent">
+</span></span><span style="text-decoration: none"><span style="background: transparent">(welches
+man aber auch deaktivieren kann) </span></span><span style="text-decoration: none"><span style="background: transparent">und
+werden als Vektor Graphiken gezeichnet, nicht als Bitmaps.</span></span></p>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+Auf die Gleise können dann zB Sensoren (auch Gleisbesetztmelder,
+Gleisbelegtmelder oder Gleisfreimelder genannt) gemalt werden, wenn
+vorher der „+ Sensor“ Button gedrückt wurde  (oder der „+
+Sensor-US“ Button – dieser wird als „US-Lampe“ im
+LanbahnPanel angezeigt). 
+</p>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+<img src="SX4Draw-docu_html_2a631d81076ed829.png" name="Bild3" align="left" hspace="11" vspace="8" width="366" height="167" border="0"/>
+Ebenso
+können Signale hinzugefügt werden, es entsteht dann z.B.:</p>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+RT-Buttons (Fahrstraßentasten) werden benötigt, wenn man Fahrstraße
+verwenden will – jeweils eine am Beginn und eine am Ende einer
+Fahrstraße.</p>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+<br/>
+
+</p>
+<h2 class="western"><a name="__RefHeading___Toc595_2232269589"></a>Weichen</h2>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+<img src="SX4Draw-docu_html_616b7f546bdc571c.png" name="Bild13" align="left" hspace="9" vspace="15" width="425" height="185">
+  <br clear="left"/>
+</img>
+Weichen
+müssen nicht als eigene Elemente eingegeben werden, sondern werden
+vom Programm berechnet („Berechnen → Weichen berechnen“) , wenn
+ein Gleis auf ein anderes trifft.</p>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+Das Ergebnis ist in diesem Fall:</p>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+<img src="SX4Draw-docu_html_df7a287b8bd0a639.png" name="Bild14" align="left" hspace="11" vspace="11" width="284" height="179">
+  <br clear="left"/>
+</img>
+Die
+erkannten Weichen werden in Orange markiert (diese Weichenerkennung
+kann man auch mehrfach laufen lassen, wenn man weitere Gleise
+hinzugefügt hat – die Daten der bereits vorher erstellten Weichen
+bleiben erhalten.)</p>
+<p class="western" align="justify"><br/>
+<br/>
+
+</p>
+<p class="western" align="justify">Doppelte Kreuzungsweichen und
+Kreuzungen werden dadurch unterschieden, dass die ersteren (=DKW) nur
+berechnet werden, wenn eines der beiden kreuzenden Gleise nicht
+durchgehend ist, sondern exakt am Kreuzungspunkt beendet und neu
+angefangen wird.</p>
+<h2 class="western" align="justify"></h2>
+<h2 class="western" align="justify"><a name="__RefHeading___Toc597_2232269589"></a>
+SX-Adressen, virtuelle Adressen</h2>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+Die Adressen von „Aktiven Elementen“ (Signale, Sensoren, Weichen)
+können eingegeben werden, nachdem man durch Click mit der rechten
+Maustaste ein entsprechendes Element ausgewählt hat. Es öffnet sich
+dann ein Popup Fenster, in dem eine Adresse eingegeben werden kann
+(SX 0.. 106, Bit 1..8 – oder auch virtuelle Adressen &gt;= 1200).</p>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+<img src="SX4Draw-docu_html_dfa92126cde025bc.png" name="Bild2" align="left" width="453" height="255">
+  <br clear="left"/>
+</img>
+Adressen
+werden als „lange Adressen“, die sowohl SX-Adresse wie SX-bit
+enthalten, gespeichert – aus 80-Bit1 wird dann adr=“801“ (siehe
+oben)<a class="sdfootnoteanc" name="sdfootnote1anc" href="#sdfootnote1sym"><sup>1</sup></a>.
+</p>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+Bei Weichen kann auch „invertiert“ ausgewählt werden, dann
+werden die Weichenstellungen gerade/ abzweigend vertauscht.</p>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+Bei Signalen kann man zusätzlich die Orientierung wählen (0 Grad,
+45 Grade, 90 Grad, 135 Grad, …) - und wählen, ob auch die
+Folgeadresse zum Signal gehört. Dies ist notwendig, wenn auch Hp2
+angezeigt werden soll (gelb, State =2) – d.h. wenn das Signal 2
+SX-Bits belegt.</p>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+<img src="SX4Draw-docu_html_7eda99e6ad5198ef.png" name="Bild4" align="left" width="459" height="214">
+  <br clear="left"/>
+</img>
+<br/>
+
+</p>
+<p class="western">Nach dem Ändern von Weichen- und Signaladressen
+werden auch die entsprechenden Einträge in den Fahrstraßen-Tabellen
+automatische auf die neue Weichen/Signal-Adresse geändert.</p>
+<h2 class="western" align="justify"></h2>
+<h2 class="western" align="justify"><br/>
+<br/>
+
+</h2>
+<h2 class="western" align="justify" style="page-break-before: always"><a name="__RefHeading___Toc599_2232269589"></a>
+File Menü</h2>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+<br/>
+
+</p>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+Ein Panel abspeichern oder einen Panel-File laden kann man über das
+File-Menü. 
+</p>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+<br/>
+
+</p>
+<h2 class="western" align="justify"><a name="__RefHeading___Toc601_2232269589"></a>
+Einzelne Panel-Elemente löschen</h2>
+<p class="western" align="justify">Hierzu muss der „Select“
+Button gedrückt sein – mit Maus Click kann man dann eines oder
+mehrere Elemente auswählen, sie werden dann ROT gezeichnet. 
+</p>
+<p class="western" align="justify">Drücken auf den Button „DELETE“
+löscht jeweils eines der selektierten (roten) Elemente (also
+mehrfach drücken, wenn man mehrere ausgewählt hat, die man löschen
+möchte.)</p>
+<h2 class="western" align="justify"><a name="__RefHeading___Toc603_2232269589"></a>
+Eingabe eines „panelname“</h2>
+<p class="western" align="justify">Unter Optionen kann ein Panel-Name
+eingegeben werden, der mit im panel.xml File abgespeichert wird –
+und später dann im LanbahnPanel-Programm im Kopf angezeigt wird.</p>
+<h2 class="western" align="justify"><a name="__RefHeading___Toc605_2232269589"></a>
+Verschieben von Panel-Elementen</h2>
+<p class="western" align="justify">Nach Auswahl von einem oder
+mehreren Panel-Elementen per „SELECT“ können sie nach Drücken
+des „MOVE“ Buttons per Mouse-Drag verschoben werden (im 10 x 10
+Raster, wenn nicht über „Optionen→Raster“ das Raster
+deaktiviert worden ist).</p>
+<h2 class="western" align="justify"><a name="__RefHeading___Toc607_2232269589"></a>
+Bearbeiten von ganzen Panels</h2>
+<p class="western" align="justify">Der „Nullpunkt“ von Panels
+kann automatisch nach 20,20 verschoben werden – mit „Calc“→
+„Norm Positions“, siehe</p>
+<p class="western" align="justify"><img src="SX4Draw-docu_html_cc5f3061fba5630c.png" name="Bild10" align="left" hspace="15" vspace="13" width="285" height="177">
+  <br clear="left"/>
+</img>
+<br/>
+<br/>
+
+</p>
+<h2 class="western" align="justify"><br/>
+<br/>
+
+</h2>
+<h2 class="western" align="justify" style="page-break-before: always"><a name="__RefHeading___Toc661_3825881407"></a>
+Zoom In / Zoom Out</h2>
+<p class="western" align="justify">Die Ansicht auf dem Bildschirm
+kann im „Optionen“ Menü vergrößert und verkleinert werden –
+ohne dass wie bei „Scale“ die x- und y-Werte im XML File
+tatsächlich verändert werden – diese Funktion nennt sich Zoom In
+/ Zoom Out, rechts „zoom“ links normale Anzeige.</p>
+<p class="western" align="justify"><img src="SX4Draw-docu_html_1d176af8613789c4.png" name="Bild15" align="left" width="342" height="226">
+  <br clear="left"/>
+</img>
+<img src="SX4Draw-docu_html_88af8f449115e900.png" name="Bild16" align="left" width="355" height="239">
+  <br clear="left"/>
+</img>
+<br/>
+<br/>
+
+</p>
+<p class="western" align="justify"><br/>
+<br/>
+
+</p>
+<h2 class="western" align="justify"><br/>
+<br/>
+
+</h2>
+<h2 class="western" align="justify" style="page-break-before: always"><a name="__RefHeading___Toc609_2232269589"></a>
+Fahrstraßen (Routing)</h2>
+<p class="western" align="justify">Mit „RouteButtons“ im
+Gleisbildstellwerk kann eine Fahrstraße eingestellt werden – von
+einem Start-Button (btn1) zu einem End-Button (btn2).  Jede
+Fahrstraße <b>muss</b> einen Start-GBM und einen Stop-GBM haben,
+denn mit Hilfe des Stop-GBM wird zB die Fahrstraße beendet
+(=aufgelöst, wenn denn Stop-GBM von einem Zug belegt wird). 
+</p>
+<p class="western" align="justify"><img src="SX4Draw-docu_html_7d32ae605d6a6e10.png" name="Bild6" align="left" width="569" height="479" border="0"/>
+Unter
+dem Menü „Optionen“ → „Routing Tabelle“ können alle
+Routen numerisch angezeigt und die Werte für die Fahrstraße und die
+Sensoren editiert werden (nicht editiert werden können: Adr(ID),
+Start- und Ende-Button):</p>
+<p class="western" align="justify"><br/>
+<br/>
+
+</p>
+<p class="western"><a name="__RefHeading___Toc663_3825881407"></a>Die
+Definition der Signalstellung kann (nur direkt beim Erstellen) durch
+mehrfaches Klicken auf das Signal erfolgen. Wenn das Signal 2
+Adressen hat, so sind 4 Stellungen möglich (sonst nur 2): 
+</p>
+<p class="western">Rot=0 oder Grün=1 oder Gelb=2 oder pink=3 („pink“
+kann zum Beispiel auf der Anlage 1) Anzeige der „feather“ (nur
+UK) bedeuten oder 2) Rangierfahrt frei), es andere Farben, 4
+mögliche, wenn das Signal 2 Adressen hat - sonst nur rot/grün)</p>
+<p class="western" align="justify" style="margin-bottom: 0.05cm"><img src="SX4Draw-docu_html_3e07d2929999d581.png" name="Bild5" align="left" width="353" height="52" border="0"/>
+<br/>
+<br/>
+
+</p>
+<h2 class="western" align="justify" style="page-break-before: always"><a name="__RefHeading___Toc611_2232269589"></a>
+Fahrstraßen graphisch erstellen</h2>
+<p class="western" align="justify">Nach Eingabe von Adressen für
+Sensoren, Weichen und Signale können Fahrstraßen graphisch erstellt
+werden, in dieser Reihenfolge:</p>
+<p class="western" align="justify">1. Start Button clicken (also auf
+den Route-Button, bei dem die Fahrstraße starten soll)</p>
+<p class="western" align="justify">2. dann auf alle Elemente klicken,
+die zu der Fahrstraße gehören sollen, also auf Sensoren, Weichen,
+Signale (bei den Weichen kann dabei auch der Zustand gewählt werden,
+indem man auf das Ende des abzweigenden bzw. durchgehenden Track der
+Weiche klickt (=grün)</p>
+<p class="western" align="justify">3. Ende Button klicken, dann wird
+die Fahrstraße gespeichert. (im Fahrstraßen-Editor können auch
+Weichen- und Signalstellungen korrigiert werden)</p>
+<p class="western" align="justify">Während des Erstellens werden die
+gewählten Elemente in Türkis markiert:</p>
+<p class="western" align="justify"><img src="SX4Draw-docu_html_fe9a976083f83c3f.png" name="Bild7" align="left" width="511" height="229" border="0"/>
+<br/>
+<br/>
+
+</p>
+<p class="western" align="justify">Nach klick auf den „Ende Button“
+sieht das im Fahrstraßen-Editor so aus:</p>
+<p class="western" align="justify"><br/>
+<br/>
+
+</p>
+<p class="western" align="justify"><img src="SX4Draw-docu_html_7a064472bf670404.png" name="Bild8" align="left" width="519" height="247" border="0"/>
+<br/>
+<br/>
+
+</p>
+<p class="western" align="justify" style="page-break-before: always">Mit
+„rechter Maustaste“ auf eine Zeile im Fahrstraßen-Editor kann
+man 
+</p>
+<p class="western" align="justify">a) Fahrstraßen löschen und 
+</p>
+<p class="western" align="justify">b) Fahrstraßen „debuggen“,
+man kann sich eine Fahrstraße anzeigen lassen, hierbei werden alle
+Elemente markiert, die Weichen- und Signalstellungen angezeigt und
+der Start-Btn mit „1“ und der End-Button mit „2“ markiert:</p>
+<p class="western"><img src="SX4Draw-docu_html_5f8b68836bf1767d.png" name="Bild11" align="left" width="643" height="221" border="0"/>
+<br/>
+<br/>
+
+</p>
+<p class="western">Wenn eine andere Fahrstraße gewählt wird, so
+wird die aktuell markiert wieder „ent-markiert“.</p>
+<h2 class="western"><a name="__RefHeading___Toc673_3825881407"></a>Welche
+Fahrstraßen sind schon eingegeben?</h2>
+<p class="western">Ein Klick auf die rechte Maustaste bei
+Fahrstraßen-Tastern (RouteButtons) bewirkt, dass angezeigt wird,
+welche Fahrstraßen von dieser Taste ausgehen. Die Start-Taste wird
+mit „1“ markiert, die möglichen Fahrstraßen-Ende-Taster mit
+„2“, ein Beispiel:</p>
+<p class="western"><img src="SX4Draw-docu_html_991979ec32513082.png" name="Bild19" align="left" width="538" height="238" border="0"/>
+<br/>
+<br/>
+
+</p>
+<h2 class="western"><a name="__RefHeading___Toc613_2232269589"></a>Zusammengesetzte
+Fahrstraßen</h2>
+<p class="western">Damit die Erstellung von Fahrstraßen „schneller
+von der Hand geht“, kann man je 2 Fahrstraßen auch zusammenfassen
+zu einer „Zusammengesetzten Fahrstraße“ (CompRoute).</p>
+<p class="western">Hierzu wählt man im graphischen Editor „+ Zus.
+Fahrstraße“ aus und klickt auf den „Anfangs-Fahrstrassen Button“
+der Fahrstraße 1, dann auf den „End-Button“ der Fahrstraße 2 –
+dann wird eine neue Zusammengesetzte Fahrstraße aus „Fahrstraße 1
+plus Fahrstraße 2“ generiert. Diese kann ebenfalls „debugged“
+werden.</p>
+<p class="western">Zusammengesetzte Fahrstraßen, die aus mehr als 2
+Einzelfahrstraßen bestehen, sind NICHT möglich.</p>
+<h2 class="western"><a name="__RefHeading___Toc615_2232269589"></a>Fahrten</h2>
+<p class="western">Fahrten (Zugfahrten) sind die Kombination aus
+einer Fahrstraße und einer Lok (mit Richtung und Geschwindigkeit) –
+sie werden in einer Tabelle editiert:</p>
+<p class="western"><img src="SX4Draw-docu_html_faffd815cb1978db.png" name="Bild17" align="left" width="525" height="248" border="0"/>
+<br/>
+<br/>
+
+</p>
+<p class="western"><br/>
+<br/>
+
+</p>
+<h2 class="western"><br/>
+<br/>
+
+</h2>
+<p class="western" style="page-break-before: always"><a name="__RefHeading___Toc617_2232269589"></a>
+Einen kompletten Zug ändern kann man in der Fahrten Tabelle mit „Zug
+ändern“ - dann öffnet sich eine Maske mit dem „alten“ Zug
+(incl Geschwindigkeit) auf der linken Seite und dem „neuen“ auf
+der rechten Seite. Hier kann man auch nur die Geschwindigkeit ändern
+– oder nur die Richtung (oder alles).</p>
+<p class="western"><img src="SX4Draw-docu_html_bf234b52fc716991.png" name="Bild18" align="left" width="501" height="226" border="0"/>
+<br/>
+<br/>
+
+</p>
+<h2 class="western"></h2>
+<h2 class="western"><a name="__RefHeading___Toc675_3825881407"></a>Fahrpläne
+(Timetable)</h2>
+<p class="western"><br/>
+<br/>
+
+</p>
+<h2 class="western"><img src="SX4Draw-docu_html_f859d9ccd95fd3a5.gif" name="Bild20" align="left" width="326" height="411" border="0"/>
+</h2>
+<p class="western"><br/>
+<br/>
+
+</p>
+<p class="western">Fahrpläne sind eine Abfolge von Fahrten, siehe
+rechts in der Graphik eine Übersicht.</p>
+<p class="western">Sie können im SX4 Programm einen Fahrplan (der im
+panel.xml File enthalten ist) starten – dann werden die Fahrten in
+der gespeicherten  Reihenfolge ausgeführt – vorausgesetzt, auf den
+Start-Sensoren der jeweiligen Fahrstraße steht jeweils ein Zug
+(sonst weiss das Programm nicht, welche Lok es beschleunigen oder
+abbremsen soll).</p>
+<h2 class="western" style="page-break-before: always"><a name="__RefHeading___Toc677_3825881407"></a>
+Lok-Tabelle</h2>
+<p class="western">Damit auf die einzelnen Loks im
+LanbahnPanel-Programm schneller zugegriffen werden kann, gibt es auch
+eine Tabelle mit allen verwendeten Loks – zusätzlich zur Adresse
+kann auch eine „Masse“ (1..5) definiert werden, die die
+Verzögerung definiert beim Anfahren und Anhalten per LanbahnPanel
+oder per Fahrplan (und ein sprechender Name ist ebenfalls möglich).</p>
+<h2 class="western" style="page-break-before: always"><a name="__RefHeading___Toc619_2232269589"></a>
+Adressensuche</h2>
+<p class="western" align="justify">Eine Suche nach Panel-Elementen
+mit einer bestimmten Adresse kann man aktivieren per „Extras→Suche
+nach Adressen“ Menü. Dabei kann entweder nach der exakten Adresse
+gesucht werden (z.B. 937 = Adr93, bit7) oder auch nach SX-Adresse
+allein, wenn man die letzte Ziffer durch ein Fragezeichen ersetzt
+(„93?“ → alle Elemente, deren SX-Adresse gleich 97 ist).</p>
+<p class="western" align="justify">Als Ergebnis der Suche werden die
+entsprechenden Paneel-Element rot markiert. 
+</p>
+<p class="western" align="justify"><img src="SX4Draw-docu_html_bddcf0b05bead7eb.png" name="Bild9" align="left" width="580" height="390" border="0"/>
+<br/>
+<br/>
+
+</p>
+<p class="western"><br/>
+<br/>
+
+</p>
+<p class="western"><br/>
+<br/>
+
+</p>
+<p class="western" style="text-decoration: none"><br/>
+<br/>
+
+</p>
+<p class="western" style="margin-bottom: 0cm; line-height: 100%; text-decoration: none">
+<br/>
+
+</p>
+<h2 class="western"><a name="__RefHeading___Toc621_2232269589"></a>Bekannte
+Fehler in Rev.0.48</h2>
+<ul>
+	<li><p class="western" style="margin-bottom: 0cm; line-height: 100%; text-decoration: none">
+	<span style="background: transparent">…</span></p>
+</ul>
+<p class="western" style="margin-bottom: 0cm; line-height: 100%; text-decoration: none">
+<br/>
+
+</p>
+<h3 class="western"><a name="__RefHeading___Toc679_3825881407"></a><br/>
+<br/>
+<br/>
+
+</h3>
+<h3 class="western" style="page-break-before: always"><a name="__RefHeading___Toc681_3825881407"></a>
+Anhang - zu Fahrstraßen im xml-File:</h3>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+Die zu stellende Fahrstraße ist in einer String-Variable „route“
+definiert, jeweils als Folge von Wertepaaren (SX-Addresse,Zustand),
+zum Beispiel:</p>
+<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+<br/>
+
+</p>
+<pre class="western" style="text-align: left"><font face="Courier New, monospace">&lt;route id=&quot;2201&quot; btn1=&quot;1200&quot; btn2=&quot;1203&quot; <b>route=&quot;854,1;853,0</b>;852,0;765,2;767,0;761,0;781,0&quot; </font>
+<font face="Courier New, monospace">sensors=&quot;924,928&quot; offending=&quot;&quot; /&gt;</font></pre><p class="western" align="justify">
+<br/>
+<br/>
+
+</p>
+<p class="western" align="justify"><a name="__DdeLink__167_2502762601"></a>
+Das heißt also zB: Weiche 85.4 wird auf 1 (=abzweigend) gestellt,
+Weiche 85.3 wird auf 0 (=gerade) gestellt und so weiter. (auch die
+Signalstellungen sind hier definiert). Die Definition der
+Weichenstellung kann auch graphisch erzeugt werden, die der Signal
+nicht – sie muss von Hand in die Fahrstraßentabelle eingetragen
+werden.</p>
+<p class="western" align="justify">Unter „sensors“ sind jeweils
+der Start- und End-Gleisabschnitt der Fahrstraße definiert (bzw. die
+entsprechenden Belegtmelder-Adressen). Zum automatischen Fahrbetrieb
+(Fahrplan) sind Start- und Ende-Sensor zwingend erforderlich!</p>
+<div id="sdfootnote1"><p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+	<font size="2"><a class="sdfootnotesym" name="sdfootnote1sym" href="#sdfootnote1anc">1</a>)
+	 Aus einem Panel.xml File eingelesen werden aber auch sxadr und
+	sxbit (=altes Format), zum Beispiel wird</font></p>
+	<p class="western" align="justify" style="margin-bottom: 0cm; line-height: 100%">
+	<font size="2" style="font-size: 10pt"><font face="Courier New, monospace"><font size="2" style="font-size: 9pt">&lt;</font></font><font face="Courier New, monospace"><font size="2" style="font-size: 9pt">…
+	sxadr=“</font></font><font face="Courier New, monospace"><font size="2" style="font-size: 9pt">9</font></font><font face="Courier New, monospace"><font size="2" style="font-size: 9pt">4“
+	sxbit =“7“ /</font></font><font face="Courier New, monospace"><font size="2" style="font-size: 9pt">&gt;</font></font><font face="Courier New, monospace">
+	</font>später abgespeichert als adr =“947“.</font></p>
+</div>
+</body>
+</html>
