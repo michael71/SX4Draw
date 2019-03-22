@@ -23,9 +23,10 @@ package de.blankedv.sx4draw
 
 object Constants {
 
-    const val versionNumber = 0.53
-    private const val versionDate = "15 Mar 2019"
+    const val versionNumber = 0.54
+    private const val versionDate = "16 Mar 2019"
     const val progVersion = "$versionNumber - $versionDate"
+    const val DOCU_URL = "https://www.blank-bb.de/SX4Draw-docu.pdf"
 
     const val SXMIN_USED = 11
     const val SXMAX_USED = 1068 // max sx address used (106, bit 8)

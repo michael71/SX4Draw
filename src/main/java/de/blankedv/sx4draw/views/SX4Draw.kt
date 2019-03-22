@@ -28,7 +28,6 @@ import javafx.event.EventHandler
 import javafx.geometry.Orientation
 import javafx.scene.Cursor
 import javafx.scene.Group
-import javafx.scene.Node
 import javafx.scene.Scene
 import javafx.scene.canvas.Canvas
 import javafx.scene.canvas.GraphicsContext
@@ -57,18 +56,19 @@ import java.util.prefs.Preferences
 
 import de.blankedv.sx4draw.Constants.INVALID_INT
 import de.blankedv.sx4draw.Constants.DEBUG
+import de.blankedv.sx4draw.Constants.DOCU_URL
 import de.blankedv.sx4draw.Constants.RASTER
 import de.blankedv.sx4draw.Constants.RECT_X
 import de.blankedv.sx4draw.Constants.RECT_Y
 import de.blankedv.sx4draw.Constants.PEState
 import de.blankedv.sx4draw.Constants.progVersion
-import de.blankedv.sx4draw.Constants.versionNumber
 
 import de.blankedv.sx4draw.PanelElement.Companion.SENSOR_WIDTH
 import de.blankedv.sx4draw.PanelElement.Companion.TRACK_WIDTH
 import de.blankedv.sx4draw.model.*
 import de.blankedv.sx4draw.util.Calc
 import javafx.collections.ObservableList
+import kotlin.Exception
 
 
 open class SX4Draw : Application() {
@@ -106,7 +106,7 @@ open class SX4Draw : Application() {
     private val rasterOn = CheckMenuItem("Raster")
     private val anchorPane = AnchorPane()
     private val scPane = ZoomableScrollPane(anchorPane)
-    // internal val status = Label("status")
+    private val status = Label("status")
 
 
     private var currentGUIState = GUIState.SELECT
@@ -278,7 +278,8 @@ open class SX4Draw : Application() {
                         }
                     }
 
-                    SX4Draw.GUIState.ADD_SENSOR_US, SX4Draw.GUIState.ADD_SIGNAL, SX4Draw.GUIState.ADD_ROUTEBTN, SX4Draw.GUIState.ADD_ROUTE -> {
+                    SX4Draw.GUIState.ADD_SENSOR_US, SX4Draw.GUIState.ADD_SIGNAL,
+                    SX4Draw.GUIState.ADD_ROUTEBTN, SX4Draw.GUIState.ADD_ROUTE -> {
                     }
                     SX4Draw.GUIState.MOVE    // MOVE ends
                     -> {
@@ -324,11 +325,9 @@ open class SX4Draw : Application() {
                     }
                 }
             }
-
         }
 
-
-        vb.children.addAll(menuBar, buttons, scPane)    //, status);
+        vb.children.addAll(menuBar, buttons, scPane, status);
         scPane.isFitToHeight = true
         scPane.isFitToWidth = true
         scPane.maxWidth = RECT_X.toDouble()
@@ -339,10 +338,6 @@ open class SX4Draw : Application() {
 
         VBox.setVgrow(scPane, Priority.ALWAYS)
         HBox.setHgrow(scPane, Priority.ALWAYS)
-
-
-
-
 
         anchorPane.children.addAll(lineGroup, /* raster, */ canvas, draggedGroup)
         
@@ -581,8 +576,11 @@ open class SX4Draw : Application() {
     private fun createMenu(prefs: Preferences, menuBar: MenuBar, stage: Stage) {
         // final ImageView ivSettings = new ImageView(new Image("/de/blankedv/sx4monitorfx/res/settings.png"));
         val ivInfo = ImageView(Image("info.png"))
+        val ivInfo2 = ImageView(Image("info.png"))
+        val ivInfo3 = ImageView(Image("info.png"))
         val ivSX4generic = ImageView(Image("sx4_draw_ico32.png"))
-        val menu1 = Menu("File")
+        val howtoTimetable = ImageView(Image("howto-timetable.png"))
+        val menuFile = Menu("File")
         val menuWindows = Menu("Fenster")
         val openRoutingTable = MenuItem("Fahrstraßen anzeigen")
         val openLocoTable = MenuItem("Loks anzeigen")
@@ -604,12 +602,15 @@ open class SX4Draw : Application() {
         val cNormPositions = MenuItem("Start Position normieren auf (20,20)")
         val menuExtra = Menu("Extras")
         val cSearch = MenuItem("Suche nach Adressen")
-        val menuInfo = Menu("Hilfe")
+
+        val menuHelp = Menu("Hilfe")
+        val howtoTimetableItem = MenuItem("wie einen Fahrplan erstellen")
+
         val saveItem = MenuItem("Panel abspeichern")
         val openItem = MenuItem("Panel öffnen")
         val exitItem = MenuItem("Programm-Ende/Exit")
 
-        menu1.items.addAll(openItem, saveItem, exitItem)
+        menuFile.items.addAll(openItem, saveItem, exitItem)
         menuWindows.items.addAll(openRoutingTable, openCompRoutesTable, openTripsTable, openTimetableTable, openLocoTable)
         menuOptions.items.addAll(setName, dispAddresses, rasterOn, zoomIn, zoomOut) //, showMousePos) //, showScrollBars)
         menuCalc.items.addAll(cTurnouts, cNormPositions, scale200, scale50)
@@ -792,12 +793,16 @@ open class SX4Draw : Application() {
                 compRoutesTable!!.show()
             }
         }
-
-
-        val infoItem = MenuItem("Info")
+        howtoTimetableItem.graphic = ivInfo
+        howtoTimetableItem.setOnAction { event ->
+            println("howto Timetable clicked")
+            Dialogs.buildInformationAlert("Wie erstelle ich einen Fahrplan?", "",
+                    "", this, howtoTimetable)
+        }
+        val infoItem = MenuItem("Version Info")
         val updateItem = MenuItem("Sind Updates verfügbar?")
-        menuInfo.items.addAll(infoItem, updateItem)
-        infoItem.graphic = ivInfo
+
+        infoItem.graphic = ivInfo2
         infoItem.setOnAction { event ->
             println("info clicked")
             Dialogs.buildInfoAlertOpenSX("Info", "SX4Draw\nhttps://opensx.net/sx4 ", "Programm Version:$progVersion", this)
@@ -805,13 +810,23 @@ open class SX4Draw : Application() {
 
         updateItem.graphic = ivSX4generic
         updateItem.setOnAction {
-                Utils.checkVersion(application)
-         }
+            Utils.checkVersion(application)
+        }
 
-        menuBar.menus.addAll(menu1, menuOptions, menuCalc, menuExtra, menuWindows, menuInfo)
+        val manualItem = MenuItem("Handbuch im Browser öffnen")
+        manualItem.graphic = ivInfo3
+        manualItem.setOnAction {
+            println("open manual")
+            try {
+                hostServices.showDocument(DOCU_URL)
+            } catch (e: Exception) {
+                println(e.message)
+            }
+        }
+
+        menuHelp.items.addAll(howtoTimetableItem, manualItem, SeparatorMenuItem(),infoItem, updateItem)
+        menuBar.menus.addAll(menuFile, menuOptions, menuCalc, menuExtra, menuWindows, menuHelp)
     }
-
-
 
     private fun toggleSelectionPE(p: IntPoint) {
         val pe = selectedPE(p.x.toDouble(), p.y.toDouble())
@@ -839,24 +854,25 @@ open class SX4Draw : Application() {
 
     private fun editTurnout(pe: PanelElement, primStage: Stage) {
         val tu = (pe.gpe as Turnout)
-        val invert = tu.inv ?: 0
+        var invert = false
+        if (tu.inv == 1) invert = true
         println("IN: addr=" + tu.adr + " inv=" + invert)
-        val initA = GenericAddress(tu.adr, INVALID_INT, invert)
-        val result = AddressDialog.open(pe, primStage, initA)
+        val addrIN = GenericAddress(tu.adr, INVALID_INT, inv = invert)
+        val result = AddressDialog.open(pe, primStage, addrIN)
         if (result.addr != -1) {
             println("OUT: addr=" + result.addr + " addr2=" + result.addr2 + " inv=" + result.inv + " orient=" + result.orient)
-            val addressOK = Dialogs.checkAddress(initA, result)
+            val addressOK = Dialogs.checkAddress(addrIN, result)
             if (!addressOK) {
                 println("addressOK=false")
                 return  // do nothing
             }
             tu.adr = result.addr
-            if (result.inv == 0) {
+            if (!result.inv) {
                 tu.inv = null
             } else {
                 tu.inv = 1
             }
-            if (result.reNumber) Route.addressInRouteChanged(initA.addr.toString(), tu.adr.toString())
+            if (result.reNumber) Route.addressInRouteChanged(addrIN.addr.toString(), tu.adr.toString())
             println("tu addr=" + tu.adr + " tu.inv=" + tu.inv)
             pe.recreateShape()
             redrawPanelElements()
@@ -870,11 +886,11 @@ open class SX4Draw : Application() {
         val orientation = Utils.signalDX2ToOrient(IntPoint(
                 (pe.gpe as Signal).x2 - pe.gpe.x, (pe.gpe as Signal).y2 - pe.gpe.y))
         println("IN: orient=$orientation")
-        val initialAddress = GenericAddress(si.getAddr(), si.getAddr2(), 0, orientation)
-        val result = AddressDialog.open(pe, primStage, initialAddress)
+        val addrIN = GenericAddress(si.getAddr(), si.getAddr2(), orient = orientation)
+        val result = AddressDialog.open(pe, primStage, addrIN)
         if (result.addr != -1) {
             println("OUT: addr=" + result.addr + " addr2=" + result.addr2 + " inv=" + result.inv + " orient=" + result.orient)
-            val addressOK = Dialogs.checkAddress(initialAddress, result)
+            val addressOK = Dialogs.checkAddress(addrIN, result)
             if (!addressOK) {
                 println("addressOK=false")
                 return  // do nothing
@@ -884,7 +900,7 @@ open class SX4Draw : Application() {
             } else {
                 si.adrStr = "" + result.addr
             }
-            if (result.reNumber) Route.addressInRouteChanged(initialAddress.addr.toString(), result.addr.toString())
+            if (result.reNumber) Route.addressInRouteChanged(addrIN.addr.toString(), result.addr.toString())
             val delta = Utils.signalOrientToDXY2(result.orient)
             println("or=" + result.orient + " dx=" + delta.x + " dy=" + delta.y)
             si.x2 = si.x + delta.x
@@ -897,16 +913,15 @@ open class SX4Draw : Application() {
         } else {
             println("no address selected")
         }
-
     }
 
     private fun editSensor(pe: PanelElement, primStage: Stage) {
         val se = (pe.gpe as Sensor)
-        val initA = GenericAddress(se.getAddr(), se.getAddr2())
-        val result = AddressDialog.open(pe, primStage, initA)
+        val addrIN = GenericAddress(se.getAddr(), se.getAddr2())
+        val result = AddressDialog.open(pe, primStage, addrIN)
         if (result.addr != -1) {
             println("OUT: addr=" + result.addr + " addr2=" + result.addr2 + " inv=" + result.inv + " orient=" + result.orient)
-            val addressOK = Dialogs.checkAddress(initA, result)
+            val addressOK = Dialogs.checkAddress(addrIN, result)
             if (!addressOK) {
                 println("addressOK=false")
                 return  // do nothing
@@ -916,12 +931,11 @@ open class SX4Draw : Application() {
             } else {
                 se.adrStr = "" + result.addr
             }
-            if (result.reNumber) Route.sensorAddressChanged(initA.addr.toString(), result.addr.toString())
+            if (result.reNumber) Route.sensorAddressChanged(addrIN.addr.toString(), result.addr.toString())
             redrawPanelElements()
         } else {
             println("no address selected")
         }
-
     }
 
     private fun editPanelElement(poi: IntPoint, primStage: Stage) {
@@ -979,6 +993,7 @@ open class SX4Draw : Application() {
             //System.out.println("drawing PE at " + pe.getX() + "," + pe.getY() + " type=" + pe.getType()
             //        + " state="+pe.getState().name() + " fillC=" + pe.getShape().getFill());
         }
+        status.text = getStatistics()
     }
 
     private fun addToDraggedGroup() {
@@ -1052,16 +1067,17 @@ open class SX4Draw : Application() {
                 // creation finished - a end route button has been selected
                 currentRoute!!.btn2 = rtbtn.gpe.getAddr()
                 rtbtn.createShapeAndSetState(PEState.MARKED)
-                val crt = currentRoute
+                var crt = currentRoute
+                crt!!.uniqueAccessories()
                 showRoute(crt!!)
                 println("btn2 =" + crt.btn2)
                 routes.add(crt.copy())  // add a new route from btn1 to btn2
                 routes.add(crt.reverseRoute())  // add reverse route also
 
                 val alert = Alert(AlertType.INFORMATION)
-                alert.title = "Fahrstraße " + currentRoute!!.adr + " abgeschlossen."
+                alert.title = "Fahrstraße " + currentRoute!!.adr
                 alert.headerText = null
-                alert.contentText = "Die Signalstellungen müssen noch manuell korrigiert werden!"
+                alert.contentText = "Die Fahrstraße \" + currentRoute!!.adr + \" ist abgeschlossen.\""
                 alert.showAndWait()
 
                 resetPEStates()
@@ -1397,6 +1413,15 @@ open class SX4Draw : Application() {
         for (pe in panelElements) {
             pe.drawAddress(gc)
         }
+    }
+
+    private fun getStatistics() : String {
+        var s = panelElements.size.toString() + " PEs "
+        s += routes.size.toString() + " Fahrtstr. "
+        s += compRoutes.size.toString() + " zus.g. Fahrstr. "
+        s += trips.size.toString() + " Fahrten "
+        s += timetables.size.toString() + " Fahrpläne "
+        return s
     }
 
     companion object {

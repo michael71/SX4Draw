@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<layout-config filename="panel_ibm99.xml" version="20190304_194827">
+<layout-config filename="panel_ibm99.xml" version="20190322_153305">
     <panels>
         <panel name="IBM2019/3">
             <locos>
@@ -136,13 +136,13 @@
                 <turnout adr="11" x="290" x2="304" xt="300" y="400" y2="400" yt="390"/>
                 <turnout adr="11" x="330" x2="344" xt="340" y="400" y2="400" yt="410"/>
                 <turnout adr="931" x="330" x2="316" xt="320" y="180" y2="180" yt="190"/>
-                <turnout adr="947" x="370" x2="384" xt="380" y="180" y2="180" yt="170"/>
+                <turnout adr="947" inv="1" x="370" x2="384" xt="380" y="180" y2="180" yt="170"/>
                 <turnout adr="921" x="380" x2="394" xt="390" y="70" y2="70" yt="60"/>
                 <turnout adr="983" x="430" x2="416" xt="420" y="540" y2="540" yt="550"/>
                 <turnout adr="922" x="450" x2="436" xt="440" y="30" y2="30" yt="20"/>
                 <turnout adr="941" x="460" x2="474" xt="470" y="180" y2="180" yt="170"/>
                 <turnout adr="942" x="500" x2="514" xt="510" y="180" y2="180" yt="190"/>
-                <turnout adr="982" x="510" x2="520" xt="524" y="420" y2="430" yt="420"/>
+                <turnout adr="982" inv="1" x="510" x2="520" xt="524" y="420" y2="430" yt="420"/>
                 <turnout adr="923" x="530" x2="544" xt="540" y="30" y2="30" yt="40"/>
                 <turnout adr="943" x="540" x2="554" xt="550" y="140" y2="140" yt="150"/>
                 <turnout adr="981" x="550" x2="564" xt="560" y="420" y2="420" yt="410"/>
@@ -381,12 +381,12 @@
                 <comproute adr="4602" btn1="1201" btn2="1200" routes="4303,4301"/>
             </comproutes>
             <trips>
-                <trip adr="5000" loco="29,1,30" route="4301" sens1="992" sens2="885" stopdelay="1500"/>
+                <trip adr="5000" loco="29,1,30" route="4301" sens1="992" sens2="885" startdelay="0" stopdelay="1500"/>
             </trips>
             <timetables>
-                <timetable adr="5500" next="-1" time="" trip=""/>
-                <timetable adr="5501" next="-1" time="" trip=""/>
-                <timetable adr="5502" next="-1" time="" trip=""/>
+                <timetable adr="5500" next="-1" trip=""/>
+                <timetable adr="5501" next="-1" trip=""/>
+                <timetable adr="5502" next="-1" trip=""/>
             </timetables>
         </panel>
     </panels>

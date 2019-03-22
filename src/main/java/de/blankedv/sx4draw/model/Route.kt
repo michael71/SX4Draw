@@ -239,6 +239,21 @@ class Route(
         }
     }
 
+    fun uniqueAccessories() {
+        // remove all "doubled sensors" BUT keep start sensor (sens1) and end sensor (sens2) at the same position !!!
+        var s2 = sensors.split(",")
+        if (s2.size >=3) {
+            val sens1 = s2[0]   // the start and end sensors must remain at the same position !!!
+            val sens2 = s2[s2.size-1]
+            val s2Mid = s2.slice(1 until s2.size-1).distinct().sorted()
+            sensors = sens1 + "," + s2Mid.joinToString(separator = ",") + "," + sens2
+        }
+        // remove all "doubled" turnouts and signals
+        var rt = route.split(";")
+        rt = rt.distinct().sorted()
+        route = rt.joinToString(separator = ";")
+    }
+
     fun setRouteStates() {
         println("setRouteStates")
         // PanelElement.resetState() TODO
@@ -345,6 +360,8 @@ class Route(
             }
             return null
         }
+
+
 
         // change sensor addresses in all routes and trips, if the sensor address was changed
         fun sensorAddressChanged(oAdr: String, nAdr: String) {

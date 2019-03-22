@@ -26,14 +26,14 @@ import de.blankedv.sx4draw.Constants.LBMIN
  */
 
 
-data class GenericAddress (var addr :Int, var addr2 :Int = INVALID_INT, var inv : Int = 0,
+data class GenericAddress (var addr :Int, var addr2 :Int = INVALID_INT, var inv : Boolean = false,
                            var orient : Int  = 0, var reNumber : Boolean = false ) {
 
     override fun toString(): String {
         return if (addr < LBMIN) {
-            (addr / 10).toString() + "." + addr % 10 + " inv="+inv + " orient="+orient
+            (addr / 10).toString() + "." + addr % 10 + " inv="+inv + " orient="+orient+ " reNumber="+reNumber
         } else {
-            "" + addr  + " inv="+inv + " orient="+orient
+            "" + addr  + " inv="+inv + " orient="+orient+ " reNumber="+reNumber
         }
     }
 

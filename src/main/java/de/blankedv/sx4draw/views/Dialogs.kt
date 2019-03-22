@@ -29,7 +29,22 @@ import javafx.application.Application
 import javafx.scene.control.Alert
 import javafx.scene.control.Button
 import javafx.scene.control.ButtonType
+import javafx.scene.image.ImageView
 import javafx.scene.layout.Region
+import javafx.scene.Scene
+import com.sun.javafx.robot.impl.FXRobotHelper.getChildren
+import javafx.beans.value.ChangeListener
+import javafx.scene.layout.VBox
+import javafx.beans.value.ObservableValue
+import javafx.concurrent.Worker
+import javafx.scene.web.WebEngine
+import javafx.scene.web.WebView
+import javafx.stage.Stage
+import sun.net.www.ParseUtil.toURI
+import java.io.File
+
+
+
 
 /**
  * @author mblank
@@ -57,17 +72,69 @@ object Dialogs {
         }
     }
 
-    fun buildInformationAlert(title: String, header: String, msg: String, app: Application) {
+    fun buildInformationAlert(title: String, header: String, msg: String, app: Application, img : ImageView? = null) {
         val alert = Alert(Alert.AlertType.INFORMATION)
         alert.contentText = msg
         alert.title = title
         alert.headerText = header
         val window = alert.dialogPane.scene.window
+        if (img != null) alert.graphic = img
+
         alert.dialogPane.minHeight = Region.USE_PREF_SIZE
         window.setOnCloseRequest { _ -> window.hide() }
 
         alert.showAndWait()
     }
+
+    fun showManual(app: Application) {
+        /* val wvStage = Stage()
+        wvStage.initOwner(primStage)
+
+// Create the WebView
+        val webView = WebView()
+
+        // Create the WebEngine
+        val webEngine = webView.engine
+
+        // LOad the Start-Page
+        webEngine.load("https://www.blank-bb.de/SX4Draw-docu.pdf")
+        //val f = File("/home/mblank/IdeaProjects/SX4Draw/SX4Draw-docu.pdf")
+        //webEngine.load(f.toURI().toString())
+
+        // Update the stage title when a new web page title is available
+        webEngine.loadWorker.stateProperty().addListener(object : ChangeListener<Worker.State> {
+
+            override fun changed(ov: ObservableValue<out Worker.State>, oldState: Worker.State, newState: Worker.State) {
+                if (newState === Worker.State.SUCCEEDED) {
+                    //stage.setTitle(webEngine.getLocation());
+                    wvStage.setTitle(webEngine.title)
+                }
+            }
+        })
+
+        // Create the VBox
+        val root = VBox()
+        // Add the WebView to the VBox
+        root.children.add(webView)
+
+        // Set the Style-properties of the VBox
+        root.style = "-fx-padding: 10;" +
+                "-fx-border-style: solid inside;" +
+                "-fx-border-width: 2;" +
+                "-fx-border-insets: 5;" +
+                "-fx-border-radius: 5;" +
+                "-fx-border-color: blue;"
+
+        // Create the Scene
+        val scene = Scene(root)
+        // Add  the Scene to the Stage
+        wvStage.setScene(scene)
+        // Display the Stage
+        wvStage.show() */
+
+
+    }
+
 
     fun buildErrorAlert(title : String, header : String, content: String) {
         val alert = Alert(Alert.AlertType.ERROR)

@@ -57,12 +57,14 @@ object AddressDialog {
     private val spinner100 = Spinner<Int>(0, 9, 0)
     private val spinner10 = Spinner<Int>(0, 9, 0)
     private val spinner1 = Spinner<Int>(0, 9, 0)
-    //internal var spin1 = arrayOf(spinner1000, spinner100, spinner10, spinner1)
-    private val lblAdr = Label(" Adresse")
+
     private val cbInv = CheckBox()
     private val lblSecondaryAdr = Label(" 2.Adr?")
     private val cbSec = CheckBox()
     private val cbRenumber = CheckBox()
+    private val lblInv = Label(" invertiert")
+    private val lblOrient = Label(" Orient.")
+    private val lblRTRenumber = Label(" RT renum.")
     private var resultA = GenericAddress(0)
     private const val SX = "Typ: SX Adresse"
     private const val VIRT = "Typ: virtuelle Adr"
@@ -77,78 +79,65 @@ object AddressDialog {
 
     fun open(pe: PanelElement, primaryStage: Stage, genA: GenericAddress): GenericAddress {
 
-        resultA = genA.copy()
-
-        println("resultA=${genA}")
+        resultA = GenericAddress(genA.addr, genA.addr2 )
+        initSpinners(genA)
 
         if (resultA.addr < LBMIN) {
             choiceAddressType.value = SX
         } else {
             choiceAddressType.value = VIRT
         }
-        initSpinners()
 
+        cbInv.isSelected = genA.inv
+        cbSec.isSelected = (genA.addr2 != INVALID_INT)
         cbRenumber.isSelected = false
-
-
 
         val title = ("Adresse des " + pe.gpe::class.simpleName
                 + "s an Position= " + pe.gpe.x + "," + pe.gpe.y+ " ?")
 
         choiceBoxOrient.selectionModel.select(0)
 
-        val lblInv = Label(" invertiert")
-        val lblOrient = Label(" Orient.")
-        val lblRTRenumber = Label(" RT renum.")
-
+        // hide or show type dependent checkboxes
         when (pe.gpe) {
             is Turnout -> {
-                cbInv.isSelected = (resultA.inv != 0)
                 cbInv.isVisible = true
                 lblInv.isVisible = true
-                resultA.addr2 = INVALID_INT
                 cbSec.isVisible = false
                 lblSecondaryAdr.isVisible = false
             }
             is Signal,
             is Sensor -> {
-                resultA.inv = 0
                 cbInv.isVisible = false
-                cbInv.isSelected = false
                 lblInv.isVisible = false
-                cbSec.isSelected = (resultA.addr2 != INVALID_INT)
                 cbSec.isVisible = true
                 lblSecondaryAdr.isVisible = true
             }
             else -> {
+                println("pe.gpe -> else")
                 println("ERROR: AddressDialog, class=" + pe.gpe::class + " not allowed")
             }
         }
 
-
         // display or hide choiceBox for (signal-) orientation
         if (pe.gpe is Signal) {
-            choiceBoxOrient.selectionModel.select(resultA.orient)
+            choiceBoxOrient.selectionModel.select(genA.orient)
             //println("cb.select=${choiceBoxOrient.selectionModel.selectedIndex}")
             choiceBoxOrient.isDisable = false
             choiceBoxOrient.isVisible = true
             lblOrient.isVisible = true
         } else {
-            resultA.orient = 0
             choiceBoxOrient.isDisable = true
             choiceBoxOrient.isVisible = false
             lblOrient.isVisible = false
         }
 
         val addrListener = ChangeListener<Int> { _, _, _ -> updateAddress(pe) }
-        val invListener = ChangeListener<Boolean> { _, _, _ -> updateAddress(pe) }
         val addrTypeListener = ChangeListener<String> { _, _, _ -> updateAddress(pe) }
 
         spinner1000.valueProperty().addListener(addrListener)
         spinner100.valueProperty().addListener(addrListener)
         spinner10.valueProperty().addListener(addrListener)
         spinner1.valueProperty().addListener(addrListener)
-        cbInv.selectedProperty().addListener(invListener)
         choiceAddressType.valueProperty().addListener(addrTypeListener)
 
         val vb = VBox(5.0)
@@ -162,15 +151,15 @@ object AddressDialog {
 
         grid.add(choiceAddressType, 1, 0, 2, 1)
 
-
         grid.add(spinner1000, 1, 2)
         grid.add(spinner100, 2, 2)
         grid.add(spinner10, 3, 2)
         grid.add(spinner1, 4, 2)
 
         if (pe.gpe is Turnout) {
-            grid.add(lblInv, 0, 3)
-            grid.add(cbInv, 1, 3)
+            // only turnout is "invertable"
+            grid.add(lblInv, 1, 3)
+            grid.add(cbInv, 2, 3)
         } else {
             grid.add(lblSecondaryAdr, 1, 3)
             grid.add(cbSec, 2, 3)
@@ -181,7 +170,6 @@ object AddressDialog {
 
         grid.add(lblRTRenumber, 1, 4)
         grid.add(cbRenumber, 2, 4)
-
 
         val col1 = ColumnConstraints()
         col1.percentWidth = 6.0
@@ -213,11 +201,15 @@ object AddressDialog {
         val newWindow = Stage()
 
         btnCancel.setOnAction {
-            resultA.addr = -1
+            resultA.addr = INVALID_INT
             newWindow.close()
         }
+
         btnSave.setOnAction {
             updateAddress(pe)
+            resultA.orient = choiceBoxOrient.selectionModel.selectedIndex
+            resultA.inv = cbInv.isSelected
+            resultA.reNumber = cbRenumber.isSelected
             newWindow.close()
         }
         newWindow.title = title
@@ -245,11 +237,11 @@ object AddressDialog {
                 + spinner1.value)
     }
 
-    private fun initSpinners() {
-        val in1000 = resultA.addr / 1000
-        val in100 = (resultA.addr - in1000 * 1000) / 100
-        val in10 = (resultA.addr - in1000 * 1000 - in100 * 100) / 10
-        val in1 = resultA.addr - in1000 * 1000 - in100 * 100 - in10 * 10
+    private fun initSpinners(genericA : GenericAddress) {
+        val in1000 = genericA.addr / 1000
+        val in100 = (genericA.addr - in1000 * 1000) / 100
+        val in10 = (genericA.addr - in1000 * 1000 - in100 * 100) / 10
+        val in1 = genericA.addr - in1000 * 1000 - in100 * 100 - in10 * 10
         spinner1000.valueFactory.value = in1000
         spinner100.valueFactory.value = in100
         spinner10.valueFactory.value = in10
@@ -292,16 +284,8 @@ object AddressDialog {
                 spinner1.valueFactory.value = 9
             }
         }
-        calcAddressFromSpinners()    // recalc after spinners may have been set
+        calcAddressFromSpinners()    // recalc after spinners may have been adjusted
 
-        // get "inv" result
-        if (cbInv.isSelected) {
-            resultA.inv = 1
-        } else {
-            resultA.inv = 0
-        }
-
-        resultA.reNumber = cbRenumber.isSelected
 
         // get secondary address, if cbSec is selected
         if (cbSec.isSelected) {
@@ -314,9 +298,6 @@ object AddressDialog {
             resultA.addr2 = INVALID_INT
         }
 
-        // get orientation index (0..7)
-        resultA.orient = choiceBoxOrient.selectionModel.selectedIndex
-        //println("cb.select=${choiceBoxOrient.selectionModel.selectedIndex} res.orient=${resultA.orient}")
     }
 
 }
