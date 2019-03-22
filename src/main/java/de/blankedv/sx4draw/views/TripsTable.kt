@@ -45,9 +45,10 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
     internal var tripsTableScene: Scene
     // New window (Stage)
     internal var tripsWindow: Stage
+    lateinit var pStage : Stage
 
     init {
-
+        pStage = primaryStage
         val bp = BorderPane()
         /* HBox hb = new HBox(15);
         Button btnClose = new Button("close");
@@ -84,12 +85,10 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
 
         btnAddTrip.setOnAction {
             generateNewTrip()
-
         }
 
         btnChangeLoco.setOnAction {
             changeLocoInTrips(primaryStage)
-
         }
 
         show()
@@ -97,7 +96,6 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
     }
 
     fun show() {
-
         createDataTables()
         tripsWindow.show()
     }
@@ -106,16 +104,17 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
         tripsWindow.close()
     }
 
-    private fun generateNewTrip(): Trip? {
-        val addr = Trip.getUnusedAddress()
-        if (routes.isNotEmpty()) {
-            val r0 = routes[0]
-            var newTrip = Trip(addr, r0.adr, r0.findSens1(), r0.findSens2(), "29,1,30", 1500)
-            trips.add(newTrip)
-            return newTrip
-        } else {
+    private fun generateNewTrip()  {
+
+        if (routes.isEmpty()) {
             Dialogs.buildErrorAlert("keine Fahrstraßen vorhanden", "", "bitte erst Fahrstraßen erzeugen!")
-            return null
+            return
+        } else if (locos.isEmpty()) {
+            Dialogs.buildErrorAlert("keine Loks/Züge vorhanden", "", "bitte erst Loks/Züge definieren!")
+            return
+        } else {
+            val newTrip = NewTripDialog.open(pStage)
+            if (newTrip.adr != INVALID_INT) trips.add(newTrip)
         }
     }
 

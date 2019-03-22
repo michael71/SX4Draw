@@ -358,6 +358,8 @@ open class SX4Draw : Application() {
             System.exit(0)
         }
 
+        status.text = getStatistics()
+
     }
 
     private fun addNewPanelElement(pe: PanelElement) {
@@ -587,6 +589,7 @@ open class SX4Draw : Application() {
         val openCompRoutesTable = MenuItem("Zusammenges. Fahrstraßen anzeigen")
         val openTripsTable = MenuItem("Fahrten anzeigen")
         val openTimetableTable = MenuItem("Fahrpläne anzeigen")
+        val openAllTables = MenuItem("alle Tabellen anzeigen")
 
         val menuOptions = Menu("Optionen")
         val setName = MenuItem("Set Panel-Name")
@@ -611,7 +614,8 @@ open class SX4Draw : Application() {
         val exitItem = MenuItem("Programm-Ende/Exit")
 
         menuFile.items.addAll(openItem, saveItem, exitItem)
-        menuWindows.items.addAll(openRoutingTable, openCompRoutesTable, openTripsTable, openTimetableTable, openLocoTable)
+        menuWindows.items.addAll(openRoutingTable, openCompRoutesTable, openTripsTable,
+                openTimetableTable, openLocoTable, SeparatorMenuItem(), openAllTables)
         menuOptions.items.addAll(setName, dispAddresses, rasterOn, zoomIn, zoomOut) //, showMousePos) //, showScrollBars)
         menuCalc.items.addAll(cTurnouts, cNormPositions, scale200, scale50)
         menuExtra.items.addAll(cSearch)
@@ -778,6 +782,44 @@ open class SX4Draw : Application() {
 
         openLocoTable.setOnAction {
             println("open locos table")
+            if (locosTable == null) {
+                locosTable = LocosTable(stage, this)
+            } else {
+                locosTable!!.show()
+            }
+        }
+
+        openCompRoutesTable.setOnAction {
+            println("open compRoutes table")
+            if (compRoutesTable == null) {
+                compRoutesTable = CompRoutesTable(stage, this)
+            } else {
+                compRoutesTable!!.show()
+            }
+        }
+
+        openAllTables.setOnAction {
+            println("open all tables")
+            if (routingTable == null) {
+                routingTable = RoutesTable(stage, this)
+            } else {
+                routingTable!!.show()
+            }
+            if (compRoutesTable == null) {
+                compRoutesTable = CompRoutesTable(stage, this)
+            } else {
+                compRoutesTable!!.show()
+            }
+            if (tripsTable == null) {
+                tripsTable = TripsTable(stage, this)
+            } else {
+                tripsTable!!.show()
+            }
+            if (timetableTable == null) {
+                timetableTable = TimetableTable(stage, this)
+            } else {
+                timetableTable!!.show()
+            }
             if (locosTable == null) {
                 locosTable = LocosTable(stage, this)
             } else {
@@ -1068,7 +1110,7 @@ open class SX4Draw : Application() {
                 currentRoute!!.btn2 = rtbtn.gpe.getAddr()
                 rtbtn.createShapeAndSetState(PEState.MARKED)
                 var crt = currentRoute
-                crt!!.uniqueAccessories()
+                crt!!.uniqueAccessories()  // remove double turnout addresses
                 showRoute(crt!!)
                 println("btn2 =" + crt.btn2)
                 routes.add(crt.copy())  // add a new route from btn1 to btn2
@@ -1077,7 +1119,7 @@ open class SX4Draw : Application() {
                 val alert = Alert(AlertType.INFORMATION)
                 alert.title = "Fahrstraße " + currentRoute!!.adr
                 alert.headerText = null
-                alert.contentText = "Die Fahrstraße \" + currentRoute!!.adr + \" ist abgeschlossen.\""
+                alert.contentText = "Die Fahrstraße " + currentRoute!!.adr +" ist abgeschlossen."
                 alert.showAndWait()
 
                 resetPEStates()
@@ -1416,11 +1458,12 @@ open class SX4Draw : Application() {
     }
 
     private fun getStatistics() : String {
-        var s = panelElements.size.toString() + " PEs "
-        s += routes.size.toString() + " Fahrtstr. "
-        s += compRoutes.size.toString() + " zus.g. Fahrstr. "
-        s += trips.size.toString() + " Fahrten "
-        s += timetables.size.toString() + " Fahrpläne "
+        var s = panelElements.size.toString() + " PEs  "
+        s += routes.size.toString() + " Fahrstr.  "
+        s += compRoutes.size.toString() + " zusFahrstr.  "
+        s += trips.size.toString() + " Fahrten  "
+        s += timetables.size.toString() + " Fahrpläne  "
+        s += locos.size.toString() + " Loks/Züge"
         return s
     }
 
@@ -1430,7 +1473,6 @@ open class SX4Draw : Application() {
         var panelElements = ArrayList<PanelElement>()
         var routes: ObservableList<Route> = FXCollections.observableArrayList<Route>()
         var compRoutes: ObservableList<CompRoute> = FXCollections.observableArrayList<CompRoute>()
-        //public static final ObservableList<Trip> trips = FXCollections.observableArrayList();
         var trips: ObservableList<Trip> = FXCollections.observableArrayList<Trip>()
         var timetables: ObservableList<Timetable> = FXCollections.observableArrayList<Timetable>()
 
@@ -1442,14 +1484,6 @@ open class SX4Draw : Application() {
         var start = IntPoint(0, 0)
 
         var isDisplayRouteButtons = false
-
-        /**
-         * @param args the command line arguments
-         */
-        //fun main(args: Array<String>) {
-        //    Application.launch(*args)
-        //}
-
 
     }
 }

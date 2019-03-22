@@ -65,7 +65,7 @@ object ChangeTrainDialog {
             return ChangeTrainDialogResult()
         }
 
-        Collections.sort(locoAddresses)
+        locoAddresses.sort()
 
         val locos1 = ChoiceBox(FXCollections.observableArrayList(
                 locoAddresses)
@@ -167,7 +167,7 @@ object ChangeTrainDialog {
         return result
     }
 
-    fun getSpeed(loco: Int): Int {
+    private fun getSpeed(loco: Int): Int {
         for (tr in SX4Draw.trips) {
             val pAS = getLocoAndSpeed(tr)
             if (pAS.key == loco) {
@@ -177,11 +177,8 @@ object ChangeTrainDialog {
         return 1
     }
 
-    fun update(loco: Int) {
 
-    }
-
-    fun getLocoAndSpeed(tr: Trip): Pair<Int, Int> {
+    private fun getLocoAndSpeed(tr: Trip): Pair<Int, Int> {
         // convert locoString string to int values for address, direction and speed
         val lData = tr.loco.split(",")
         if (lData.size < 2) {

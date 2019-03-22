@@ -241,17 +241,23 @@ class Route(
 
     fun uniqueAccessories() {
         // remove all "doubled sensors" BUT keep start sensor (sens1) and end sensor (sens2) at the same position !!!
-        var s2 = sensors.split(",")
-        if (s2.size >=3) {
-            val sens1 = s2[0]   // the start and end sensors must remain at the same position !!!
-            val sens2 = s2[s2.size-1]
-            val s2Mid = s2.slice(1 until s2.size-1).distinct().sorted()
-            sensors = sens1 + "," + s2Mid.joinToString(separator = ",") + "," + sens2
+        var sensArr = sensors.split(",")
+        if (sensArr.size >=3) {
+            val sens1 = sensArr[0]   // the start and end sensors must remain at the same position !!!
+            val sens2 = sensArr[sensArr.size-1]
+            val s2Mid = sensArr.slice(1 until sensArr.size-1).distinct().sorted()
+            sensors = sens1
+            for (s in s2Mid) {
+                if (!s.equals(sens1) && !s.equals(sens2)) {
+                    sensors += ",$s"
+                }
+            }
+            sensors += ",$sens2"
         }
         // remove all "doubled" turnouts and signals
-        var rt = route.split(";")
-        rt = rt.distinct().sorted()
-        route = rt.joinToString(separator = ";")
+        var rtArr = route.split(";")
+        rtArr = rtArr.distinct().sorted()
+        route = rtArr.joinToString(separator = ";")
     }
 
     fun setRouteStates() {

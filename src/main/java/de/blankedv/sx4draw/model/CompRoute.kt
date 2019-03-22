@@ -66,7 +66,7 @@ data class CompRoute (
         return CompRoute(adr+1, btn2, btn1, revRoutes)
     }
 
-    fun getStartSensor() : Int? {
+    fun getStartSensor() : Int {
         try {
             val allRoutes = routes.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
             if (allRoutes.size >= 2) {
@@ -80,10 +80,10 @@ data class CompRoute (
         } catch (e : Exception) {
 
         }
-        return null
+        return INVALID_INT
     }
 
-    fun getEndSensor() : Int? {
+    fun getEndSensor() : Int {
         try {
         val allRoutes = routes.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         if (allRoutes.size >= 2) {
@@ -97,7 +97,7 @@ data class CompRoute (
         } catch (e : Exception) {
 
         }
-        return null
+        return INVALID_INT
     }
 
     override fun compare(o1: CompRoute, o2: CompRoute): Int {

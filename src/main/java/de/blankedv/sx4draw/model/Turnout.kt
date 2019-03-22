@@ -147,26 +147,39 @@ class Turnout : GenericPE {
                 && touch.x <= x2 + PanelElement.TOUCH_RADIUS
                 && touch.y >= y2 - PanelElement.TOUCH_RADIUS
                 && touch.y <= y2 + PanelElement.TOUCH_RADIUS) {
-            Pair(true, 0)
-
+            Pair(true, checkInvert(0))
         } else if (touch.x >= xt - PanelElement.TOUCH_RADIUS // thrown, state1
-
                 && touch.x <= xt + PanelElement.TOUCH_RADIUS
                 && touch.y >= yt - PanelElement.TOUCH_RADIUS
                 && touch.y <= yt + PanelElement.TOUCH_RADIUS) {
-            Pair(true, 1)  // thrown state
+            Pair(true, checkInvert(1))  // thrown state
         } else if (touch.x >= x - PanelElement.TOUCH_RADIUS // near center
 
                 && touch.x <= x + PanelElement.TOUCH_RADIUS
                 && touch.y >= y - PanelElement.TOUCH_RADIUS
                 && touch.y <= y + PanelElement.TOUCH_RADIUS) {
-            Pair(true, 0)
+            Pair(true, checkInvert(0))
         } else {
             Pair(false, 0)
         }
 
     }
 
+    fun checkInvert(v : Int) : Int {
+        if (inv == null) {
+            return v
+        } else {  // invert state value
+            when (v) {
+                0 -> return 1
+                1 -> return 0
+                else -> {
+                    println("ERROR, state other than 0 or 1 for Turnout")
+                    return 0
+                }
+            }
+
+        }
+    }
     override fun translate (d : IntPoint) {
         x += d.x
         x2 += d.x
