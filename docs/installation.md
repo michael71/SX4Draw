@@ -1,9 +1,8 @@
 # Installation
 
 1. Java 8 auf dem PC / Raspberry PI installieren
-2. Download des Programms als Zip-File (zB „SX4Draw-0.7.zip“)
-3. Entzippen in ein Verzeichnis
-4. Starten des Programms
+2. Download des Programms („SX4Draw.jar“)
+3. Starten des Programms
    
 SX4Draw wird gestartet mit
 
