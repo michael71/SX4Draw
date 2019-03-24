@@ -1,6 +1,6 @@
 # Optionen Menü
 
-![](img21.png)
+![](img20.png)
 
 ## Zoom In / Zoom Out
 

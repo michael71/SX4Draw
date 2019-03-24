@@ -9,12 +9,11 @@ So sieht die Erstellung/Test einer Fahrstraße im SX4Draw-GUI aus:
 
 ![SX4 GUI](sx4draw-1.png)
 
-Currently in BETA state, please wait for a fully implemented and tested version (or contact me when you want to participate in testing).
-
 # USAGE
 
 Programmstart mit: 
-    java -jar SX4Draw.jar
+    java -jar SX4Draw-0.xy.jar
+(xy durch versionsnummer ersetzen ...)
 
 # Website
 
@@ -28,8 +27,21 @@ Programmstart mit:
 
 [Weichen](turnouts.md)
 
-...
-demnächst mehr 
+[SX-Adressen, virtuelle Adressen](addresses.md)
+
+[File Menü](file_menu.md)
+
+[Optionen Menü](options.md)
+
+[Fahrstraßen (Routing)](routes.md)
+
+[Fahrstraßen graphisch erstellen](create_routes.md)
+
+[Fahrten (Trips)](trips.md)
+
+[Fahrpläne](timetables.md)
+
+
 
 [als PDF]<https://michael71.github.io/SX4Draw/sx4draw-docu.pdf>
 
