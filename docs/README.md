@@ -23,6 +23,8 @@ Programmstart mit: java -jar SX4Draw.jar
 
 <https://michael71.github.io/SX4Draw/sx4draw-docu.pdf>
 
-## licence
+[page2](page2.md)
 
-GPL v3.0
+# Licence
+
+[GPL v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html)
