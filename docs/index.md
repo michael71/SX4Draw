@@ -23,8 +23,12 @@ Programmstart mit:
 # Handbuch
 
 [Installation](installation.md)
+
 [Start](draw_elements.md)
+
 [Weichen](turnouts.md)
+
+...
 demnächst mehr 
 
 [als PDF]<https://michael71.github.io/SX4Draw/sx4draw-docu.pdf>
