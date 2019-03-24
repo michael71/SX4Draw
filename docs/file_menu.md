@@ -26,6 +26,6 @@ Der „Nullpunkt“ von Panels kann automatisch nach 20,20 verschoben werden –
 
 
 
--> weiter zu [Optionen Menü](options_menu.md)
+-> weiter zu [Optionen Menü](options.md)
 
 -> zurück zum [Index](index.md)
