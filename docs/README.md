@@ -21,7 +21,7 @@ Programmstart mit: java -jar SX4Draw.jar
 
 # Handbuch
 
-<page2>
+<https://michael71.github.io/SX4Draw/sx4draw-docu.pdf>
 
 ## licence
 
