@@ -13,7 +13,8 @@ Currently in BETA state, please wait for a fully implemented and tested version 
 
 # USAGE
 
-Programmstart mit: java -jar SX4Draw.jar
+Programmstart mit: 
+    java -jar SX4Draw.jar
 
 # Website
 
@@ -21,7 +22,12 @@ Programmstart mit: java -jar SX4Draw.jar
 
 # Handbuch
 
-<https://michael71.github.io/SX4Draw/sx4draw-docu.pdf>
+[Installation](installation.md)
+[Start](draw_elements.md)
+[Weichen](turnouts.md)
+demnächst mehr 
+
+[als PDF]<https://michael71.github.io/SX4Draw/sx4draw-docu.pdf>
 
 [page2](page2.md)
 
