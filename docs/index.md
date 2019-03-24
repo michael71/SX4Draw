@@ -36,12 +36,6 @@ So sieht die Erstellung/Test einer Fahrstraße im SX4Draw-GUI aus:
 * [Fahrpläne](timetables.md)
 
 
-
-als PDF herunterladen: <https://michael71.github.io/SX4Draw/sx4draw-docu.pdf>
-
-
-
-
 # Licence
 
 [GPL v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html)
