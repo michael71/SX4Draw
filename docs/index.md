@@ -1,6 +1,6 @@
 # SX4Draw
 
-Zeichenprogramm, um XML Panel Definitionen für SX4 und Lanbahnpanel zu zeichnen.
+Zeichenprogramm, um XML Panel Definitionen für ein Selectrix Gleisbildstellwerk (SX4 und Lanbahnpanel) zu zeichnen.
 
 Aber: Das Programm ist KEIN Gleisbildstellpult, sondern rein für die XML-Erzeugung gedacht
 (für "LanbahnPanel"), die Ansicht von Signalen etc ist z.B. "rein schematisch" (in einer Farbe)
@@ -21,31 +21,32 @@ Programmstart mit:
 
 # Handbuch
 
-[Installation](installation.md)
+* [Installation](installation.md)
 
-[Start](draw_elements.md)
+* [Start](draw_elements.md)
 
-[Weichen](turnouts.md)
+* [Weichen](turnouts.md)
 
-[SX-Adressen, virtuelle Adressen](addresses.md)
+* [SX-Adressen, virtuelle Adressen](addresses.md)
 
-[File Menü](file_menu.md)
+* [File Menü](file_menu.md)
 
-[Optionen Menü](options.md)
+* [Optionen Menü](options.md)
 
-[Fahrstraßen (Routing)](routes.md)
+* [Fahrstraßen (Routing)](routes.md)
 
-[Fahrstraßen graphisch erstellen](create_routes.md)
+* [Fahrstraßen graphisch erstellen](create_routes.md)
 
-[Fahrten (Trips)](trips.md)
+* [Fahrten (Trips)](trips.md)
 
-[Fahrpläne](timetables.md)
+* [Fahrpläne](timetables.md)
 
 
 
-[als PDF]<https://michael71.github.io/SX4Draw/sx4draw-docu.pdf>
+als PDF herunterladen: <https://michael71.github.io/SX4Draw/sx4draw-docu.pdf>
 
-[page2](page2.md)
+
+
 
 # Licence
 
