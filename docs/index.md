@@ -1,9 +1,6 @@
 # SX4Draw
 
 Zeichenprogramm, um XML Panel Definitionen für SX4 und Lanbahnpanel zu zeichnen.
----
-# Feel free to add content and custom Front Matter to this file.
-# To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 
 Aber: Das Programm ist KEIN Gleisbildstellpult, sondern rein für die XML-Erzeugung gedacht
 (für "LanbahnPanel"), die Ansicht von Signalen etc ist z.B. "rein schematisch" (in einer Farbe)
@@ -41,6 +38,5 @@ demnächst mehr
 # Licence
 
 [GPL v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html)
-layout: home
----
+
 
