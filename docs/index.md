@@ -9,12 +9,6 @@ So sieht die Erstellung/Test einer Fahrstraße im SX4Draw-GUI aus:
 
 ![SX4 GUI](sx4draw-1.png)
 
-# USAGE
-
-Programmstart mit: 
-    java -jar SX4Draw-0.xy.jar
-(xy durch versionsnummer ersetzen ...)
-
 # Website
 
 <https://opensx.net/sx4>
