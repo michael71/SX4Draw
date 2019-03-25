@@ -44,8 +44,6 @@ import sun.net.www.ParseUtil.toURI
 import java.io.File
 
 
-
-
 /**
  * @author mblank
  */
@@ -72,7 +70,7 @@ object Dialogs {
         }
     }
 
-    fun buildInformationAlert(title: String, header: String, msg: String, app: Application, img : ImageView? = null) {
+    fun buildInformationAlert(title: String, header: String, msg: String, app: Application, img: ImageView? = null) {
         val alert = Alert(Alert.AlertType.INFORMATION)
         alert.contentText = msg
         alert.title = title
@@ -86,31 +84,16 @@ object Dialogs {
         alert.showAndWait()
     }
 
-    fun showManual(app: Application) {
-        /* val wvStage = Stage()
+    fun showManual(primStage: Stage, content : String) {
+        val wvStage = Stage()
         wvStage.initOwner(primStage)
 
-// Create the WebView
+        // Create the WebView
         val webView = WebView()
-
-        // Create the WebEngine
-        val webEngine = webView.engine
-
-        // LOad the Start-Page
-        webEngine.load("https://www.blank-bb.de/SX4Draw-docu.pdf")
-        //val f = File("/home/mblank/IdeaProjects/SX4Draw/SX4Draw-docu.pdf")
-        //webEngine.load(f.toURI().toString())
-
-        // Update the stage title when a new web page title is available
-        webEngine.loadWorker.stateProperty().addListener(object : ChangeListener<Worker.State> {
-
-            override fun changed(ov: ObservableValue<out Worker.State>, oldState: Worker.State, newState: Worker.State) {
-                if (newState === Worker.State.SUCCEEDED) {
-                    //stage.setTitle(webEngine.getLocation());
-                    wvStage.setTitle(webEngine.title)
-                }
-            }
-        })
+        val webEngine = webView.getEngine()
+//println(file.readText())
+        //val url = file.toURI().toURL()
+        webEngine.loadContent(content)
 
         // Create the VBox
         val root = VBox()
@@ -118,25 +101,26 @@ object Dialogs {
         root.children.add(webView)
 
         // Set the Style-properties of the VBox
-        root.style = "-fx-padding: 10;" +
+        /*root.style = "-fx-padding: 10;" +
                 "-fx-border-style: solid inside;" +
                 "-fx-border-width: 2;" +
                 "-fx-border-insets: 5;" +
                 "-fx-border-radius: 5;" +
-                "-fx-border-color: blue;"
+                "-fx-border-color: blue;" */
 
         // Create the Scene
-        val scene = Scene(root)
+        val scene = Scene(root, 1200.0, 700.0)
+        wvStage.setTitle("Handbuch SX4Draw")
         // Add  the Scene to the Stage
         wvStage.setScene(scene)
         // Display the Stage
-        wvStage.show() */
+        wvStage.show()
 
 
     }
 
 
-    fun buildErrorAlert(title : String, header : String, content: String) {
+    fun buildErrorAlert(title: String, header: String, content: String) {
         val alert = Alert(Alert.AlertType.ERROR)
         alert.title = title
         alert.headerText = header
@@ -144,7 +128,7 @@ object Dialogs {
         alert.showAndWait()
     }
 
-    fun confAlert(title : String, header : String, content: String) : Boolean {
+    fun confAlert(title: String, header: String, content: String): Boolean {
         val alert = Alert(Alert.AlertType.CONFIRMATION)
         alert.title = title
         alert.headerText = header
@@ -160,8 +144,8 @@ object Dialogs {
 
     fun checkAddress(oldValue: GenericAddress, newAddress: GenericAddress): Boolean {
         println("check new address = " + newAddress.addr)
-        if (( (newAddress.addr in 0..(SXMAX_USED*10+8) ) &&
-                        (newAddress.addr % 10 != 0) && (newAddress.addr % 10 != 9 ) )
+        if (((newAddress.addr in 0..(SXMAX_USED * 10 + 8)) &&
+                        (newAddress.addr % 10 != 0) && (newAddress.addr % 10 != 9))
                 || // =valid sx address
                 (newAddress.addr in LBMIN..LBMAX)) { // =valid lanbahn address
             // the address is valid

@@ -68,6 +68,7 @@ import de.blankedv.sx4draw.PanelElement.Companion.TRACK_WIDTH
 import de.blankedv.sx4draw.model.*
 import de.blankedv.sx4draw.util.Calc
 import javafx.collections.ObservableList
+import javafx.scene.web.WebView
 import kotlin.Exception
 
 
@@ -577,10 +578,8 @@ open class SX4Draw : Application() {
 
     private fun createMenu(prefs: Preferences, menuBar: MenuBar, stage: Stage) {
         // final ImageView ivSettings = new ImageView(new Image("/de/blankedv/sx4monitorfx/res/settings.png"));
-        val ivInfo = ImageView(Image("info.png"))
-        val ivInfo2 = ImageView(Image("info.png"))
-        val ivInfo3 = ImageView(Image("info.png"))
-        val ivSX4generic = ImageView(Image("sx4_draw_ico32.png"))
+        //val ivInfo = ImageView(Image("info.png"))
+        //val ivSX4generic = ImageView(Image("sx4_draw_ico32.png"))
         val howtoTimetable = ImageView(Image("howto-timetable.png"))
         val menuFile = Menu("File")
         val menuWindows = Menu("Fenster")
@@ -607,7 +606,7 @@ open class SX4Draw : Application() {
         val cSearch = MenuItem("Suche nach Adressen")
 
         val menuHelp = Menu("Hilfe")
-        val howtoTimetableItem = MenuItem("wie einen Fahrplan erstellen")
+        val howtoTimetableItem = MenuItem("Wie erstelle ich einen Fahrplan?")
 
         val saveItem = MenuItem("Panel abspeichern")
         val openItem = MenuItem("Panel öffnen")
@@ -835,7 +834,7 @@ open class SX4Draw : Application() {
                 compRoutesTable!!.show()
             }
         }
-        howtoTimetableItem.graphic = ivInfo
+
         howtoTimetableItem.setOnAction { event ->
             println("howto Timetable clicked")
             Dialogs.buildInformationAlert("Wie erstelle ich einen Fahrplan?", "",
@@ -844,20 +843,21 @@ open class SX4Draw : Application() {
         val infoItem = MenuItem("Version Info")
         val updateItem = MenuItem("Sind Updates verfügbar?")
 
-        infoItem.graphic = ivInfo2
         infoItem.setOnAction { event ->
             println("info clicked")
             Dialogs.buildInfoAlertOpenSX("Info", "SX4Draw\nhttps://opensx.net/sx4 ", "Programm Version:$progVersion", this)
         }
 
-        updateItem.graphic = ivSX4generic
         updateItem.setOnAction {
             Utils.checkVersion(application)
         }
 
-        val manualItem = MenuItem("Handbuch im Browser öffnen")
-        manualItem.graphic = ivInfo3
+        val manualItem = MenuItem("Handbuch")
         manualItem.setOnAction {
+            //val fileName = "index.html"
+            //val classLoader = SX4Draw::class.java.getClassLoader()
+           // val file = File(classLoader.getResource(fileName)!!.getFile())
+            //Dialogs.showManual(stage, file.readText())
             println("open manual")
             try {
                 hostServices.showDocument(DOCU_URL)
