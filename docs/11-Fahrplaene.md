@@ -7,6 +7,6 @@ Sie können im SX4 Programm einen Fahrplan (der im panel.xml File enthalten ist)
 
 
 
--> Weiter zu [xy](xy.md)
+-> Weiter zu [Select](12-Select.md)
 
 -> Zurück zum [Index](index.md)

@@ -13,6 +13,6 @@ Einen kompletten Zug ändern kann man in der Fahrten Tabelle mit „Zug ändern�
 
 
 
--> Weiter zu [Fahrpläne](timetables.md)
+-> Weiter zu [Fahrpläne](11-Fahrplaene.md)
 
 -> Zurück zum [Index](index.md)

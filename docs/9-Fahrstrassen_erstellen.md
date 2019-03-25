@@ -39,6 +39,6 @@ Hierzu wählt man im graphischen Editor „+ Zus. Fahrstraße“ aus und klickt 
 Zusammengesetzte Fahrstraßen, die aus mehr als 2 Einzelfahrstraßen bestehen, sind NICHT möglich.
 
 
--> weiter zu [Fahrten (Trips)](trips.md)
+-> weiter zu [Fahrten (Trips)](10-Fahrten.md)
 
 -> zurück zum [Index](index.md)

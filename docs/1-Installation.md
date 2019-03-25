@@ -11,6 +11,6 @@ SX4Draw wird gestartet mit
 Es öffnet sich eine leere Zeichenfläche, auf der ein Gleisplan gezeichnet werden kann:
 ![Gleisplan](img1.png)
 
--> Weiter mit dem [Zeichnen von Gleisen, Sensoren und Signalen](draw_elements.md)
+-> Weiter mit dem [Zeichnen von Gleisen, Sensoren und Signalen](2-Start_Zeichnen.md)
 
 -> Zurück zum [Index](index.md)

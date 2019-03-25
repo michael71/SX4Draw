@@ -1020,6 +1020,7 @@ open class SX4Draw : Application() {
             println("redrawPES() nPE=" + panelElements.size)
         }
         gc.clearRect(0.0, 0.0, RECT_X.toDouble(), RECT_Y.toDouble())
+
         if (rasterOn.isSelected) {
             drawRaster(gc)
         }
@@ -1448,7 +1449,6 @@ open class SX4Draw : Application() {
     }
 
     private fun drawAddresses(gc: GraphicsContext) {
-        gc.clearRect(0.0, 0.0, RECT_X.toDouble(), RECT_Y.toDouble())
         gc.lineWidth = 1.0
         gc.stroke = Color.BLUE
         gc.fill = Color.LIGHTBLUE

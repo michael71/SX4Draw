@@ -13,6 +13,6 @@ Rot=0 oder Grün=1 oder Gelb=2 oder pink=3 („pink“ kann zum Beispiel auf der
 ![](img12.png)
 
 
--> weiter zu [Fahrstraßen erstellen](create_routes.md)
+-> weiter zu [Fahrstraßen erstellen](9-Fahrstrassen_erstellen.md)
 
 -> zurück zum [Index](index.md)

@@ -11,6 +11,6 @@ Die erkannten Weichen werden in Orange markiert (diese Weichenerkennung kann man
 
 Doppelte Kreuzungsweichen und Kreuzungen werden dadurch unterschieden, dass die ersteren (=DKW) nur berechnet werden, wenn eines der beiden kreuzenden Gleise nicht durchgehend ist, sondern exakt am Kreuzungspunkt beendet und neu angefangen wird.
 
--> weiter zu [SX-Adressen, virtuelle Adressen](addresses.md)
+-> weiter zu [SX-Adressen, virtuelle Adressen](4-Adressen.md)
 
 -> zurück zum [Index](index.md)

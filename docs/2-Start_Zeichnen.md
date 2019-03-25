@@ -1,6 +1,6 @@
 #  Zeichnen von Gleisen, Sensoren und Signalen
 
-Mit den Buttons:
+Mit den *"+" Buttons* :
 
 ![](img2.png)
 
@@ -17,6 +17,6 @@ Ebenso können Signale hinzugefügt werden, es entsteht dann z.B.:
 Fahrstraßentasten (RT-Buttons)  werden benötigt, wenn man Fahrstraßen verwenden will – jeweils eine am Beginn und eine am Ende einer Fahrstraße.
 
 
--> Weiter zu [Weichen](turnouts.md)
+-> Weiter zu [Weichen](3-Weichen.md)
 
 -> Zurück zum [Index](index.md)
