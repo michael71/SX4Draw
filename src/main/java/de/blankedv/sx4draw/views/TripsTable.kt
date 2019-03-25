@@ -45,7 +45,7 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
     internal var tripsTableScene: Scene
     // New window (Stage)
     internal var tripsWindow: Stage
-    lateinit var pStage : Stage
+    lateinit var pStage: Stage
 
     init {
         pStage = primaryStage
@@ -104,7 +104,7 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
         tripsWindow.close()
     }
 
-    private fun generateNewTrip()  {
+    private fun generateNewTrip() {
 
         if (routes.isEmpty()) {
             Dialogs.buildErrorAlert("keine Fahrstraßen vorhanden", "", "bitte erst Fahrstraßen erzeugen!")
@@ -223,12 +223,17 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
 
         locoCol.setOnEditCommit { event: TableColumn.CellEditEvent<Trip, String> ->
             val pos = event.tablePosition
-            val newLocoVal = event.newValue
+            val newLocoVal = event.newValue.trim()
+            val oldVal = event.oldValue
             val row = pos.row
             val trip = event.tableView.items[row]
-            if (isValidLocoVal(newLocoVal)) {
-                trip.loco = newLocoVal
+            val newValidLocoString = validateLocoString(newLocoVal)
+            if (newValidLocoString.isNotEmpty()) {
+                trip.loco = newValidLocoString
+                locoCol.isVisible = false
+                locoCol.isVisible = true
             } else {
+                trip.loco = oldVal
                 locoCol.isVisible = false
                 locoCol.isVisible = true
             }
@@ -323,37 +328,67 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
 
     }
 
-    private fun isValidLocoVal(s: String): Boolean {
+    private fun validateLocoString(s: String): String {
         val spLoco = s.split(",")
+        var result = ""
 
         // check if we have 3 elements, 1. locoAddr, 2. dir, 3. speed
-        if (spLoco.size != 3) return false
+        if (spLoco.size != 3) return ""
+
+        //for (i in 0..2) {
+        //    println("spLoco[$i]=${spLoco[i]}-")
+        //}
 
         // check if loco address is valid
-        val locoAddr = spLoco[0].toInt()
-        var found = false
-        for (l in locos) {
-            if (locoAddr == l.adr) found = true
-        }
-        if (found == false) {
-            Dialogs.buildErrorAlert("loco string (Adr,Dir,V)", "", "Nicht erlaubt, die Lokadresse muss eine der Adressen aus der Loktabelle sein.")
-            return false
+        try {
+            val locoAddr = spLoco[0].toInt()
+            var found = false
+            for (l in locos) {
+                if (locoAddr == l.adr) found = true
+            }
+            if (found == false) {
+                Dialogs.buildErrorAlert("loco string (Adr,Dir,V)", "", "Nicht erlaubt, die Lokadresse muss eine der Adressen aus der Loktabelle sein.")
+                return ""
+            } else {
+                result = locoAddr.toString()
+            }
+        } catch (e: NumberFormatException) {
+            Dialogs.buildErrorAlert("loco string (Adr,Dir,V)", "", "Nicht erlaubt, die Fahrtrichtung muss 0 oder 1 sein.")
+            return ""
         }
 
+
         // check if dir is valid
-        if (!(spLoco[1].equals("0") or !spLoco[1].equals("1"))) {
+        try {
+            val locoDir = spLoco[1].trim().toInt()
+            if ((locoDir != 0) and (locoDir != 1)) {
+                //println("spLoco[1]=" + spLoco[1] + "-")
+                Dialogs.buildErrorAlert("loco string (Adr,Dir,V)", "", "Nicht erlaubt, die Fahrtrichtung muss 0 oder 1 sein.")
+                return ""
+            } else {
+                result += ","+locoDir
+            }
+        } catch (e: NumberFormatException) {
             Dialogs.buildErrorAlert("loco string (Adr,Dir,V)", "", "Nicht erlaubt, die Fahrtrichtung muss 0 oder 1 sein.")
-            return false
+            return ""
         }
 
         // check speed setting
-        if ((spLoco[2].toInt() <= 0) or (spLoco[2].toInt() > 31)) {
+        try {
+            val speed = spLoco[2].trim().toInt()
+            if ((speed <= 0) or (speed > 31)) {
+                Dialogs.buildErrorAlert("loco string (Adr,Dir,V)", "", "Nicht erlaubt, die Geschwindigkeitsstufe muss zwischen 1 und 31 liegen.")
+                return ""
+            } else {
+                result += ","+speed
+            }
+        } catch (e: NumberFormatException) {
             Dialogs.buildErrorAlert("loco string (Adr,Dir,V)", "", "Nicht erlaubt, die Geschwindigkeitsstufe muss zwischen 1 und 31 liegen.")
-
-            return false
+            return ""
         }
 
-        return true
+
+        return result
 
     }
 
