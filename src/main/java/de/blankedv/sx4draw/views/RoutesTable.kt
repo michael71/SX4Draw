@@ -39,37 +39,22 @@ import javafx.util.StringConverter
  */
 class RoutesTable internal constructor(primaryStage: Stage, private val app: SX4Draw) {
 
-
-
     private var routingTableScene: Scene
-    // New window (Stage)
+
     private var routingWindow: Stage
 
     init {
 
         val bp = BorderPane()
-        /* HBox hb = new HBox(15);
-        Button btnClose = new Button("close");
-        hb.getChildren().addAll(btnClose);
-        bp.setBottom(hb);
-        hb.setAlignment(Pos.CENTER);
-        BorderPane.setMargin(hb, new Insets(8, 8, 8, 8)); */
+
         routingTableScene = Scene(bp, 700.0, 300.0)
         bp.center = tableView
 
         // New window (Stage)
         routingWindow = Stage()
-        /* btnClose.setOnAction((e) -> {
-            //sxAddress.addr = -1;
-            locosWindow.close();
-        }); */
 
         routingWindow.title = "Fahrstraßen (Route) Tabelle"
         routingWindow.scene = routingTableScene
-
-        // Specifies the modality for new window.
-        //locosWindow.initModality(Modality.WINDOW_MODAL);
-        // Specifies the owner Window (parent) for new window
         routingWindow.initOwner(primaryStage)
 
         // Set position of second window, related to primary window.
@@ -90,8 +75,6 @@ class RoutesTable internal constructor(primaryStage: Stage, private val app: SX4
         routingWindow.close()
     }
 
-
-
     private fun createDataTables() {
 
         val idCol = TableColumn<Route, Int>("ID")
@@ -105,14 +88,7 @@ class RoutesTable internal constructor(primaryStage: Stage, private val app: SX4
         val sensorsCol = TableColumn<Route, String>("Sensoren")
         sensorsCol.prefWidthProperty().bind(RoutesTable.tableView.widthProperty().multiply(0.15));
 
-
-
-        /* final TextFormatter<String> formatter = new TextFormatter<String>(change -> {
-            change.setText(change.getText().replaceAll("[^0-9.,]", ""));
-            return change;
-
-        }); */
-        val myStringIntConverter = object : StringConverter<Int>() {
+        /* val myStringIntConverter = object : StringConverter<Int>() {
             override fun toString(`object`: Int?): String {
                 return if (`object` == null) {
                     "-"
@@ -127,12 +103,12 @@ class RoutesTable internal constructor(primaryStage: Stage, private val app: SX4
                 }
 
             }
-        }
+        } */
 
         tableView.columns.setAll(idCol, btn1Col, btn2Col, routeCol, sensorsCol)
         tableView.isEditable = true
-        //idCol.setCellFactory(TextFieldTableCell.forTableColumn());
-        /*idCol.setCellFactory(TextFieldTableCell.forTableColumn(myStringIntConverter));
+        /*idCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        idCol.setCellFactory(TextFieldTableCell.forTableColumn(myStringIntConverter));
         idCol.setOnEditCommit(new EventHandler<CellEditEvent<Route, Integer>>() {
             @Override
             public void handle(CellEditEvent<Route, Integer> ev) {
@@ -145,11 +121,6 @@ class RoutesTable internal constructor(primaryStage: Stage, private val app: SX4
         routeCol.setOnEditCommit { ev -> (ev.tableView.items[ev.tablePosition.row] as Route).route = ev.newValue }
         sensorsCol.setCellFactory(TextFieldTableCell.forTableColumn())
         sensorsCol.setOnEditCommit { ev -> (ev.tableView.items[ev.tablePosition.row] as Route).sensors = ev.newValue }
-        /*      tableViewData[i].setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-            chanCol.setMaxWidth(1f * Integer.MAX_VALUE * 18); // 30% width
-            chanCol.setStyle("-fx-alignment: CENTER;");
-            dataCol.setMaxWidth(1f * Integer.MAX_VALUE * 18); // 70% width
-            dataCol.setStyle("-fx-alignment: CENTER;"); */
         tableView.isCenterShape = true
         tableView.setRowFactory { tableView ->
             val row = TableRow<Route>()
@@ -178,27 +149,6 @@ class RoutesTable internal constructor(primaryStage: Stage, private val app: SX4
             )
             row
         }
-        /*   tableView.setRowFactory(new Callback<TableView<RouteData>, TableRow<RouteData>>() {
-                @Override
-                public TableRow<RouteData> call(TableView<RouteData> tableView) {
-                    final TableRow<RouteData> row = new TableRow<RouteData>() {
-                        @Override
-                        protected void updateItem(Route sxv, boolean empty) {
-                            super.updateItem(sxv, empty);
-                            if (!empty) {
-                                if (sxv.isMarked()) {
-                                    setStyle("-fx-background-color: yellow;");
-                                } else {
-                                    setStyle("");
-                                }
-                            } else {
-                                setStyle("");
-                            }
-                        }
-                    };
-                    return row;
-                }
-            }); */
 
         idCol.cellValueFactory = PropertyValueFactory("adr")
         btn1Col.cellValueFactory = PropertyValueFactory("btn1")
@@ -208,7 +158,6 @@ class RoutesTable internal constructor(primaryStage: Stage, private val app: SX4
 
         tableView.items = routes
 
-        // textField.setTextFormatter(formatter);
         Utils.customResize(tableView)
 
     }

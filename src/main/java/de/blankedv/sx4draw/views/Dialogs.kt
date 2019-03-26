@@ -84,39 +84,21 @@ object Dialogs {
         alert.showAndWait()
     }
 
-    fun showManual(primStage: Stage, content : String) {
+    fun showManual(primStage: Stage) {
         val wvStage = Stage()
         wvStage.initOwner(primStage)
 
-        // Create the WebView
-        val webView = WebView()
-        val webEngine = webView.getEngine()
-//println(file.readText())
-        //val url = file.toURI().toURL()
-        webEngine.loadContent(content)
+        val mWebView = WebView()
+        val webEngine = mWebView.getEngine()
+        webEngine.load(javaClass.getResource("/docs/index.html").toExternalForm())
 
-        // Create the VBox
-        val root = VBox()
-        // Add the WebView to the VBox
-        root.children.add(webView)
-
-        // Set the Style-properties of the VBox
-        /*root.style = "-fx-padding: 10;" +
-                "-fx-border-style: solid inside;" +
-                "-fx-border-width: 2;" +
-                "-fx-border-insets: 5;" +
-                "-fx-border-radius: 5;" +
-                "-fx-border-color: blue;" */
-
-        // Create the Scene
-        val scene = Scene(root, 1200.0, 700.0)
+        val scene = Scene(mWebView /*root*/, 1200.0, 700.0)
         wvStage.setTitle("Handbuch SX4Draw")
+
         // Add  the Scene to the Stage
         wvStage.setScene(scene)
         // Display the Stage
         wvStage.show()
-
-
     }
 
 

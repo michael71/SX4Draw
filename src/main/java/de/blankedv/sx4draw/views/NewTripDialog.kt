@@ -156,10 +156,10 @@ object NewTripDialog {
         val secondScene = Scene(grid, 400.0, 200.0)
         // New window (Stage)
         val newWindow = Stage()
-        btnCancel.setOnAction { e ->
+        btnCancel.setOnAction {
               newWindow.close()
         }
-        btnSave.setOnAction { e ->
+        btnSave.setOnAction {
             val locoAddr = cbLoco.selectionModel.selectedItem
             val speed = cbSpeed.value
             val dir = cbDir.value

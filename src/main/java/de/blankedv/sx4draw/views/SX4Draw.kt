@@ -56,7 +56,6 @@ import java.util.prefs.Preferences
 
 import de.blankedv.sx4draw.Constants.INVALID_INT
 import de.blankedv.sx4draw.Constants.DEBUG
-import de.blankedv.sx4draw.Constants.DOCU_URL
 import de.blankedv.sx4draw.Constants.RASTER
 import de.blankedv.sx4draw.Constants.RECT_X
 import de.blankedv.sx4draw.Constants.RECT_Y
@@ -835,7 +834,7 @@ open class SX4Draw : Application() {
             }
         }
 
-        howtoTimetableItem.setOnAction { event ->
+        howtoTimetableItem.setOnAction {
             println("howto Timetable clicked")
             Dialogs.buildInformationAlert("Wie erstelle ich einen Fahrplan?", "",
                     "", this, howtoTimetable)
@@ -843,7 +842,7 @@ open class SX4Draw : Application() {
         val infoItem = MenuItem("Version Info")
         val updateItem = MenuItem("Sind Updates verfügbar?")
 
-        infoItem.setOnAction { event ->
+        infoItem.setOnAction {
             println("info clicked")
             Dialogs.buildInfoAlertOpenSX("Info", "SX4Draw\nhttps://opensx.net/sx4 ", "Programm Version:$progVersion", this)
         }
@@ -857,13 +856,13 @@ open class SX4Draw : Application() {
             //val fileName = "index.html"
             //val classLoader = SX4Draw::class.java.getClassLoader()
            // val file = File(classLoader.getResource(fileName)!!.getFile())
-            //Dialogs.showManual(stage, file.readText())
+            Dialogs.showManual(stage)
             println("open manual")
-            try {
+           /* try {
                 hostServices.showDocument(DOCU_URL)
             } catch (e: Exception) {
                 println(e.message)
-            }
+            } */
         }
 
         menuHelp.items.addAll(howtoTimetableItem, manualItem, SeparatorMenuItem(),infoItem, updateItem)
@@ -1112,7 +1111,7 @@ open class SX4Draw : Application() {
                 rtbtn.createShapeAndSetState(PEState.MARKED)
                 var crt = currentRoute
                 crt!!.uniqueAccessories()  // remove double turnout addresses
-                showRoute(crt!!)
+                showRoute(crt)
                 println("btn2 =" + crt.btn2)
                 routes.add(crt.copy())  // add a new route from btn1 to btn2
                 routes.add(crt.reverseRoute())  // add reverse route also

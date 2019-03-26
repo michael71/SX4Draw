@@ -7,20 +7,19 @@ Zeichenprogramm, um XML Panel Definitionen für SX4 und Lanbahnpanel zu zeichnen
 
 So sieht die Erstellung/Test einer Fahrstraße im SX4Draw-GUI aus:
 
+# Handbuch
+
+https://michael71.github.io/SX4Draw
+
 <img src="https://opensx.net/wordpress/wp-content/uploads/2019/02/sx4draw-1.png" />
 
-Currently in BETA state, please wait for a fully implemented and tested version (or contact me when you want to participate in testing).
-
-# USAGE
-
-Programmstart mit:    java -jar SX4Draw.jar 
-
+# SX4 Webseite
 
 https://opensx.net/sx4
 
-## licence
+# Licence
 
-GPL v3.0
+[GPL v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
 
 

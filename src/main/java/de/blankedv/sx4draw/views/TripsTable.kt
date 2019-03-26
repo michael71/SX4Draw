@@ -21,6 +21,7 @@ import de.blankedv.sx4draw.Constants.INVALID_INT
 import de.blankedv.sx4draw.model.CompRoute
 import de.blankedv.sx4draw.model.Route
 import de.blankedv.sx4draw.model.Trip
+import de.blankedv.sx4draw.util.Utils
 import de.blankedv.sx4draw.views.SX4Draw.Companion.locos
 import de.blankedv.sx4draw.views.SX4Draw.Companion.routes
 import de.blankedv.sx4draw.views.SX4Draw.Companion.trips
@@ -42,20 +43,15 @@ import javafx.util.StringConverter
  */
 class TripsTable internal constructor(primaryStage: Stage, private val app: SX4Draw) {
 
-    internal var tripsTableScene: Scene
+    private var tripsTableScene: Scene
     // New window (Stage)
-    internal var tripsWindow: Stage
-    lateinit var pStage: Stage
+    private var tripsWindow: Stage
+    private var pStage: Stage
 
     init {
         pStage = primaryStage
         val bp = BorderPane()
-        /* HBox hb = new HBox(15);
-        Button btnClose = new Button("close");
-        hb.getChildren().addAll(btnClose);
-        bp.setBottom(hb);
-        hb.setAlignment(Pos.CENTER);
-        BorderPane.setMargin(hb, new Insets(8, 8, 8, 8)); */
+
         val btnAddTrip = Button("+ NEUE Fahrt");
         val btnChangeLoco = Button("Zug ändern")
         tripsTableScene = Scene(bp, 720.0, 300.0)
@@ -66,17 +62,9 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
 
         // New window (Stage)
         tripsWindow = Stage()
-        /* btnClose.setOnAction((e) -> {
-            //sxAddress.addr = -1;
-            locosWindow.close();
-        }); */
 
         tripsWindow.title = "Fahrten (Trips) Tabelle"
         tripsWindow.scene = tripsTableScene
-
-        // Specifies the modality for new window.
-        //locosWindow.initModality(Modality.WINDOW_MODAL);
-        // Specifies the owner Window (parent) for new window
         tripsWindow.initOwner(primaryStage)
 
         // Set position of second window, related to primary window.
@@ -156,12 +144,6 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
         locoCol.prefWidthProperty().bind(tableView.widthProperty().multiply(0.25));
         //   <trip adr="3100" route="2300" sens1="924" sens2="902" loco="29,1,126" stopdelay="1500" />
 
-
-        /* final TextFormatter<String> formatter = new TextFormatter<String>(change -> {
-            change.setText(change.getText().replaceAll("[^0-9.,]", ""));
-            return change;
-
-        }); */
         val myStringIntConverter = object : StringConverter<Int>() {
             override fun toString(`object`: Int?): String {
                 return if (`object` == null) {
@@ -208,8 +190,8 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
                 }
             } else if (newCompRoute != null) {
                 trip.route = newRouteAdr  // new compRouteAddress
-                trip.sens1 = newCompRoute.getStartSensor() ?: INVALID_INT
-                trip.sens2 = newCompRoute.getEndSensor() ?: INVALID_INT
+                trip.sens1 = newCompRoute.getStartSensor()
+                trip.sens2 = newCompRoute.getEndSensor()
             } else {
                 // NO CHANGE
                 trip.sens1 = INVALID_INT
@@ -275,15 +257,6 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
             }
         }
 
-        //adrCol.setOnEditCommit( { ev -> (ev.tableView.items[ev.tablePosition.row] as Integer).adr = ev.newValue }
-
-        /*massCol.setCellFactory(TextFieldTableCell.forTableColumn())
-        massCol.setOnEditCommit { ev -> (ev.tableView.items[ev.tablePosition.row] as Integer).mass = ev.newValue }
-
-        vmaxCol.setCellFactory(TextFieldTableCell.forTableColumn())
-        vmaxCol.setOnEditCommit { ev -> (ev.tableView.items[ev.tablePosition.row] as Integer).vmax = ev.newValue } */
-
-
         tableView.isCenterShape = true
         tableView.setRowFactory { tv ->
             val row = TableRow<Trip>()
@@ -323,14 +296,13 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
 
         println("tripsTable " + tableView.items.size + " trips")
 
-        // textField.setTextFormatter(formatter);
-        // Utils.customResize(tableView)
+        Utils.customResize(tableView)
 
     }
 
     private fun validateLocoString(s: String): String {
         val spLoco = s.split(",")
-        var result = ""
+        var result : String
 
         // check if we have 3 elements, 1. locoAddr, 2. dir, 3. speed
         if (spLoco.size != 3) return ""

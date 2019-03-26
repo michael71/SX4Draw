@@ -26,7 +26,6 @@ object Constants {
     const val versionNumber = 0.56
     private const val versionDate = "25 Mar 2019"
     const val progVersion = "$versionNumber - $versionDate"
-    const val DOCU_URL = "https://michael71.github.io/SX4Draw/"
 
     const val SXMIN_USED = 11
     const val SXMAX_USED = 1068 // max sx address used (106, bit 8)
