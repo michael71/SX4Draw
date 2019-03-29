@@ -205,7 +205,7 @@ class TripsTable internal constructor(primaryStage: Stage, private val app: SX4D
 
         locoCol.setOnEditCommit { event: TableColumn.CellEditEvent<Trip, String> ->
             val pos = event.tablePosition
-            val newLocoVal = event.newValue.trim()
+            val newLocoVal = event.newValue.replace("\\s".toRegex(), "")   // remove whitespace
             val oldVal = event.oldValue
             val row = pos.row
             val trip = event.tableView.items[row]

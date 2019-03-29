@@ -122,10 +122,27 @@ class TimetableTable internal constructor(primaryStage: Stage, private val app: 
 
         tripCol.setOnEditCommit { event: TableColumn.CellEditEvent<Timetable, String> ->
             val pos = event.tablePosition
-            val newTrips = event.newValue
+            val newTrips = event.newValue.replace("\\s".toRegex(), "")   // remove whitespace
+            val oldTrips = event.oldValue
             val row = pos.row
             val timetable = event.tableView.items[row]
-            timetable.trip = newTrips
+            val validNewTrips = validateTripsString(newTrips)
+            if (validNewTrips.isNotEmpty()) {
+                timetable.trip = validNewTrips
+                if (!newTrips.equals(validNewTrips)) {
+                    Dialogs.buildErrorAlert("Fahrpläne", "",
+                            "Für die Fahrten Liste dürfen nur existierende Fahrten ausgewählt werden.")
+
+                }
+            } else {
+                Dialogs.buildErrorAlert("Fahrpläne", "",
+                        "Fahrten Liste nicht möglich, es dürfen nur existierende Fahrten ausgewählt werden.")
+                timetable.trip = oldTrips
+
+            }
+            tripCol.isVisible = false
+            tripCol.isVisible = true
+
         }
 
         nextCol.setOnEditCommit { event: TableColumn.CellEditEvent<Timetable, Int> ->
@@ -190,6 +207,38 @@ class TimetableTable internal constructor(primaryStage: Stage, private val app: 
         // textField.setTextFormatter(formatter);
         Utils.customResize(tableView)
 
+    }
+
+    private fun validateTripsString(tripStr : String) : String {
+        val tripArray = tripStr.split(",")
+        var result = ""
+        for (trAdrStr in tripArray) {
+            var trAdr = 0
+            try {
+                trAdr = trAdrStr.toInt()
+            } catch (e : NumberFormatException) {
+                // irregular address of trip
+                return result
+            }
+            var found = false
+            // check if this address is a trip address
+            for (trip in trips) {
+                if (trip.adr == trAdr) {
+                    found = true
+                    // found this trip
+                    if (result.isEmpty()) {
+                        result = trip.adr.toString()
+                    } else {
+                        result += "," + trip.adr.toString()
+                    }
+                    break
+                }
+            }
+            if (!found) {
+                return result
+            }
+        }
+        return result  // every single trip is valid
     }
 
     //private fun editLoco(a : Int, st : Stage) {

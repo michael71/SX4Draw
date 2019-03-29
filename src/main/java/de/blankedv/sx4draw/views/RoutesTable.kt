@@ -77,7 +77,7 @@ class RoutesTable internal constructor(primaryStage: Stage, private val app: SX4
 
     private fun createDataTables() {
 
-        val idCol = TableColumn<Route, Int>("ID")
+        val idCol = TableColumn<Route, Int>("Adr (ID)")
         idCol.prefWidthProperty().bind(RoutesTable.tableView.widthProperty().multiply(0.1));
         val btn1Col = TableColumn<Route, Int>("Start")
         btn1Col.prefWidthProperty().bind(RoutesTable.tableView.widthProperty().multiply(0.1));
