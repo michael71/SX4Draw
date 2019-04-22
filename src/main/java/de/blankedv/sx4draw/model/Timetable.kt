@@ -46,7 +46,7 @@ class Timetable(
         var trip: String = "",   // is mandatory
 
         @get:XmlAttribute
-        var next: Int = 0) : Comparator<Timetable>, Comparable<Timetable> {
+        var name: String = "" ) : Comparator<Timetable>, Comparable<Timetable> {
 
     init {
         autoAddress()
@@ -86,8 +86,8 @@ class Timetable(
                     tt.adr = Integer.parseInt(theAttribute.nodeValue)
                 } else if (theAttribute.nodeName == "trip") {
                     tt.trip = theAttribute.nodeValue
-                } else if (theAttribute.nodeName == "next") {
-                    tt.next = Integer.parseInt(theAttribute.nodeValue)
+                } else if (theAttribute.nodeName == "name") {
+                    tt.name = theAttribute.nodeValue
                 }
             }
             if (tt.adr != INVALID_INT) {
@@ -95,14 +95,6 @@ class Timetable(
             }
 
         }
-
-        /* no longer used.
-        fun addressInTripChanged(oAdr: String, nAdr: String) {
-            for (tt in SX4Draw.timetables) {
-                tt.trip = tt.trip.replace(oAdr, nAdr)
-            }
-            RoutesTable.refresh()
-        }  */
 
     }
 }

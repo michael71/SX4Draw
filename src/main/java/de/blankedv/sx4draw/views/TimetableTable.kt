@@ -88,13 +88,13 @@ class TimetableTable internal constructor(primaryStage: Stage, private val app: 
     }
 
     private fun createDataTables() {
-        //    <timetable adr="3300" time="0,20,40" trip="3100,3101,0" next=""/>
+        //    <timetable adr="3300" time="0,20,40" trip="3100,3101,0" name="Waldbahn(18)"/>
         val adrCol = TableColumn<Timetable, Int>("Adr (ID)")
         adrCol.prefWidthProperty().bind(TimetableTable.tableView.widthProperty().multiply(0.1));
         val tripCol = TableColumn<Timetable, String>("Fahrten")
-        tripCol.prefWidthProperty().bind(TimetableTable.tableView.widthProperty().multiply(0.7));
-        val nextCol = TableColumn<Timetable, Int>("nächster Fahrplan")
-        nextCol.prefWidthProperty().bind(TimetableTable.tableView.widthProperty().multiply(0.2));
+        tripCol.prefWidthProperty().bind(TimetableTable.tableView.widthProperty().multiply(0.6));
+        val nameCol = TableColumn<Timetable, String>("Name/Kommentar")
+        nameCol.prefWidthProperty().bind(TimetableTable.tableView.widthProperty().multiply(0.3));
 
         val myStringIntConverter = object : StringConverter<Int>() {
             override fun toString(`object`: Int?): String {
@@ -113,12 +113,12 @@ class TimetableTable internal constructor(primaryStage: Stage, private val app: 
             }
         }
 
-        tableView.columns.setAll(adrCol, tripCol, nextCol)
+        tableView.columns.setAll(adrCol, tripCol, nameCol)
         tableView.isEditable = true
 
         tripCol.cellFactory = TextFieldTableCell.forTableColumn();
         adrCol.cellFactory = TextFieldTableCell.forTableColumn(myStringIntConverter);
-        nextCol.cellFactory = TextFieldTableCell.forTableColumn(myStringIntConverter);
+        nameCol.cellFactory = TextFieldTableCell.forTableColumn();
 
         tripCol.setOnEditCommit { event: TableColumn.CellEditEvent<Timetable, String> ->
             val pos = event.tablePosition
@@ -145,46 +145,30 @@ class TimetableTable internal constructor(primaryStage: Stage, private val app: 
 
         }
 
-        nextCol.setOnEditCommit { event: TableColumn.CellEditEvent<Timetable, Int> ->
+        nameCol.setOnEditCommit { event: TableColumn.CellEditEvent<Timetable, String> ->
             val pos = event.tablePosition
-            val newNext = event.newValue
             val row = pos.row
             val timetable = event.tableView.items[row]
-            if (newNext != null) {
-                var found = false
-                for (tt in timetables) {
-                    if (newNext == tt.adr) found = true
-                }
-                if (found or (newNext == 0) or (newNext == INVALID_INT)) {
-                    timetable.next = newNext
-                    return@setOnEditCommit
-                }
-            }
-            // this is a workaround for a bug in javafx, value not repainted
-            Dialogs.buildErrorAlert("Fahrpläne", "",
-                    "Nicht erlaubt, es muss eine existierende Fahrplannummer oder 0 gewählt werden.")
-            nextCol.isVisible = false
-            nextCol.isVisible = true
-        }
+            timetable.name = event.newValue
+            //nameCol.isVisible = false
+            //nameCol.isVisible = true
 
+        }
 
         tableView.isCenterShape = true
         tableView.setRowFactory { tableView ->
             val row = TableRow<Timetable>()
             val contextMenu = ContextMenu()
-            val removeMenuItem = MenuItem("Fahrt löschen")
+            val removeMenuItem = MenuItem("Fahrplan löschen")
             removeMenuItem.onAction = EventHandler {
                 tableView.items.remove(row.item)
             }
-            val newMenuItem = MenuItem("+ NEUE Fahrt")
+            val newMenuItem = MenuItem("+ NEUER Fahrplan")
             newMenuItem.onAction = EventHandler {
                 timetables.add(Timetable(INVALID_INT))
             }
-            /*val hideMenuItem = MenuItem("Fahrstraßen nicht mehr anzeigen")
-            hideMenuItem.onAction = EventHandler {
-                app.hideAllRoutes()
-            } */
-            contextMenu.items.addAll(newMenuItem, /* hideMenuItem, */ removeMenuItem)
+
+            contextMenu.items.addAll(newMenuItem, removeMenuItem)
             // Set context menu on row, but use a binding to make it only show for non-empty rows:
             row.contextMenuProperty().bind(
                     Bindings.`when`(row.emptyProperty())
@@ -196,7 +180,7 @@ class TimetableTable internal constructor(primaryStage: Stage, private val app: 
 
         adrCol.cellValueFactory = PropertyValueFactory("adr")
         tripCol.cellValueFactory = PropertyValueFactory("trip")
-        nextCol.cellValueFactory = PropertyValueFactory("next")
+        nameCol.cellValueFactory = PropertyValueFactory("name")
 
 
 

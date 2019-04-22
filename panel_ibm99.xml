@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<layout-config filename="panel_ibm99.xml" version="20190322_153305">
+<layout-config filename="panel_ibm99.xml" version="20190329_074132">
     <panels>
         <panel name="IBM2019/3">
             <locos>
@@ -382,6 +382,8 @@
             </comproutes>
             <trips>
                 <trip adr="5000" loco="29,1,30" route="4301" sens1="992" sens2="885" startdelay="0" stopdelay="1500"/>
+                <trip adr="5001" loco="8,0,31" route="4311" sens1="896" sens2="1001" startdelay="1000" stopdelay="1000"/>
+                <trip adr="5002" loco="8,0,31" route="4312" sens1="1001" sens2="896" startdelay="1000" stopdelay="1000"/>
             </trips>
             <timetables>
                 <timetable adr="5500" next="-1" trip=""/>
