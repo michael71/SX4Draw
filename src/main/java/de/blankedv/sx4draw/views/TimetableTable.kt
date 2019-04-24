@@ -159,16 +159,23 @@ class TimetableTable internal constructor(primaryStage: Stage, private val app: 
         tableView.setRowFactory { tableView ->
             val row = TableRow<Timetable>()
             val contextMenu = ContextMenu()
-            val removeMenuItem = MenuItem("Fahrplan löschen")
-            removeMenuItem.onAction = EventHandler {
-                tableView.items.remove(row.item)
-            }
+
             val newMenuItem = MenuItem("+ NEUER Fahrplan")
             newMenuItem.onAction = EventHandler {
                 timetables.add(Timetable(INVALID_INT))
             }
 
-            contextMenu.items.addAll(newMenuItem, removeMenuItem)
+            val removeMenuItem = MenuItem("markierten Fahrplan löschen")
+            removeMenuItem.onAction = EventHandler {
+                tableView.items.remove(row.item)
+            }
+
+            val copyMenuItem = MenuItem("markierten Fahrplan kopieren")
+            copyMenuItem.onAction = EventHandler {
+                timetables.add(row.item.copy())
+            }
+
+            contextMenu.items.addAll(newMenuItem, removeMenuItem, copyMenuItem)
             // Set context menu on row, but use a binding to make it only show for non-empty rows:
             row.contextMenuProperty().bind(
                     Bindings.`when`(row.emptyProperty())

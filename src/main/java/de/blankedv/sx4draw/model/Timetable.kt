@@ -52,6 +52,13 @@ class Timetable(
         autoAddress()
     }
 
+    fun copy() : Timetable {
+        val t = Timetable();
+        t.trip = trip
+        t.name = name
+        return t
+    }
+
     private fun autoAddress() {
         if (adr != INVALID_INT) return
 
