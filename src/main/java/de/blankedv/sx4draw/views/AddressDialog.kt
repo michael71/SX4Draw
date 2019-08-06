@@ -59,7 +59,7 @@ object AddressDialog {
     private val spinner1 = Spinner<Int>(0, 9, 0)
 
     private val cbInv = CheckBox()
-    private val lblSecondaryAdr = Label(" 2.Adr?")
+    private var lblSecondaryAdr = Label(" 2.Adr?")
     private val cbSec = CheckBox()
     private val cbRenumber = CheckBox()
     private val lblInv = Label(" invertiert")
@@ -79,7 +79,7 @@ object AddressDialog {
 
     fun open(pe: PanelElement, primaryStage: Stage, genA: GenericAddress): GenericAddress {
 
-        resultA = GenericAddress(genA.addr, genA.addr2 )
+        resultA = GenericAddress(genA.addr, genA.addr2)
         initSpinners(genA)
 
         if (resultA.addr < LBMIN) {
@@ -93,9 +93,14 @@ object AddressDialog {
         cbRenumber.isSelected = false
 
         val title = ("Adresse des " + pe.gpe::class.simpleName
-                + "s an Position= " + pe.gpe.x + "," + pe.gpe.y+ " ?")
+                + "s an Position= " + pe.gpe.x + "," + pe.gpe.y + " ?")
 
         choiceBoxOrient.selectionModel.select(0)
+
+        when (pe.gpe) {
+            is Signal -> lblSecondaryAdr = Label(" 2Bit?")
+            is Sensor -> lblSecondaryAdr = Label(" 2.Adr?")
+        }
 
         // hide or show type dependent checkboxes
         when (pe.gpe) {
@@ -237,7 +242,7 @@ object AddressDialog {
                 + spinner1.value)
     }
 
-    private fun initSpinners(genericA : GenericAddress) {
+    private fun initSpinners(genericA: GenericAddress) {
         val in1000 = genericA.addr / 1000
         val in100 = (genericA.addr - in1000 * 1000) / 100
         val in10 = (genericA.addr - in1000 * 1000 - in100 * 100) / 10

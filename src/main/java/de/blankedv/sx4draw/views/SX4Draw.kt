@@ -1330,15 +1330,20 @@ open class SX4Draw : Application() {
         }
     }
 
+    // mark end route button with a "2" and display route adr below
     private fun dispRouteEndButtons(rtBtn : RouteButton) {
         gc.strokeText("1", (rtBtn.x - 4).toDouble(), (rtBtn.y + 4).toDouble())
         for (rt in routes.filter{ it -> it.btn1 == rtBtn.adr}) {
             val bt2 = PanelElement.getPeByAddress(rt.btn2)[0]
             gc.strokeText("2", (bt2.gpe.x - 4).toDouble(), (bt2.gpe.y + 4).toDouble())
+            //gc.fillRect((bt2.gpe.x - 12).toDouble(), (bt2.gpe.y + 16).toDouble(), (bt2.gpe.x + 12).toDouble(), (bt2.gpe.y + 16).toDouble())
+            gc.strokeText("F"+rt.adr.toString(), (bt2.gpe.x - 18).toDouble(), (bt2.gpe.y + 18).toDouble())
         }
         for (crt in compRoutes.filter{ it -> it.btn1 == rtBtn.adr}) {
             val bt2 = PanelElement.getPeByAddress(crt.btn2)[0]
             gc.strokeText("2", (bt2.gpe.x - 4).toDouble(), (bt2.gpe.y + 4).toDouble())
+            //gc.fillRect((bt2.gpe.x - 12).toDouble(), (bt2.gpe.y + 16).toDouble(), (bt2.gpe.x + 12).toDouble(), (bt2.gpe.y + 16).toDouble())
+            gc.strokeText("F"+crt.adr.toString(), (bt2.gpe.x - 18).toDouble(), (bt2.gpe.y + 18).toDouble())
         }
     }
 
