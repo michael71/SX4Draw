@@ -237,7 +237,7 @@ object Utils {
                             "Konnte die aktuelle Version nicht von Github lesen!", "?")
                     newVersion <= Constants.versionNumber ->  Dialogs.buildInformationAlert(
                             "keine neue Version vorhanden", "",
-                                "Version ${Constants.versionNumber} ist aktuell", app)
+                                "Version ${Constants.versionNumber} ist aktuell")
                     else -> {
                         val title = "${Constants.versionNumber} ist nicht aktuell."
                         val msg = "Download der aktuellen Version $newVersion von: https://opensx.net/sx4 möglich "

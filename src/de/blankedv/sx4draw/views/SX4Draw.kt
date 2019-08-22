@@ -67,8 +67,7 @@ import de.blankedv.sx4draw.PanelElement.Companion.TRACK_WIDTH
 import de.blankedv.sx4draw.model.*
 import de.blankedv.sx4draw.util.Calc
 import javafx.collections.ObservableList
-import javafx.scene.web.WebView
-import kotlin.Exception
+import kotlin.system.exitProcess
 
 
 open class SX4Draw : Application() {
@@ -83,7 +82,8 @@ open class SX4Draw : Application() {
     // TODO  zusammengesetzte Fahrstrasse graphisch aufsetzen
     //      welche fahrstrassen gibt es? welche fehlen noch?
 
-    // TODO  weichen automatisch adressieren
+    // ?? Fahrplan zusammenklicken von "Bubble" zu "Bubble" (+Lok/V/Ri) ohne vorherige Fahrstrassendefinition ??
+
 
     private val lineGroup  = Group()
     private val draggedGroup = Group()
@@ -351,13 +351,13 @@ open class SX4Draw : Application() {
 
         primaryStage.setOnCloseRequest {
             saveOnExit(prefs, primaryStage)
-            System.exit(0)
+            exitProcess(0)   // i.e. System.exit(0)
         }
 
         if (Utils.isOtherInstanceRunning()) {
             Dialogs.buildErrorAlert("ERROR",
                     "eine andere Instance von SX4Draw läuft bereits!","Programm wird jetzt beendet.")
-            System.exit(0)
+            exitProcess(0)
         }
 
         status.text = getStatistics()
@@ -388,8 +388,8 @@ open class SX4Draw : Application() {
         val sep1 = Separator(Orientation.VERTICAL)
         val sep2 = Separator(Orientation.VERTICAL)
 
-        val btns = HBox(3.0)
-        btns.children.addAll(btnSelect, btnUnSelect, sep1, btnAddTrack, btnAddSensor, btnAddSensorUS,
+        val btnsBox = HBox(3.0)
+        btnsBox.children.addAll(btnSelect, btnUnSelect, sep1, btnAddTrack, btnAddSensor, btnAddSensorUS,
                 btnAddSignal, btnRouteBtn, btnAddRoute, btnAddCompRoute, sep2, btnUndo, btnDelete, btnMove)
 
         btnSelect.toggleGroup = toggleGroup
@@ -549,7 +549,7 @@ open class SX4Draw : Application() {
 
         }
 
-        return btns
+        return btnsBox
     }
 
     private fun enterSelectState() {
@@ -840,7 +840,7 @@ open class SX4Draw : Application() {
         howtoTimetableItem.setOnAction {
             println("howto Timetable clicked")
             Dialogs.buildInformationAlert("Wie erstelle ich einen Fahrplan?", "",
-                    "", this, howtoTimetable)
+                    "", howtoTimetable)
         }
         val infoItem = MenuItem("Version Info")
         val updateItem = MenuItem("Sind Updates verfügbar?")

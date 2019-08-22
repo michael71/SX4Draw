@@ -71,8 +71,14 @@ class TimetableTable internal constructor(primaryStage: Stage, private val app: 
         timetablesWindow.x = primaryStage.x + 250
         timetablesWindow.y = primaryStage.y + 200
 
-        btnAddTimetable.setOnAction { timetables.add(Timetable(INVALID_INT)) }
+        // btnAddTimetable.setOnAction { timetables.add(Timetable(INVALID_INT)) }
 
+        btnAddTimetable.setOnAction {
+            Dialogs.buildInformationAlert("Start Button","","selektieren")
+            // val startBtn = selectRouteBtn()
+
+
+        }
         show()
 
     }

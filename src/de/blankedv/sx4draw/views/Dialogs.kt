@@ -62,7 +62,7 @@ object Dialogs {
         }
     }
 
-    fun buildInformationAlert(title: String, header: String, msg: String, app: Application, img: ImageView? = null) {
+    fun buildInformationAlert(title: String, header: String, msg: String, img: ImageView? = null) {
         val alert = Alert(Alert.AlertType.INFORMATION)
         alert.contentText = msg
         alert.title = title
