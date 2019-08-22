@@ -99,6 +99,8 @@ open class SX4Draw : Application() {
     private var compRoutesTable: CompRoutesTable? = null
     private var tripsTable: TripsTable? = null
     private var timetableTable: TimetableTable? = null
+    private var currentTimeTable: Timetable? = null
+    private var currentTrip: Trip? = null
 
     private var line: Line? = null
 
@@ -123,6 +125,7 @@ open class SX4Draw : Application() {
     private val btnRouteBtn = ToggleButton()
     private val btnAddRoute = ToggleButton()
     private val btnAddCompRoute = ToggleButton()
+    private val btnAddTimeTable = ToggleButton()
     private val btnSelect = ToggleButton()
     private val btnUnSelect = Button()
     private val btnMove = ToggleButton()
@@ -131,8 +134,11 @@ open class SX4Draw : Application() {
 
     private val resLoc = "/de/blankedv/sx4draw/resources/"
 
+    private var dest = ArrayList<Int>()
+    private var currentTripStartBtn = INVALID_INT
+
     enum class GUIState {
-        ADD_TRACK, ADD_SENSOR, ADD_SENSOR_US, ADD_SIGNAL, ADD_ROUTEBTN, ADD_ROUTE, ADD_COMPROUTE, SELECT, MOVE
+        ADD_TRACK, ADD_SENSOR, ADD_SENSOR_US, ADD_SIGNAL, ADD_ROUTEBTN, ADD_ROUTE, ADD_COMPROUTE, ADD_TIMETABLE, SELECT, MOVE
     }
 
     override fun start(primaryStage: Stage) {
@@ -151,9 +157,9 @@ open class SX4Draw : Application() {
             if (me.button == MouseButton.PRIMARY) {
                 println("prim btn")
                 when (currentGUIState) {
-                    SX4Draw.GUIState.SELECT ->
+                    GUIState.SELECT ->
                         toggleSelectionPE(poi)
-                    SX4Draw.GUIState.MOVE -> {
+                    GUIState.MOVE -> {
                         moveStart.x = me.x.toInt()
                         moveStart.y = me.y.toInt()
                         println("moveStart")
@@ -183,7 +189,13 @@ open class SX4Draw : Application() {
                     }
                     currentRoute = null // reset
                     currentCompRoute = null
-                }
+                } else if (currentGUIState == GUIState.ADD_TIMETABLE) {
+                    // abbruch
+                    for (sel in panelElements) {
+                        sel.createShapeAndSetState(Constants.PEState.DEFAULT)
+                    }
+                    currentTimeTable = null // reset
+                    }
             }
         }
 
@@ -198,33 +210,34 @@ open class SX4Draw : Application() {
                 println("primary button")
                 val poiRast = IntPoint.toRaster(poi, getRasterValue())
                 when (currentGUIState) {
-                    SX4Draw.GUIState.ADD_TRACK -> line = startNewLine(start, TRACK_WIDTH)
-                    SX4Draw.GUIState.ADD_SIGNAL -> {
+                    GUIState.ADD_TRACK -> line = startNewLine(start, TRACK_WIDTH)
+                    GUIState.ADD_SIGNAL -> {
                         if (!isPanelElementAlreadyOnPoint(poiRast)) {
                             val pe = PanelElement(Signal(poiRast))
                             addNewPanelElement(pe)
                         }
                     }
-                    SX4Draw.GUIState.ADD_ROUTEBTN -> {
+                    GUIState.ADD_ROUTEBTN -> {
                         if (!isPanelElementAlreadyOnPoint(poiRast)) {
                             val pe = PanelElement(RouteButton(poiRast))
                             addNewPanelElement(pe)
                         }
                     }
-                    SX4Draw.GUIState.ADD_SENSOR_US -> {
+                    GUIState.ADD_SENSOR_US -> {
                         if (!isPanelElementAlreadyOnPoint(poiRast)) {
                             val pe = PanelElement(Sensor(poiRast))
                             addNewPanelElement(pe)
                         }
                     }
-                    SX4Draw.GUIState.ADD_ROUTE -> createRoute(poi)
-                    SX4Draw.GUIState.ADD_COMPROUTE -> createCompRoute(poi)
-                    SX4Draw.GUIState.ADD_SENSOR -> {
+                    GUIState.ADD_ROUTE -> createRoute(poi)
+                    GUIState.ADD_COMPROUTE -> createCompRoute(poi)
+                    GUIState.ADD_TIMETABLE -> createTimeTable(poi)
+                    GUIState.ADD_SENSOR -> {
                         line = startNewLine(start, SENSOR_WIDTH)
                         line!!.strokeDashArray.addAll(6.0, 12.0)
                         line!!.stroke = Color.YELLOW
                     }
-                    SX4Draw.GUIState.SELECT ->
+                    GUIState.SELECT ->
                         // TODO make selection where ROUTEB has higher prio than SENSOR has higher prio than TRACK
                         // avoiding use of extra keys for selection !!!
                         //if (me.isControlDown()) {
@@ -234,7 +247,7 @@ open class SX4Draw : Application() {
                         //} else {
                         toggleSelectionPE(poi)
 
-                    SX4Draw.GUIState.MOVE -> {
+                    GUIState.MOVE -> {
                         val ms = IntPoint.toRaster(poi, getRasterValue())
                         moveStart.x = ms.x
                         moveStart.y = ms.y
@@ -381,6 +394,7 @@ open class SX4Draw : Application() {
         val plusIcon4 = ImageView(Image(resLoc + "plus.png"))
         val plusIcon5 = ImageView(Image(resLoc + "plus.png"))
         val plusIcon6 = ImageView(Image(resLoc + "plus.png"))
+        val plusIcon7 = ImageView(Image(resLoc + "plus.png"))
         val delIcon = ImageView(Image(resLoc + "delete.png"))
         val moveIcon = ImageView(Image(resLoc + "move.png"))
         val undoIcon = ImageView(Image(resLoc + "undo.png"))
@@ -390,7 +404,7 @@ open class SX4Draw : Application() {
 
         val btnsBox = HBox(3.0)
         btnsBox.children.addAll(btnSelect, btnUnSelect, sep1, btnAddTrack, btnAddSensor, btnAddSensorUS,
-                btnAddSignal, btnRouteBtn, btnAddRoute, btnAddCompRoute, sep2, btnUndo, btnDelete, btnMove)
+                btnAddSignal, btnRouteBtn, btnAddRoute, /** btnAddCompRoute, **/ btnAddTimeTable, sep2, btnUndo, btnDelete, btnMove)
 
         btnSelect.toggleGroup = toggleGroup
         btnSelect.isSelected = true
@@ -500,6 +514,26 @@ open class SX4Draw : Application() {
                 alert.title = "Warnung"
                 alert.headerText = "Es sind keine oder nur wenige Adressen eingegeben"
                 alert.contentText = "Bitte Adressen definieren vor der Fahrstraßeneingabe!"
+                alert.showAndWait()
+                enterSelectState()
+            }
+        }
+
+        btnAddTimeTable.toggleGroup = toggleGroup
+        btnAddTimeTable.text = "Fahrplan"
+        btnAddTimeTable.graphic = plusIcon7
+        btnAddTimeTable.setOnAction {
+            if (PanelElement.addressesAvail()) {
+                currentGUIState = GUIState.ADD_TIMETABLE
+                canvas.cursor = Cursor.CLOSED_HAND
+                currentTimeTable = null
+                PanelElement.resetState()    // unselect all PE
+                redrawPanelElements()
+            } else {
+                val alert = Alert(AlertType.WARNING)
+                alert.title = "Warnung"
+                alert.headerText = "Es sind keine oder nur wenige Fahrstraßen eingegeben"
+                alert.contentText = "Bitte Fahrstraßen erzeugen vor Eingabe eines Fahrplans!"
                 alert.showAndWait()
                 enterSelectState()
             }
@@ -1184,6 +1218,81 @@ open class SX4Draw : Application() {
         }
     }
 
+    private fun createTimeTable(poi: IntPoint) {  // primaryStage: Stage) {
+        val rtBtn = getRouteBtn(poi)
+        if (currentTimeTable == null) {
+            // initialize new route
+            currentTimeTable = Timetable()
+            println("init new timetable with adr=" + currentTimeTable!!.adr)
+            if (rtBtn != null) {  // first button
+                currentTrip = Trip(Trip.getUnusedAddress())
+                val sensor = rtBtn.getSensor()    // TODO rework sensors check .... can it be done later ???
+                if (sensor == null) {
+                    println("no sensor at this point")
+                    currentTrip = null
+                    dest.clear()
+                    currentTripStartBtn = INVALID_INT
+                } else {
+                    currentTripStartBtn = rtBtn.gpe.getAddr()
+                    currentTrip!!.sens1 = sensor.getAddr()
+                    rtBtn.createShapeAndSetState(PEState.MARKED)
+                    redrawPanelElements()
+                    val rtb = rtBtn.gpe as RouteButton
+                    dest = dispRouteEndButtons(rtb)
+                    println("btn1=" + rtBtn.gpe.getAddr()+"  sens1="+currentTrip!!.sens1)
+                    //gc.strokeText("1", rtbtn.x - 4, rtbtn.y - YOFF + 4);
+                }
+            } else {
+                currentTrip = null // no routebtn at this point
+                dest.clear()
+                currentTripStartBtn = INVALID_INT
+            }
+        }  else {
+            // check if have hit one of the possible destinations
+            var validEndpoint = false
+            for (a in dest) {
+                if (rtBtn!!.gpe.getAddr() == a) {
+                    val endSensor = rtBtn.getSensor()
+                    if (endSensor == null) {
+                        println("no sensor at this point")
+                        return
+                    } else {
+                        currentTrip!!.sens2 = endSensor.getAddr()
+                        // find corresponding route
+                        for (rt in routes.filter{ it -> it.btn1 == currentTripStartBtn}) {
+                            if (rt.btn2 == a) {
+                                println("found a route!")
+                                showRoute(rt)
+                                // TODO add Loco etc
+                                // TODO add to timetables table
+                                return
+                            }
+                        }
+                    }
+                }
+            }
+            /*
+                currentRoute!!.btn2 = rtbtn.gpe.getAddr()
+                rtbtn.createShapeAndSetState(PEState.MARKED)
+                var crt = currentRoute
+                crt!!.uniqueAccessories()  // remove double turnout addresses
+                showRoute(crt)
+                println("btn2 =" + crt.btn2)
+                routes.add(crt.copy())  // add a new route from btn1 to btn2
+                routes.add(crt.reverseRoute())  // add reverse route also
+
+                val alert = Alert(AlertType.INFORMATION)
+                alert.title = "Fahrstraße " + currentRoute!!.adr
+                alert.headerText = null
+                alert.contentText = "Die Fahrstraße " + currentRoute!!.adr +" ist abgeschlossen."
+                alert.showAndWait()
+
+                resetPEStates()
+                redrawPanelElements()
+                currentRoute = null // reset
+            */
+        }
+    }
 
     private fun writeFile(stage: Stage, path: String): String? {
 
@@ -1334,10 +1443,13 @@ open class SX4Draw : Application() {
     }
 
     // mark end route button with a "2" and display route adr below
-    private fun dispRouteEndButtons(rtBtn : RouteButton) {
+    // returns a list of addresses with the "2" possible end buttons
+    private fun dispRouteEndButtons(rtBtn : RouteButton) : ArrayList<Int> {
+        val destinations = ArrayList<Int>()
         gc.strokeText("1", (rtBtn.x - 4).toDouble(), (rtBtn.y + 4).toDouble())
         for (rt in routes.filter{ it -> it.btn1 == rtBtn.adr}) {
             val bt2 = PanelElement.getPeByAddress(rt.btn2)[0]
+            destinations.add(bt2.gpe.getAddr())
             gc.strokeText("2", (bt2.gpe.x - 4).toDouble(), (bt2.gpe.y + 4).toDouble())
             //gc.fillRect((bt2.gpe.x - 12).toDouble(), (bt2.gpe.y + 16).toDouble(), (bt2.gpe.x + 12).toDouble(), (bt2.gpe.y + 16).toDouble())
             gc.strokeText("F"+rt.adr.toString(), (bt2.gpe.x - 18).toDouble(), (bt2.gpe.y + 18).toDouble())
@@ -1348,6 +1460,7 @@ open class SX4Draw : Application() {
             //gc.fillRect((bt2.gpe.x - 12).toDouble(), (bt2.gpe.y + 16).toDouble(), (bt2.gpe.x + 12).toDouble(), (bt2.gpe.y + 16).toDouble())
             gc.strokeText("F"+crt.adr.toString(), (bt2.gpe.x - 18).toDouble(), (bt2.gpe.y + 18).toDouble())
         }
+        return destinations
     }
 
     fun showRoute(rt: Route?) {

@@ -63,7 +63,7 @@ class Timetable(
         if (adr != INVALID_INT) return
 
         var a = Constants.ADDR0_TIMETABLE
-        for (tt in SX4Draw.timetables) {
+        for (tt in timetables) {
             if (tt.adr >= a) {
                 a = tt.adr + 1
             }

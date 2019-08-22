@@ -21,6 +21,8 @@ package de.blankedv.sx4draw.util
 import de.blankedv.sx4draw.model.Track
 import de.blankedv.sx4draw.model.Turnout
 import de.blankedv.sx4draw.model.IntPoint
+import de.blankedv.sx4draw.model.Sensor
+import kotlin.math.min
 
 
 object LinearMath {
@@ -211,5 +213,29 @@ object LinearMath {
         }
         //System.out.println("a=" + a + " b=" + b + " sgn=" + res);
         return res
+    }
+
+    fun pointOnSensor(p : IntPoint, s : Sensor) : Boolean {
+        // is the point p on the line defined by Sensor s ?
+        // makes only sense for "track type" sensors
+        val x1 = s.x
+        val y1 = s.y
+        val x2 = s.x2
+        val y2 = s.y2
+        if ((x2 == null) || (y2 == null)) {
+            return false
+        } else {
+            val xmin = Math.min(x1, x2)
+            val xmax = Math.max(x1, x2)
+            val ymin = Math.min(y1, y2)
+            val ymax = Math.max(y1, y2)
+            if ((p.x >= xmin) && (p.x <= xmax) && (p.y >= ymin) && p.y <= ymax) {
+                // TODO make more precise
+                return true
+            } else {
+                return false
+            }
+        }
+
     }
 }

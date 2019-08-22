@@ -23,7 +23,9 @@ import de.blankedv.sx4draw.Constants.INVALID_INT
 import de.blankedv.sx4draw.Constants.PEState
 import de.blankedv.sx4draw.Constants.PEState.*
 import de.blankedv.sx4draw.model.*
+import de.blankedv.sx4draw.util.LinearMath
 import de.blankedv.sx4draw.util.Utils
+import de.blankedv.sx4draw.views.SX4Draw
 import de.blankedv.sx4draw.views.SX4Draw.Companion.panelElements
 
 import java.util.ArrayList
@@ -168,6 +170,18 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
         } else {
             gpe.ord - other.gpe.ord
         }
+    }
+
+    // find a sensor which is "under" this Panel Element
+    fun getSensor() : Sensor? {
+        for (pe in SX4Draw.panelElements) {
+            if (pe.gpe is Sensor) {
+                if (LinearMath.pointOnSensor(IntPoint(gpe.x, gpe.y), pe.gpe as Sensor)) {
+                    return pe.gpe  as Sensor
+                }
+            }
+        }
+        return null
     }
 
     companion object {

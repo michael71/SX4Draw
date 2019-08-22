@@ -18,6 +18,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 package de.blankedv.sx4draw.model
 
 import de.blankedv.sx4draw.PanelElement
+import de.blankedv.sx4draw.util.LinearMath
+import de.blankedv.sx4draw.views.SX4Draw
 import javafx.util.Pair
 import java.util.Comparator
 
