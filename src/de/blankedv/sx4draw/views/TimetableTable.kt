@@ -53,7 +53,7 @@ class TimetableTable internal constructor(primaryStage: Stage, private val app: 
 
         val btnAddTimetable = Button("+ NEUER Fahrplan");
         timetablesTableScene = Scene(bp, 700.0, 300.0)
-        bp.top = btnAddTimetable
+        //bp.top = btnAddTimetable
         bp.center = tableView
 
         // New window (Stage)
@@ -75,9 +75,6 @@ class TimetableTable internal constructor(primaryStage: Stage, private val app: 
 
         btnAddTimetable.setOnAction {
             Dialogs.buildInformationAlert("Start Button","","selektieren")
-            // val startBtn = selectRouteBtn()
-
-
         }
         show()
 
@@ -102,6 +99,7 @@ class TimetableTable internal constructor(primaryStage: Stage, private val app: 
         val nameCol = TableColumn<Timetable, String>("Name/Kommentar")
         nameCol.prefWidthProperty().bind(TimetableTable.tableView.widthProperty().multiply(0.3));
 
+        /* no longer used
         val myStringIntConverter = object : StringConverter<Int>() {
             override fun toString(`object`: Int?): String {
                 return if (`object` == null) {
@@ -117,13 +115,12 @@ class TimetableTable internal constructor(primaryStage: Stage, private val app: 
                 }
 
             }
-        }
+        }        */
 
         tableView.columns.setAll(adrCol, tripCol, nameCol)
         tableView.isEditable = true
 
         tripCol.cellFactory = TextFieldTableCell.forTableColumn();
-        adrCol.cellFactory = TextFieldTableCell.forTableColumn(myStringIntConverter);
         nameCol.cellFactory = TextFieldTableCell.forTableColumn();
 
         tripCol.setOnEditCommit { event: TableColumn.CellEditEvent<Timetable, String> ->
@@ -166,9 +163,22 @@ class TimetableTable internal constructor(primaryStage: Stage, private val app: 
             val row = TableRow<Timetable>()
             val contextMenu = ContextMenu()
 
-            val newMenuItem = MenuItem("+ NEUER Fahrplan")
+            val newMenuItem = MenuItem("+ NEUER leerer Fahrplan")
             newMenuItem.onAction = EventHandler {
                 timetables.add(Timetable(INVALID_INT))
+            }
+
+            val editMenuItem = MenuItem("markierten Fahrplan editieren")
+            editMenuItem.onAction = EventHandler {
+                val ttSelected = row.item.copy()
+                Dialogs.buildInformationAlert("Fahrplan editieren","","ist noch nicht implementiert...")
+            }
+
+
+
+            val copyMenuItem = MenuItem("markierten Fahrplan kopieren")
+            copyMenuItem.onAction = EventHandler {
+                timetables.add(row.item.copy())
             }
 
             val removeMenuItem = MenuItem("markierten Fahrplan löschen")
@@ -176,12 +186,7 @@ class TimetableTable internal constructor(primaryStage: Stage, private val app: 
                 tableView.items.remove(row.item)
             }
 
-            val copyMenuItem = MenuItem("markierten Fahrplan kopieren")
-            copyMenuItem.onAction = EventHandler {
-                timetables.add(row.item.copy())
-            }
-
-            contextMenu.items.addAll(newMenuItem, removeMenuItem, copyMenuItem)
+            contextMenu.items.addAll(newMenuItem, editMenuItem, copyMenuItem, removeMenuItem)
             // Set context menu on row, but use a binding to make it only show for non-empty rows:
             row.contextMenuProperty().bind(
                     Bindings.`when`(row.emptyProperty())
@@ -194,8 +199,6 @@ class TimetableTable internal constructor(primaryStage: Stage, private val app: 
         adrCol.cellValueFactory = PropertyValueFactory("adr")
         tripCol.cellValueFactory = PropertyValueFactory("trip")
         nameCol.cellValueFactory = PropertyValueFactory("name")
-
-
 
         tableView.items = timetables
 

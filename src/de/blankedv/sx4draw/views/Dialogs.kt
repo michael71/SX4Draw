@@ -34,6 +34,9 @@ import javafx.scene.layout.Region
 import javafx.scene.Scene
 import javafx.scene.web.WebView
 import javafx.stage.Stage
+import java.io.File
+
+
 
 
 /**
@@ -81,14 +84,15 @@ object Dialogs {
         wvStage.initOwner(primStage)
 
         val mWebView = WebView()
-        val webEngine = mWebView.getEngine()
-        webEngine.load(javaClass.getResource("/docs/index.html").toExternalForm())
+        val webEngine = mWebView.engine
+
+        webEngine.load(javaClass.getResource("/de/blankedv/sx4draw/resources/docs/index.html").toExternalForm())
 
         val scene = Scene(mWebView /*root*/, 1200.0, 700.0)
-        wvStage.setTitle("Handbuch SX4Draw")
+        wvStage.title = "Handbuch SX4Draw"
 
         // Add  the Scene to the Stage
-        wvStage.setScene(scene)
+        wvStage.scene = scene
         // Display the Stage
         wvStage.show()
     }

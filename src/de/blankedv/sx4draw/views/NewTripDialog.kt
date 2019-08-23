@@ -75,25 +75,25 @@ object NewTripDialog {
         )
         cbLoco.selectionModel.selectFirst()
 
-        val routeAddresses = ArrayList<Int>()
-        // get all routes and comproutes
-        for (rt in routes) {
-            val a = rt.adr
-            if (!routeAddresses.contains(a)) {
-                routeAddresses.add(a)
+            val routeAddresses = ArrayList<Int>()
+            // get all routes and comproutes
+            for (rt in routes) {
+                val a = rt.adr
+                if (!routeAddresses.contains(a)) {
+                    routeAddresses.add(a)
+                }
             }
-        }
-        for (rt in compRoutes) {
-            val a = rt.adr
-            if (!routeAddresses.contains(a)) {
-                routeAddresses.add(a)
+            for (rt in compRoutes) {
+                val a = rt.adr
+                if (!routeAddresses.contains(a)) {
+                    routeAddresses.add(a)
+                }
             }
-        }
-        routeAddresses.sort()
-        val cbRoute = ChoiceBox(FXCollections.observableArrayList(
-                routeAddresses)
-        )
-        cbRoute.selectionModel.selectFirst()
+            routeAddresses.sort()
+            val cbRoute = ChoiceBox(FXCollections.observableArrayList(
+                    routeAddresses)
+            )
+            cbRoute.selectionModel.selectFirst()
 
 
         val dirs = ArrayList<Int>()
@@ -117,12 +117,16 @@ object NewTripDialog {
         grid.setPadding(Insets(20.0));
         grid.vgap = 20.0
         grid.hgap = 20.0
-        grid.add(Label("Fahrstr"), 0, 0)
+
+
+            grid.add(Label("Fahrstr"), 0, 0)
+            grid.add(cbRoute, 0, 1)
+
         grid.add(Label("Lok/Zug"), 1, 0)
         grid.add(Label("Richtung"), 2, 0)
         grid.add(Label("Geschw."), 3, 0)
 
-        grid.add(cbRoute, 0, 1)
+
         grid.add(cbLoco, 1, 1)
         grid.add(cbDir, 2, 1)
         grid.add(cbSpeed, 3, 1)
@@ -164,7 +168,9 @@ object NewTripDialog {
             val speed = cbSpeed.value
             val dir = cbDir.value
             val locoString = locoAddr.toString()+","+dir.toString()+","+speed.toString()
-            val routeAddr = cbRoute.selectionModel.selectedItem
+
+                val routeAddr = cbRoute.selectionModel.selectedItem
+
             val rt = Route.getByAddress(routeAddr)
             if (rt != null) {
                 val sens1 = rt.findSens1()
