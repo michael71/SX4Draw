@@ -26,6 +26,7 @@ import de.blankedv.sx4draw.model.*
 import de.blankedv.sx4draw.util.LinearMath
 import de.blankedv.sx4draw.util.Utils
 import de.blankedv.sx4draw.views.SX4Draw
+import de.blankedv.sx4draw.views.SX4Draw.Companion.layoutType
 import de.blankedv.sx4draw.views.SX4Draw.Companion.panelElements
 
 import java.util.ArrayList
@@ -143,13 +144,9 @@ class PanelElement : Comparator<PanelElement>, Comparable<PanelElement> {
             return   // don't draw invalid int
         }
         var sAddr: String
-        if (addr < LBMIN) {
-            gc.fill = Color.LIGHTBLUE
-            sAddr = (addr / 10).toString() + "." + addr % 10
-        } else {
-            gc.fill = Color.LIGHTSALMON
-            sAddr = "" + addr
-        }
+        gc.fill = Color.LIGHTSALMON
+        sAddr = "" + addr
+
         if (gpe.getAddr2() != INVALID_INT) sAddr += "+"
 
         gc.fillRect(gpe.x.toDouble(), gpe.y.toDouble() - 11.0, (8 * sAddr.length).toDouble(), 12.0)

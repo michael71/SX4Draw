@@ -18,12 +18,29 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 package de.blankedv.sx4draw.views
 
-import de.blankedv.sx4draw.*
-import de.blankedv.sx4draw.config.*
-import de.blankedv.sx4draw.util.*
-
+import de.blankedv.sx4draw.Constants
+import de.blankedv.sx4draw.Constants.DEBUG
+import de.blankedv.sx4draw.Constants.INVALID_INT
+import de.blankedv.sx4draw.Constants.PEState
+import de.blankedv.sx4draw.Constants.RASTER
+import de.blankedv.sx4draw.Constants.RECT_X
+import de.blankedv.sx4draw.Constants.RECT_Y
+import de.blankedv.sx4draw.Constants.progVersion
+import de.blankedv.sx4draw.GenericAddress
+import de.blankedv.sx4draw.PanelElement
+import de.blankedv.sx4draw.PanelElement.Companion.SENSOR_WIDTH
+import de.blankedv.sx4draw.PanelElement.Companion.TRACK_WIDTH
+import de.blankedv.sx4draw.config.LayoutConfig
+import de.blankedv.sx4draw.config.PanelConfig
+import de.blankedv.sx4draw.config.ReadConfig
+import de.blankedv.sx4draw.config.WriteConfig
+import de.blankedv.sx4draw.model.*
+import de.blankedv.sx4draw.util.Calc
+import de.blankedv.sx4draw.util.Utils
+import de.blankedv.sx4draw.util.ZoomableScrollPane
 import javafx.application.Application
 import javafx.collections.FXCollections
+import javafx.collections.ObservableList
 import javafx.event.EventHandler
 import javafx.geometry.Orientation
 import javafx.scene.Cursor
@@ -39,7 +56,10 @@ import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
 import javafx.scene.input.MouseButton
 import javafx.scene.input.MouseEvent
-import javafx.scene.layout.*
+import javafx.scene.layout.AnchorPane
+import javafx.scene.layout.HBox
+import javafx.scene.layout.Priority
+import javafx.scene.layout.VBox
 import javafx.scene.paint.Color
 import javafx.scene.shape.Line
 import javafx.scene.shape.StrokeLineCap
@@ -47,26 +67,10 @@ import javafx.stage.FileChooser
 import javafx.stage.FileChooser.ExtensionFilter
 import javafx.stage.Stage
 import javafx.util.Pair
-
 import java.io.File
 import java.text.SimpleDateFormat
-import java.util.ArrayList
-import java.util.Date
+import java.util.*
 import java.util.prefs.Preferences
-
-import de.blankedv.sx4draw.Constants.INVALID_INT
-import de.blankedv.sx4draw.Constants.DEBUG
-import de.blankedv.sx4draw.Constants.RASTER
-import de.blankedv.sx4draw.Constants.RECT_X
-import de.blankedv.sx4draw.Constants.RECT_Y
-import de.blankedv.sx4draw.Constants.PEState
-import de.blankedv.sx4draw.Constants.progVersion
-
-import de.blankedv.sx4draw.PanelElement.Companion.SENSOR_WIDTH
-import de.blankedv.sx4draw.PanelElement.Companion.TRACK_WIDTH
-import de.blankedv.sx4draw.model.*
-import de.blankedv.sx4draw.util.Calc
-import javafx.collections.ObservableList
 import kotlin.system.exitProcess
 
 
@@ -106,6 +110,7 @@ open class SX4Draw : Application() {
 
     private val dispAddresses = CheckMenuItem("Adressen anzeigen")
     private val rasterOn = CheckMenuItem("Raster")
+
     private val anchorPane = AnchorPane()
     private val scPane = ZoomableScrollPane(anchorPane)
     private val status = Label("status")
@@ -142,7 +147,7 @@ open class SX4Draw : Application() {
     }
 
     override fun start(primaryStage: Stage) {
-        primaryStage.title = "Panel XML File Creator (Name: ???)"
+        primaryStage.title = "Panel XML File Creator (Name: ???, Type: ???)"
         primaryStage.icons.add(Image(resLoc +"sx4_draw_ico64.png"))
 
         val prefs = Preferences.userNodeForPackage(this.javaClass)
@@ -628,6 +633,12 @@ open class SX4Draw : Application() {
 
         val menuOptions = Menu("Optionen")
         val setName = MenuItem("Set Panel-Name")
+        val setType = MenuItem("Set LayoutType (SX/DCC)")
+
+        val choices = ArrayList<String>()
+        choices.add("SX")
+        choices.add("DCC")
+
 
         val scale200 = MenuItem("Scale 200%")
         val scale50 = MenuItem("Scale 50%")
@@ -651,7 +662,7 @@ open class SX4Draw : Application() {
         menuFile.items.addAll(openItem, saveItem, exitItem)
         menuWindows.items.addAll(openRoutingTable, openCompRoutesTable, openTripsTable,
                 openTimetableTable, openLocoTable, SeparatorMenuItem(), openAllTables)
-        menuOptions.items.addAll(setName, dispAddresses, rasterOn, zoomIn, zoomOut) //, showMousePos) //, showScrollBars)
+        menuOptions.items.addAll(setName, setType, dispAddresses, rasterOn, zoomIn, zoomOut) //, showMousePos) //, showScrollBars)
         menuCalc.items.addAll(cTurnouts, cNormPositions, scale200, scale50)
         menuExtra.items.addAll(cSearch)
 
@@ -674,7 +685,7 @@ open class SX4Draw : Application() {
             if (lastPath != null && !lastPath.isEmpty()) {
                 prefs.put("directory", lastPath)
             }
-            stage.title = "Create Panel Description (Name: $panelName) File: $currentFileName"
+            updateTitle(stage)
         }
 
         openItem.setOnAction {
@@ -683,7 +694,7 @@ open class SX4Draw : Application() {
             if (lastPath != null && !lastPath.isEmpty()) {
                 prefs.put("directory", lastPath)
             }
-            stage.title = "Create Panel Description (Name: $panelName) File: $currentFileName"
+            updateTitle(stage)
         }
 
         setName.setOnAction {
@@ -695,7 +706,26 @@ open class SX4Draw : Application() {
             val result = getName.showAndWait()
             result.ifPresent { name ->
                 panelName = name
-                stage.title = "Create Panel Description (Name: $panelName)"
+                if (currentFileName.isEmpty()) {
+                    currentFileName = "panel-"+panelName+".xml"
+                }
+                updateTitle(stage)
+            }
+
+        }
+
+        setType.setOnAction {
+            println("set Type (SX vs. DCC")
+            val dialog = ChoiceDialog("Layout Typ", choices)
+            dialog.title = "Typ DCC oder SX?"
+            dialog.headerText = null
+            dialog.contentText = "Bitte auswählen:"
+
+            val result = dialog.showAndWait()
+
+            result.ifPresent { type ->
+                layoutType = type
+                updateTitle(stage)
             }
 
         }
@@ -728,6 +758,7 @@ open class SX4Draw : Application() {
             println("Zoom Out")
             scPane.zoomOut()
         }
+
 
         dispAddresses.setOnAction {
             println("display addresses = " + dispAddresses.isSelected)
@@ -1307,7 +1338,7 @@ open class SX4Draw : Application() {
             fileChooser.initialDirectory = file
         }
         if (currentFileName.isEmpty()) {
-            fileChooser.initialFileName = "panel.xml"
+            fileChooser.initialFileName = "panel-"+panelName+".xml"
         } else {
             fileChooser.initialFileName = currentFileName
         }
@@ -1341,7 +1372,7 @@ open class SX4Draw : Application() {
                 ArrayList(compRoutes),
                 ArrayList(trips), ArrayList(timetables))
         val shortFN = File(fn).name
-        val layoutConfig = LayoutConfig(shortFN, version, panelConfig)
+        val layoutConfig =  LayoutConfig(shortFN, version, layoutType, panelConfig)
         WriteConfig.toXML(fn, layoutConfig)
     }
 
@@ -1371,6 +1402,7 @@ open class SX4Draw : Application() {
             if (layoutConfig != null) {
                 currentFileName = selectedFile.name
                 val version = layoutConfig.version
+                layoutType = layoutConfig.type
                 System.out.println("filename=$currentFileName version=$version")
                 val panelConfig = layoutConfig.getPC0()   // first PanelConfig
                 if (panelConfig != null) {
@@ -1587,6 +1619,10 @@ open class SX4Draw : Application() {
         return s
     }
 
+    private fun updateTitle(st : Stage) {
+        st.title = "Create Panel (Name: $panelName Type: $layoutType) File: $currentFileName"
+    }
+
     companion object {
 
         var locos: ObservableList<Loco> = FXCollections.observableArrayList<Loco>()
@@ -1598,6 +1634,7 @@ open class SX4Draw : Application() {
 
         var lastPE: PanelElement? = null
         var panelName = ""
+        var layoutType = "?"
         var lastSignalAddr : Int = 0
         var lastSignalState = 0
 

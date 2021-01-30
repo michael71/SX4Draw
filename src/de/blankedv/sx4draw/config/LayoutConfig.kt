@@ -33,6 +33,9 @@ class /**/ LayoutConfig {
     var filename = ""
 
     @get:XmlAttribute
+    var type: String = "?"
+
+    @get:XmlAttribute
     var version = "0001"
 
     @XmlElementWrapper(name = "panels")
@@ -41,11 +44,12 @@ class /**/ LayoutConfig {
 
     constructor()
 
-    constructor(fn: String, ve: String, pc: PanelConfig) {
+    constructor(fn: String, ve: String, ty: String, pc: PanelConfig) {
         this.filename = fn
         panel.add(pc)
 
         this.version = ve
+        this.type = ty
     }
 
     fun getPC0(): PanelConfig? {

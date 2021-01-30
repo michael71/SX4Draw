@@ -22,6 +22,8 @@ import de.blankedv.sx4draw.Constants.LBMAX
 import de.blankedv.sx4draw.Constants.LBMIN
 import de.blankedv.sx4draw.Constants.SXMAX_USED
 import de.blankedv.sx4draw.Constants.SXMIN_USED
+import de.blankedv.sx4draw.Constants.DCCMIN
+import de.blankedv.sx4draw.Constants.DCCMAX
 import de.blankedv.sx4draw.GenericAddress
 import de.blankedv.sx4draw.PanelElement
 import de.blankedv.sx4draw.model.Sensor
@@ -68,13 +70,14 @@ object AddressDialog {
     private var resultA = GenericAddress(0)
     private const val SX = "Typ: SX Adresse"
     private const val VIRT = "Typ: virtuelle Adr"
+    private const val DCC = "Typ: DCC Adr oder virtuell"
 
     // select orientation (ONLY for SIGNAL)
     private val choiceBoxOrient = ChoiceBox(FXCollections.observableArrayList(
             "0°", "45°", "90°", "135°", "180°", "225°", "270°", "315°")
     )
     private val choiceAddressType = ChoiceBox(FXCollections.observableArrayList(
-            SX, VIRT)
+            SX, VIRT, DCC)
     )
 
     fun open(pe: PanelElement, primaryStage: Stage, genA: GenericAddress): GenericAddress {
@@ -257,40 +260,8 @@ object AddressDialog {
 
         calcAddressFromSpinners()
 
-        if (choiceAddressType.value == SX) {
-            // choose a valid sx address
 
-            if (resultA.addr < SXMIN_USED) {
-                spinner1000.valueFactory.value = 0
-                spinner100.valueFactory.value = 0
-                spinner10.valueFactory.value = 1
-                spinner1.valueFactory.value = 1
-            } else if (resultA.addr > SXMAX_USED) {
-                spinner1000.valueFactory.value = 1
-                spinner100.valueFactory.value = 0
-                spinner10.valueFactory.value = 6
-                spinner1.valueFactory.value = 8
-            } else if (spinner1.value == 9) {
-                spinner1.valueFactory.value = 8
-            } else if (spinner1.value == 0) {
-                spinner1.valueFactory.value = 1
-            }
-
-        } else { // virtual address
-            if (resultA.addr < LBMIN) {
-                spinner1000.valueFactory.value = 1
-                spinner100.valueFactory.value = 2
-                spinner10.valueFactory.value = 0
-                spinner1.valueFactory.value = 0
-            } else if (resultA.addr > LBMAX) {
-                spinner1000.valueFactory.value = 9
-                spinner100.valueFactory.value = 9
-                spinner10.valueFactory.value = 9
-                spinner1.valueFactory.value = 9
-            }
-        }
-        calcAddressFromSpinners()    // recalc after spinners may have been adjusted
-
+        checkPlausibility()
 
         // get secondary address, if cbSec is selected
         if (cbSec.isSelected) {
@@ -305,4 +276,7 @@ object AddressDialog {
 
     }
 
+    private fun checkPlausibility() {
+        // TODO check addresses for plausibility (depending on type of layout SX/DCC)
+    }
 }

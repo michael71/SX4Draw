@@ -23,14 +23,17 @@ package de.blankedv.sx4draw
 
 object Constants {
 
-    const val versionNumber = 0.70
-    private const val versionDate = "22 Aug 2019"
+    const val versionNumber = 0.80
+    private const val versionDate = "30 Jan 2021"
     const val progVersion = "$versionNumber - $versionDate"
 
+    // address ranges - used in plausability checks
     const val SXMIN_USED = 11
     const val SXMAX_USED = 1068 // max sx address used (106, bit 8)
     const val LBMIN = 1200  // minimum virtual address
     const val LBMAX = 9999
+    const val DCCMIN = 1   // min and max addresses for DCC accessories
+    const val DCCMAX = 2048
 
     const val INVALID_INT = -1
     const val DEBUG = true
