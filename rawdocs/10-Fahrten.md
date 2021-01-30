@@ -1,4 +1,7 @@
 # SX4Draw - Fahrten
+
+**NICHT MEHR GANZ AKTUELL ! Die Fahrten können jetzt implizit erzeugt werden bei der Fahrplan-Generierung, müssen also nicht mehr einzeln angelegt werden.**
+
 Fahrten (Zugfahrten) sind die Kombination aus einer Fahrstraße und einer Lok (mit Richtung und Geschwindigkeit) – durch 
 
 ![](img18.png)

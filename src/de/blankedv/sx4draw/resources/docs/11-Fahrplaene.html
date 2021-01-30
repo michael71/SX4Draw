@@ -467,24 +467,38 @@
     <article id="main" class="content">
       <h1>SX4Draw - Fahrpläne</h1>
 <p>Fahrpläne sind eine Abfolge von Fahrten, ein “Name” dient zur leichteren Identifizierung.</p>
-<p><img src="img22a.png" alt=""></p>
-<p>Sie können im SX4 Programm einen Fahrplan (der im panel.xml File enthalten sein muss) starten – dann
+<p>Eine Bemerkung: natürlich müssen die Fahrten so kombiniert werden,
+dass bei jeder Fahrt die <strong>richtige</strong> Lok auf dem <strong>Anfangssensor</strong> der Fahrstraße steht!</p>
+<p>Sie können im SX4 Programm einen Fahrplan (der im panel.xml File enthalten sein muss) automatisch ablaufen lassen – dann
 werden die Fahrten in der gespeicherten  Reihenfolge ausgeführt – vorausgesetzt, auf den Start-Sensoren
 der jeweiligen Fahrstraße steht jeweils ein Zug (sonst weiß das Programm nicht, welche Lok es beschleunigen
 oder abbremsen soll).</p>
-<p>Hier eine Übersicht zur Entstehung eines <strong>Fahrplans</strong>:</p>
+<p>Wichtig: zunächst müssen die <strong>Fahrstraßen</strong> erstellt worden sein!</p>
+<p>Mit dem Button <strong>“+ Fahrplan”</strong> kann ein neuer Fahrplan erstellt werden.</p>
 <ol>
 <li>
-<p>zunächst müssen die <strong>Fahrstraßen</strong> erstellt werden</p>
+<p>zunächst wird ein Name für den neuen Fahrplan erfragt</p>
 </li>
 <li>
-<p>kombiniert mit einer Lok(Zug)-Info(Adresse, Richtung und Geschwindigkeit) entsteht eine <strong>Fahrt</strong></p>
+<p>dann wird der “Start-Button” angeklickt (und dann mit “1” markiert)</p>
 </li>
 <li>
-<p>eine Liste von Fahrten ergibt dann einen <strong>Fahrplan</strong> - natürlich müssen die Fahrten so kombiniert werden,
-dass bei jeder Fahrt die <strong>richtige</strong> Lok auf dem Anfangssensor der Fahrt steht!</p>
+<p>daraufhin werden die möglichen Ziele (Ende der Fahrstraße) mit “2” markiert</p>
+</li>
+<li>
+<p>nach Auswahl des Ziels wird die gewählte Fahrstrasse angezeigt</p>
+</li>
+<li>
+<p>die zu startende Lok (bzw Zug) mit Adresse, Richtung und Geschwindigkeit muss gewählt werden</p>
+</li>
+<li>
+<p>dann kann der Fahrplan abgeschlossen werden - oder es wird eine weitere Fahrt hinzugefügt (-&gt; weiter bei Punkt 2)</p>
 </li>
 </ol>
+<p>Der erzeugte Fahrplan (und die darin enthaltenen Fahrten) werden dann mit dem nächsten “Panel abspeichern”
+im panel.xml abgespeichert.</p>
+<p>Tabellarisch sehen Fahrpläne wie folgt aus:</p>
+<p><img src="img22a.png" alt=""></p>
 <p><img src="img22.png" alt=""></p>
 <p>-&gt; Weiter zu <a href="12-Select.html">Select</a></p>
 <p>-&gt; Zurück zum <a href="index.html">Index</a></p>

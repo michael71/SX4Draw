@@ -42,9 +42,9 @@ import javafx.scene.control.*
  *
  * @author mblank
  */
-object NewTripDialog {
+object NewTripDialogFixedRoute {
 
-    internal fun open(primaryStage: Stage): Trip {
+    internal fun open(primaryStage: Stage, rtAddress : Int): Trip {
 
         var result = Trip()
         val addr = Trip.getUnusedAddress()
@@ -75,27 +75,6 @@ object NewTripDialog {
         )
         cbLoco.selectionModel.selectFirst()
 
-            val routeAddresses = ArrayList<Int>()
-            // get all routes and comproutes
-            for (rt in routes) {
-                val a = rt.adr
-                if (!routeAddresses.contains(a)) {
-                    routeAddresses.add(a)
-                }
-            }
-            for (rt in compRoutes) {
-                val a = rt.adr
-                if (!routeAddresses.contains(a)) {
-                    routeAddresses.add(a)
-                }
-            }
-            routeAddresses.sort()
-            val cbRoute = ChoiceBox(FXCollections.observableArrayList(
-                    routeAddresses)
-            )
-            cbRoute.selectionModel.selectFirst()
-
-
         val dirs = ArrayList<Int>()
         dirs.add(0) ; dirs.add(1)
         val cbDir = ChoiceBox(FXCollections.observableArrayList(
@@ -114,38 +93,31 @@ object NewTripDialog {
         lblLoco.alignment = Pos.CENTER
 
         val grid = GridPane()
-        grid.setPadding(Insets(20.0));
+        grid.setPadding(Insets(10.0));
         grid.vgap = 20.0
         grid.hgap = 20.0
 
-
-            grid.add(Label("Fahrstr"), 0, 0)
-            grid.add(cbRoute, 0, 1)
-
-        grid.add(Label("Lok/Zug"), 1, 0)
-        grid.add(Label("Richtung"), 2, 0)
-        grid.add(Label("Geschw."), 3, 0)
+        grid.add(Label("Lok/Zug"), 0, 0)
+        grid.add(Label("Richtung"), 1, 0)
+        grid.add(Label("Geschw."), 2, 0)
 
 
-        grid.add(cbLoco, 1, 1)
-        grid.add(cbDir, 2, 1)
-        grid.add(cbSpeed, 3, 1)
+        grid.add(cbLoco, 0, 1)
+        grid.add(cbDir, 1, 1)
+        grid.add(cbSpeed, 2, 1)
 
 
         val col1 = ColumnConstraints()
-        col1.percentWidth = 25.0
+        col1.percentWidth = 33.3
         col1.halignment = HPos.CENTER
         val col2 = ColumnConstraints()
-        col2.percentWidth = 25.0
+        col2.percentWidth = 33.3
         col2.halignment = HPos.CENTER
         val col3 = ColumnConstraints()
-        col3.percentWidth = 25.0
+        col3.percentWidth = 33.3
         col3.halignment = HPos.CENTER
-        val col4 = ColumnConstraints()
-        col4.percentWidth = 25.0
-        col4.halignment = HPos.CENTER
 
-        grid.columnConstraints.addAll(col1, col2, col3, col4)
+        grid.columnConstraints.addAll(col1, col2, col3)
 
         GridPane.setMargin(grid, Insets(5.0, 5.0, 5.0, 5.0))
 
@@ -153,11 +125,11 @@ object NewTripDialog {
 
         val btnSave = Button("  OK  ")
 
-        grid.add(btnCancel, 1, 3)
+        grid.add(btnCancel, 0, 3)
         grid.add(btnSave, 2, 3)
         //GridPane.setMargin(btnCancel, new Insets(5, 5, 5, 5));
 
-        val secondScene = Scene(grid, 400.0, 200.0)
+        val secondScene = Scene(grid, 300.0, 200.0)
         // New window (Stage)
         val newWindow = Stage()
         btnCancel.setOnAction {
@@ -169,20 +141,18 @@ object NewTripDialog {
             val dir = cbDir.value
             val locoString = locoAddr.toString()+","+dir.toString()+","+speed.toString()
 
-                val routeAddr = cbRoute.selectionModel.selectedItem
-
-            val rt = Route.getByAddress(routeAddr)
+            val rt = Route.getByAddress(rtAddress)
             if (rt != null) {
                 val sens1 = rt.findSens1()
                 val sens2 = rt.findSens2()
-                result = Trip(addr, routeAddr, sens1, sens2,
+                result = Trip(addr, rtAddress, sens1, sens2,
                         startdelay = 1000, stopdelay = 1000, loco = locoString)
             } else {
-                val crt = CompRoute.getByAddress(routeAddr)
+                val crt = CompRoute.getByAddress(rtAddress)
                 if (crt != null) {
                     val sens1 : Int = crt.getStartSensor()
                     val sens2 = crt.getEndSensor()
-                    result = Trip(addr, routeAddr, sens1, sens2,
+                    result = Trip(addr, rtAddress, sens1, sens2,
                             startdelay = 1000, stopdelay = 1000, loco = locoString)
                 } else {
                     Dialogs.buildErrorAlert("ERROR",
@@ -192,7 +162,7 @@ object NewTripDialog {
 
             newWindow.close()
         }
-        newWindow.title = "neue Fahrt erzeugen"
+        newWindow.title = "Lok/Zug auswählen"
         newWindow.scene = secondScene
 
         // Specifies the modality for new window.
@@ -206,7 +176,6 @@ object NewTripDialog {
         newWindow.y = primaryStage.y + 100
 
         newWindow.showAndWait()
-
 
         return result
     }
